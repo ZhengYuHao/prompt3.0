@@ -1,30 +1,28 @@
 """
 S.E.D.E Framework - Step 2: 实体抽取与变量定义 (Entity Extraction & Variable Definition)
 充当编译器前端的词法分析角色,将自然语言中的常量与变量分离
+版本: 2.0
 """
 
 import json
 import re
+import time
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, asdict
 from enum import Enum
 from collections import defaultdict
 from logger import info, warning, error, debug, setup_logger
+from llm_client import UnifiedLLMClient, create_llm_client
+from data_models import (
+    DataType, VariableMeta, Prompt10Result, Prompt20Result,
+    create_prompt20_result, generate_id, get_timestamp
+)
 
 # ========== 配置日志系统 ==========
 logger = setup_logger("prompt3.0.step2")
 
 
-# ========== 数据类型定义 ==========
-class DataType(Enum):
-    """允许的数据类型白名单"""
-    STRING = "String"
-    INTEGER = "Integer"
-    BOOLEAN = "Boolean"
-    LIST = "List"
-    ENUM = "Enum"
-
-
+# ========== 兼容性数据结构（保留旧接口） ==========
 @dataclass
 class VariableConstraints:
     """变量约束条件"""
@@ -35,69 +33,51 @@ class VariableConstraints:
 
 
 @dataclass
-class VariableMeta:
-    """变量元数据"""
-    name: str  # 变量名 (英文, snake_case)
-    original_text: str  # 原文中的精确片段
-    value: Any  # 提取出的具体值
-    data_type: str  # 数据类型
-    start_index: int  # 在原文中的起始位置
-    end_index: int  # 在原文中的结束位置
-    constraints: Optional[VariableConstraints] = None
-    source_context: str = "Prompt 1.0"
-
-
-@dataclass
 class PromptStructure:
-    """Prompt 2.0 结构化输出"""
+    """Prompt 2.0 结构化输出（兼容旧接口）"""
     template_text: str  # 带 {{variable}} 占位符的模板
     variable_registry: List[Dict]  # 变量注册表
     original_text: str  # 原始文本
     extraction_log: List[str]  # 提取日志
 
 
-# ========== LLM 接口层 ==========
+# ========== LLM 实体提取器 ==========
 class LLMEntityExtractor:
-    """LLM 实体提取接口 (语义扫描层)"""
+    """LLM 实体提取接口 (语义扫描层) - 使用统一LLM客户端"""
     
-    def __init__(self, model_name: str = "gpt-4"):
-        self.model_name = model_name
-        self.system_prompt = """你是一个实体抽取专家。你的任务是从文本中识别需要动态调整的"变量"。
+    def __init__(
+        self,
+        llm_client: Optional[UnifiedLLMClient] = None,
+        use_mock: bool = False
+    ):
+        """
+        初始化实体提取器
+        
+        Args:
+            llm_client: 统一LLM客户端实例
+            use_mock: 是否使用模拟模式
+        """
+        self.llm = llm_client or create_llm_client(use_mock=use_mock)
+        self.use_mock = use_mock
 
-严格规则:
-1. 只输出 JSON 格式,不要有任何其他文字
-2. 必须原样返回原文片段,严禁同义词替换
-3. 必须返回精确的 start_index 和 end_index
-4. 数据类型仅限: String, Integer, Boolean, List, Enum
-
-输出格式:
-[
-  {
-    "name": "变量英文名(snake_case)",
-    "original_text": "原文精确片段",
-    "start_index": 起始位置,
-    "end_index": 结束位置,
-    "type": "数据类型",
-    "value": "当前值"
-  }
-]
-
-识别原则:
-- 数字、时间、人名、专有名词 -> 变量
-- 通用描述、固定格式文本 -> 常量
-- 优先识别最长匹配项"""
-
-    def extract(self, text: str) -> str:
+    def extract(self, text: str) -> List[Dict]:
         """
         调用 LLM 进行实体提取
-        实际生产环境应使用 OpenAI Function Calling 或 Claude 的 Structured Output
+        
+        Args:
+            text: 待抽取文本
+            
+        Returns:
+            实体列表
         """
-        # 这里是模拟实现,实际应调用真实 LLM API
-        return self._mock_llm_call(text)
+        if self.use_mock:
+            return self._mock_extract(text)
+        
+        # 使用统一客户端的实体抽取功能
+        return self.llm.extract_entities(text)
     
-    def _mock_llm_call(self, text: str) -> str:
-        """模拟 LLM 返回 (用于演示)"""
-        # 智能识别常见模式
+    def _mock_extract(self, text: str) -> List[Dict]:
+        """模拟实体抽取（用于测试）"""
         mock_entities = []
         
         # 识别数字+单位模式 (如 "3年", "2周")
@@ -125,7 +105,7 @@ class LLMEntityExtractor:
                     "value": term
                 })
         
-        return json.dumps(mock_entities, ensure_ascii=False)
+        return mock_entities
 
 
 # ========== 幻觉防火墙 ==========
@@ -301,12 +281,73 @@ class EntityConflictResolver:
 class PromptStructurizer:
     """Prompt 结构化处理引擎 (主控制器)"""
     
-    def __init__(self, llm_extractor: Optional[LLMEntityExtractor] = None):
-        self.llm_extractor = llm_extractor or LLMEntityExtractor()
+    def __init__(
+        self,
+        llm_client: Optional[UnifiedLLMClient] = None,
+        use_mock: bool = False
+    ):
+        """
+        初始化结构化处理引擎
+        
+        Args:
+            llm_client: 统一LLM客户端实例
+            use_mock: 是否使用模拟模式
+        """
+        self.llm_extractor = LLMEntityExtractor(
+            llm_client=llm_client,
+            use_mock=use_mock
+        )
         self.firewall = HallucinationFirewall()
         self.type_cleaner = TypeCleaner()
         self.conflict_resolver = EntityConflictResolver()
         self.extraction_log = []
+        self.use_mock = use_mock
+    
+    def process_from_prompt10(self, prompt10_result: Prompt10Result) -> Prompt20Result:
+        """
+        从 Prompt 1.0 结果进行处理
+        
+        Args:
+            prompt10_result: Prompt 1.0 的处理结果
+            
+        Returns:
+            Prompt20Result: Prompt 2.0 结构化结果
+        """
+        start_time = time.time()
+        
+        # 使用 Prompt 1.0 的处理后文本
+        clean_text = prompt10_result.processed_text
+        
+        # 调用核心处理流程
+        structure = self.process(clean_text)
+        
+        # 构建 VariableMeta 列表
+        variables = [
+            VariableMeta(
+                name=reg["variable"],
+                original_text=reg["original_text"],
+                value=reg["value"],
+                data_type=reg["type"],
+                start_index=0,  # 简化处理
+                end_index=len(reg["original_text"]),
+                source_context=reg.get("source_context", "Prompt 1.0")
+            )
+            for reg in structure.variable_registry
+        ]
+        
+        processing_time_ms = int((time.time() - start_time) * 1000)
+        
+        return Prompt20Result(
+            id=generate_id(),
+            timestamp=get_timestamp(),
+            source_prompt10_id=prompt10_result.id,
+            original_text=prompt10_result.processed_text,
+            template_text=structure.template_text,
+            variables=variables,
+            variable_registry=structure.variable_registry,
+            extraction_log=structure.extraction_log,
+            processing_time_ms=processing_time_ms
+        )
     
     def process(self, clean_text: str) -> PromptStructure:
         """
@@ -318,8 +359,10 @@ class PromptStructurizer:
         self.extraction_log = []
         
         # ===== 阶段 2.1: 语义扫描与实体定位 (LLM-Layer) =====
-        llm_response = self.llm_extractor.extract(clean_text)
-        raw_entities = json.loads(llm_response)
+        raw_entities = self.llm_extractor.extract(clean_text)
+        # 兼容处理：确保是列表
+        if isinstance(raw_entities, str):
+            raw_entities = json.loads(raw_entities)
         self._log(f"LLM 识别到 {len(raw_entities)} 个候选实体")
         
         # ===== 阶段 2.2: 幻觉防火墙与存在性校验 (Code-Layer) =====
@@ -431,10 +474,10 @@ def main():
     info("=" * 60)
     info(f"\n【输入 - Prompt 1.0】:\n{input_text}\n")
     
-    # 创建处理器
-    structurizer = PromptStructurizer()
+    # 创建处理器（使用模拟模式）
+    structurizer = PromptStructurizer(use_mock=True)
     
-    # 执行处理
+    # 方式1: 直接处理文本
     result = structurizer.process(input_text)
     
     # 输出结果
@@ -453,6 +496,31 @@ def main():
     info("=" * 60)
     for log in result.extraction_log:
         info(f"  {log}")
+    
+    # 方式2: 从 Prompt10Result 处理
+    info("\n\n" + "=" * 60)
+    info("【演示: 从 Prompt10Result 处理】")
+    info("=" * 60)
+    
+    # 模拟一个 Prompt10Result
+    mock_prompt10 = Prompt10Result(
+        id="test123",
+        timestamp=get_timestamp(),
+        mode="dictionary",
+        original_text="帮我搞个RAG应用",
+        processed_text=input_text,  # 使用已处理文本
+        steps=[],
+        terminology_changes={},
+        status="success",
+        ambiguity_detected=False
+    )
+    
+    prompt20_result = structurizer.process_from_prompt10(mock_prompt10)
+    
+    info(f"\n来源 Prompt 1.0 ID: {prompt20_result.source_prompt10_id}")
+    info(f"生成 Prompt 2.0 ID: {prompt20_result.id}")
+    info(f"模板: {prompt20_result.template_text}")
+    info(f"变量数量: {len(prompt20_result.variables)}")
     
     info("\n" + "=" * 60)
     info("【验证: 模板回填】:")

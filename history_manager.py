@@ -1,19 +1,20 @@
 """
 处理历史存储与对比展示模块
 用于持久化存储每次处理的结果，并提供清晰的对比展示
+支持完整流水线追踪
 """
 
 import json
 import os
 from datetime import datetime
-from typing import Dict, List, Optional
-from dataclasses import dataclass, asdict
+from typing import Dict, List, Optional, Any
+from dataclasses import dataclass, asdict, field
 from logger import info, warning, error
 
 
 @dataclass
 class ProcessingHistory:
-    """单次处理历史记录"""
+    """单次处理历史记录（兼容旧格式）"""
     timestamp: str  # 处理时间戳
     original_text: str  # 原始输入
     processed_text: str  # 处理后文本
@@ -24,6 +25,34 @@ class ProcessingHistory:
     ambiguity_detected: bool  # 是否检测到歧义
     success: bool  # 是否成功处理（无歧义）
     processing_time_ms: Optional[int] = None  # 处理耗时（毫秒）
+
+
+@dataclass
+class PipelineHistory:
+    """完整流水线历史记录"""
+    pipeline_id: str  # 流水线ID
+    timestamp: str  # 开始时间戳
+    raw_input: str  # 用户原始输入
+    
+    # 阶段1结果
+    prompt10_original: str = ""
+    prompt10_processed: str = ""
+    prompt10_mode: str = ""
+    prompt10_steps: List[Dict] = field(default_factory=list)
+    prompt10_terminology_changes: Dict[str, str] = field(default_factory=dict)
+    prompt10_ambiguity_detected: bool = False
+    prompt10_status: str = ""
+    prompt10_time_ms: int = 0
+    
+    # 阶段2结果
+    prompt20_template: str = ""
+    prompt20_variables: List[Dict] = field(default_factory=list)
+    prompt20_time_ms: int = 0
+    
+    # 整体状态
+    overall_status: str = ""
+    total_time_ms: int = 0
+    error_message: Optional[str] = None
 
 
 class HistoryManager:

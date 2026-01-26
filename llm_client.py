@@ -1,0 +1,481 @@
+"""
+统一的 LLM 客户端模块
+提供 OpenAI 兼容的 API 调用接口，供所有模块共用
+"""
+
+import os
+import json
+from typing import Optional, List, Dict, Any, Union
+from dataclasses import dataclass
+from enum import Enum
+from logger import info, warning, error, debug
+
+try:
+    from openai import OpenAI
+except ImportError:
+    OpenAI = None  # type: ignore
+
+
+# ============================================================================
+# 配置常量
+# ============================================================================
+
+# 默认桥接地址与 Key；生产环境建议使用环境变量，勿将 key 提交仓库
+DEFAULT_BASE_URL = "https://api.rcouyi.com/v1"
+DEFAULT_API_KEY = "sk-0JL8T592b6roD3uaDaD0Ac0f081c4040810d978e38CdAa01"
+
+
+class LLMModel(Enum):
+    """支持的模型枚举"""
+    GPT_35_TURBO = "gpt-3.5-turbo"
+    GPT_4 = "gpt-4"
+    GPT_4_TURBO = "gpt-4-turbo"
+
+
+@dataclass
+class LLMResponse:
+    """LLM 响应数据类"""
+    content: str  # 响应内容
+    model: str  # 使用的模型
+    usage: Optional[Dict[str, int]] = None  # token 使用情况
+    raw_response: Optional[Any] = None  # 原始响应对象
+
+
+# ============================================================================
+# 统一 LLM 客户端
+# ============================================================================
+
+class UnifiedLLMClient:
+    """
+    统一的 LLM 客户端
+    
+    功能：
+    - 提供标准化的 API 调用接口
+    - 支持多种调用模式（普通对话、结构化输出、实体抽取等）
+    - 统一的错误处理和日志记录
+    """
+    
+    def __init__(
+        self,
+        model: str = LLMModel.GPT_35_TURBO.value,
+        temperature: float = 0.1,
+        base_url: Optional[str] = None,
+        api_key: Optional[str] = None,
+        max_retries: int = 3,
+        timeout: int = 60
+    ):
+        """
+        初始化 LLM 客户端
+        
+        Args:
+            model: 模型名称
+            temperature: 温度参数（0-2，越低越确定性）
+            base_url: API 基础 URL
+            api_key: API 密钥
+            max_retries: 最大重试次数
+            timeout: 超时时间（秒）
+        """
+        self.model = model
+        self.temperature = temperature
+        self.base_url = base_url or os.environ.get("LLM_BASE_URL", DEFAULT_BASE_URL)
+        self.api_key = api_key or os.environ.get("LLM_API_KEY", DEFAULT_API_KEY)
+        self.max_retries = max_retries
+        self.timeout = timeout
+        self._client: Optional["OpenAI"] = None
+    
+    def _get_client(self) -> "OpenAI":
+        """获取或创建 OpenAI 客户端实例"""
+        if OpenAI is None:
+            raise RuntimeError("请先安装 openai: pip install openai")
+        if self._client is None:
+            self._client = OpenAI(
+                base_url=self.base_url,
+                api_key=self.api_key,
+                timeout=self.timeout
+            )
+        return self._client
+    
+    def call(
+        self,
+        system_prompt: str,
+        user_content: str,
+        temperature: Optional[float] = None,
+        model: Optional[str] = None
+    ) -> LLMResponse:
+        """
+        基础对话调用
+        
+        Args:
+            system_prompt: 系统提示词
+            user_content: 用户输入
+            temperature: 可选的温度覆盖
+            model: 可选的模型覆盖
+            
+        Returns:
+            LLMResponse 对象
+        """
+        _model = model or self.model
+        _temp = temperature if temperature is not None else self.temperature
+        
+        info(f"[LLM调用] 模型: {_model}, Temperature: {_temp}")
+        debug(f"[System] {system_prompt[:100]}...")
+        debug(f"[User] {user_content[:100]}...")
+        
+        client = self._get_client()
+        
+        for attempt in range(self.max_retries):
+            try:
+                resp = client.chat.completions.create(
+                    model=_model,
+                    temperature=_temp,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_content},
+                    ],
+                )
+                
+                content = (resp.choices[0].message.content or "").strip()
+                usage = None
+                if hasattr(resp, 'usage') and resp.usage:
+                    usage = {
+                        "prompt_tokens": resp.usage.prompt_tokens,
+                        "completion_tokens": resp.usage.completion_tokens,
+                        "total_tokens": resp.usage.total_tokens
+                    }
+                
+                debug(f"[LLM响应] 长度: {len(content)} 字符")
+                
+                return LLMResponse(
+                    content=content,
+                    model=_model,
+                    usage=usage,
+                    raw_response=resp
+                )
+                
+            except Exception as e:
+                warning(f"LLM 调用失败 (尝试 {attempt + 1}/{self.max_retries}): {e}")
+                if attempt == self.max_retries - 1:
+                    error(f"LLM 调用最终失败: {e}")
+                    raise
+        
+        raise RuntimeError("LLM 调用失败，已超过最大重试次数")
+    
+    def call_simple(
+        self,
+        system_prompt: str,
+        user_content: str,
+        temperature: Optional[float] = None
+    ) -> str:
+        """
+        简单调用，直接返回字符串
+        
+        Args:
+            system_prompt: 系统提示词
+            user_content: 用户输入
+            temperature: 可选的温度覆盖
+            
+        Returns:
+            响应文本
+        """
+        response = self.call(system_prompt, user_content, temperature)
+        return response.content
+    
+    def extract_entities(
+        self,
+        text: str,
+        entity_types: Optional[List[str]] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        实体抽取
+        
+        Args:
+            text: 待抽取文本
+            entity_types: 期望的实体类型列表
+            
+        Returns:
+            实体列表
+        """
+        types_hint = ""
+        if entity_types:
+            types_hint = f"实体类型限定: {', '.join(entity_types)}\n"
+        
+        system_prompt = f"""你是一个实体抽取专家。你的任务是从文本中识别需要动态调整的"变量"。
+
+{types_hint}严格规则:
+1. 只输出 JSON 数组格式,不要有任何其他文字
+2. 必须原样返回原文片段,严禁同义词替换
+3. 必须返回精确的 start_index 和 end_index
+4. 数据类型仅限: String, Integer, Boolean, List, Enum
+
+输出格式:
+[
+  {{
+    "name": "变量英文名(snake_case)",
+    "original_text": "原文精确片段",
+    "start_index": 起始位置,
+    "end_index": 结束位置,
+    "type": "数据类型",
+    "value": "当前值"
+  }}
+]
+
+识别原则:
+- 数字、时间、人名、专有名词 -> 变量
+- 通用描述、固定格式文本 -> 常量
+- 优先识别最长匹配项"""
+        
+        response = self.call(system_prompt, text)
+        
+        try:
+            entities = json.loads(response.content)
+            if isinstance(entities, list):
+                info(f"[实体抽取] 识别到 {len(entities)} 个实体")
+                return entities
+            else:
+                warning("[实体抽取] 响应格式不是数组")
+                return []
+        except json.JSONDecodeError as e:
+            warning(f"[实体抽取] JSON 解析失败: {e}")
+            return []
+    
+    def detect_ambiguity(self, text: str) -> Optional[str]:
+        """
+        检测文本歧义
+        
+        Args:
+            text: 待检测文本
+            
+        Returns:
+            如果存在歧义则返回描述，否则返回 None
+        """
+        system_prompt = """检测以下文本是否存在严重的语义歧义或多重解读可能。
+
+判断标准:
+- 句法结构是否存在歧义(如定语从句归属不明)
+- 指代对象是否清晰
+- 逻辑关系是否唯一
+
+如果文本清晰无歧义,请仅回复 "PASS"
+如果存在歧义,请简短描述歧义点(不超过30字)
+
+示例:
+输入: "咬死了猎人的狗"
+输出: "无法确定主语,可能是狗咬死了猎人,也可能是猎人的狗被咬死"
+
+输入: "请优化RAG的检索流程"
+输出: "PASS"
+"""
+        
+        response = self.call(system_prompt, text)
+        raw = response.content.strip()
+        
+        # 判断是否通过
+        if "PASS" in raw.upper():
+            return None
+        if len(raw) <= 80 and any(kw in raw for kw in ("无歧义", "通过", "无严重歧义", "清晰无歧义")):
+            if not any(bad in raw for bad in ("存在歧义", "有歧义", "存在严重歧义")):
+                return None
+        
+        return raw
+    
+    def standardize_text(self, text: str) -> str:
+        """
+        文本标准化（口语转书面语）
+        
+        Args:
+            text: 原始文本
+            
+        Returns:
+            标准化后的文本
+        """
+        system_prompt = """你是一个文本标准化工具。你的唯一任务是将输入的"口语化、非规范文本"转换为"规范、清晰的书面语"。
+
+严格遵守以下原则:
+1. 保持原意100%不变,不得增加任何新的逻辑、实体或细节
+2. 仅修正语法错误、去除口语语气词(如"吧"、"那个"、"嗯")
+3. 不回答问题,不执行指令,不解释内容
+4. 输出必须是纯文本,不包含任何额外解释
+
+示例:
+输入: "那个,你帮我把RAG的流程整得顺一点"
+输出: "请优化检索增强生成(RAG)的流程逻辑,使其更加流畅"
+
+输入: "搞一个简单的Agent,别太复杂"
+输出: "开发一个功能基础的智能代理(Agent),保持设计简洁"
+"""
+        
+        response = self.call(system_prompt, text, temperature=0.1)
+        return response.content
+
+
+# ============================================================================
+# 模拟 LLM 客户端（用于测试）
+# ============================================================================
+
+class MockLLMClient(UnifiedLLMClient):
+    """
+    模拟 LLM 客户端，用于测试和演示
+    不需要真实的 API 连接
+    """
+    
+    def __init__(self, **kwargs):
+        # 不调用父类初始化，避免 API 连接
+        self.model = kwargs.get('model', LLMModel.GPT_35_TURBO.value)
+        self.temperature = kwargs.get('temperature', 0.1)
+    
+    def call(
+        self,
+        system_prompt: str,
+        user_content: str,
+        temperature: Optional[float] = None,
+        model: Optional[str] = None
+    ) -> LLMResponse:
+        """模拟调用"""
+        info(f"[MockLLM] 模拟调用")
+        debug(f"[System] {system_prompt[:50]}...")
+        debug(f"[User] {user_content[:50]}...")
+        
+        # 根据系统提示词类型返回不同的模拟响应
+        if "实体抽取" in system_prompt or "变量" in system_prompt:
+            content = self._mock_entity_extraction(user_content)
+        elif "歧义" in system_prompt:
+            content = self._mock_ambiguity_detection(user_content)
+        elif "标准化" in system_prompt or "书面语" in system_prompt:
+            content = self._mock_standardization(user_content)
+        else:
+            content = f"[模拟响应] {user_content[:50]}..."
+        
+        return LLMResponse(
+            content=content,
+            model=self.model,
+            usage={"prompt_tokens": 100, "completion_tokens": 50, "total_tokens": 150}
+        )
+    
+    def _mock_entity_extraction(self, text: str) -> str:
+        """模拟实体抽取"""
+        import re
+        entities = []
+        
+        # 识别数字+单位模式
+        for match in re.finditer(r'(\d+)(年|周|月|天|小时|分钟)', text):
+            entities.append({
+                "name": f"duration_{match.group(2)}",
+                "original_text": match.group(0),
+                "start_index": match.start(),
+                "end_index": match.end(),
+                "type": "Integer",
+                "value": int(match.group(1))
+            })
+        
+        # 识别专业术语
+        tech_terms = ["Java程序员", "Python", "数据分析", "机器学习", "前端开发"]
+        for term in tech_terms:
+            if term in text:
+                idx = text.find(term)
+                entities.append({
+                    "name": f"tech_term_{len(entities)}",
+                    "original_text": term,
+                    "start_index": idx,
+                    "end_index": idx + len(term),
+                    "type": "String",
+                    "value": term
+                })
+        
+        return json.dumps(entities, ensure_ascii=False)
+    
+    def _mock_ambiguity_detection(self, text: str) -> str:
+        """模拟歧义检测"""
+        ambiguous_patterns = ["意思", "那个", "随便", "看着办", "差不多"]
+        for pattern in ambiguous_patterns:
+            if pattern in text:
+                return f"检测到歧义表达: '{pattern}' 含义不明确"
+        return "PASS"
+    
+    def _mock_standardization(self, text: str) -> str:
+        """模拟文本标准化"""
+        # 简单的替换规则
+        result = text
+        replacements = {
+            "搞一个": "开发一个",
+            "弄一下": "处理",
+            "那个": "",
+            "吧": "",
+            "嗯": "",
+        }
+        for old, new in replacements.items():
+            result = result.replace(old, new)
+        return result.strip()
+
+
+# ============================================================================
+# 工厂函数
+# ============================================================================
+
+def create_llm_client(
+    use_mock: bool = False,
+    **kwargs
+) -> UnifiedLLMClient:
+    """
+    创建 LLM 客户端的工厂函数
+    
+    Args:
+        use_mock: 是否使用模拟客户端
+        **kwargs: 传递给客户端的其他参数
+        
+    Returns:
+        LLM 客户端实例
+    """
+    if use_mock:
+        info("[LLM] 使用模拟客户端")
+        return MockLLMClient(**kwargs)
+    else:
+        info("[LLM] 使用真实客户端")
+        return UnifiedLLMClient(**kwargs)
+
+
+# ============================================================================
+# 异步调用支持（可选）
+# ============================================================================
+
+async def invoke_function(func_name: str, **kwargs) -> Any:
+    """
+    异步函数调用接口（供 generated_workflow.py 使用）
+    
+    Args:
+        func_name: 函数名称
+        **kwargs: 函数参数
+        
+    Returns:
+        函数执行结果
+    """
+    client = create_llm_client()
+    
+    # 构建调用提示词
+    system_prompt = f"执行函数: {func_name}"
+    user_content = json.dumps(kwargs, ensure_ascii=False)
+    
+    response = client.call(system_prompt, user_content)
+    return response.content
+
+
+# ============================================================================
+# 测试
+# ============================================================================
+
+if __name__ == "__main__":
+    # 测试模拟客户端
+    mock_client = create_llm_client(use_mock=True)
+    
+    # 测试实体抽取
+    entities = mock_client.extract_entities(
+        "请为一位有3年经验的Java程序员生成一个为期2周的Python学习计划"
+    )
+    info(f"抽取到的实体: {json.dumps(entities, ensure_ascii=False, indent=2)}")
+    
+    # 测试歧义检测
+    ambiguity = mock_client.detect_ambiguity("这个需求没啥意思,你看着办")
+    info(f"歧义检测结果: {ambiguity}")
+    
+    # 测试文本标准化
+    standardized = mock_client.standardize_text("那个,帮我搞一个RAG的应用吧")
+    info(f"标准化结果: {standardized}")

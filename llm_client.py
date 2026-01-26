@@ -57,7 +57,7 @@ class UnifiedLLMClient:
     
     def __init__(
         self,
-        model: str = LLMModel.GPT_35_TURBO.value,
+        model: str = LLMModel.GPT_4.value,
         temperature: float = 0.1,
         base_url: Optional[str] = None,
         api_key: Optional[str] = None,

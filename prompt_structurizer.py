@@ -475,7 +475,7 @@ def main():
     info(f"\n【输入 - Prompt 1.0】:\n{input_text}\n")
     
     # 创建处理器（使用模拟模式）
-    structurizer = PromptStructurizer(use_mock=True)
+    structurizer = PromptStructurizer(use_mock=False)  # 使用真实LLM
     
     # 方式1: 直接处理文本
     result = structurizer.process(input_text)

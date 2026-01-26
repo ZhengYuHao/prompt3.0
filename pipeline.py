@@ -234,7 +234,7 @@ if __name__ == "__main__":
         mode=ProcessingMode.DICTIONARY,
         term_mapping=TERM_MAPPING,
         ambiguity_blacklist=AMBIGUITY_BLACKLIST,
-        use_mock_llm=True  # 使用模拟LLM
+        use_mock_llm=False  # 使用真实LLM
     )
     
     result = pipeline.run(
@@ -247,7 +247,7 @@ if __name__ == "__main__":
         "帮我搞一个RAG的大模型应用",
         mode="dictionary",
         term_mapping=TERM_MAPPING,
-        use_mock=True
+        use_mock=False
     )
     
     # 打印 JSON 结果

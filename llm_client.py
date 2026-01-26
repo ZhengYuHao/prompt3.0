@@ -463,19 +463,19 @@ async def invoke_function(func_name: str, **kwargs) -> Any:
 # ============================================================================
 
 if __name__ == "__main__":
-    # 测试模拟客户端
-    mock_client = create_llm_client(use_mock=True)
+    # 测试真实LLM客户端
+    client = create_llm_client(use_mock=False)  # 使用真实LLM
     
     # 测试实体抽取
-    entities = mock_client.extract_entities(
+    entities = client.extract_entities(
         "请为一位有3年经验的Java程序员生成一个为期2周的Python学习计划"
     )
     info(f"抽取到的实体: {json.dumps(entities, ensure_ascii=False, indent=2)}")
     
     # 测试歧义检测
-    ambiguity = mock_client.detect_ambiguity("这个需求没啥意思,你看着办")
+    ambiguity = client.detect_ambiguity("这个需求没啥意思,你看着办")
     info(f"歧义检测结果: {ambiguity}")
     
     # 测试文本标准化
-    standardized = mock_client.standardize_text("那个,帮我搞一个RAG的应用吧")
+    standardized = client.standardize_text("那个,帮我搞一个RAG的应用吧")
     info(f"标准化结果: {standardized}")

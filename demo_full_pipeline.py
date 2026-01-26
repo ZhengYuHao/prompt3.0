@@ -23,7 +23,8 @@ from prompt_structurizer import (
     HallucinationFirewall,
     TypeCleaner,
     EntityConflictResolver,
-    VariableMeta
+    VariableMeta,
+    LLMEntityExtractor  # 真实 LLM 实体抽取器
 )
 
 
@@ -232,7 +233,7 @@ def run_full_pipeline():
         mode=ProcessingMode.DICTIONARY,
         term_mapping=TERM_MAPPING,
         ambiguity_blacklist=AMBIGUITY_BLACKLIST,
-        use_mock_llm=True,
+        use_mock_llm=False,  # 使用真实LLM
         enable_deep_check=False  # 关闭深度检测以便演示继续
     )
     
@@ -298,8 +299,8 @@ def run_full_pipeline():
     
     info("\n>>> 输入: Prompt 1.0 处理后的标准化文本")
     
-    # 使用自定义抽取器
-    extractor = PipelineMockExtractor()
+    # 使用真实 LLM 实体抽取器
+    extractor = LLMEntityExtractor(use_mock=False)
     
     # 阶段 2.1: 语义扫描
     info("\n" + "─" * 60)

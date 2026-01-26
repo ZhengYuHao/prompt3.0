@@ -1,7 +1,7 @@
 """
 处理历史存储与对比展示模块
 用于持久化存储每次处理的结果，并提供清晰的对比展示
-支持完整流水线追踪
+支持完整流水线追踪：Prompt 1.0 + Prompt 2.0
 """
 
 import json
@@ -14,7 +14,7 @@ from logger import info, warning, error
 
 @dataclass
 class ProcessingHistory:
-    """单次处理历史记录（兼容旧格式）"""
+    """单次处理历史记录（兼容旧格式 - Prompt 1.0）"""
     timestamp: str  # 处理时间戳
     original_text: str  # 原始输入
     processed_text: str  # 处理后文本
@@ -28,6 +28,31 @@ class ProcessingHistory:
 
 
 @dataclass
+class Prompt20History:
+    """Prompt 2.0 结构化历史记录"""
+    id: str                              # 唯一标识
+    timestamp: str                       # 处理时间戳
+    source_prompt10_id: str              # 关联的 Prompt 1.0 ID
+    
+    # 输入输出
+    input_text: str                      # 输入文本（来自 Prompt 1.0）
+    template_text: str                   # 生成的模板
+    
+    # 变量信息
+    variables: List[Dict] = field(default_factory=list)  # 变量列表
+    variable_count: int = 0              # 变量数量
+    
+    # 类型统计
+    type_stats: Dict[str, int] = field(default_factory=dict)  # 按类型统计
+    
+    # 日志
+    extraction_log: List[str] = field(default_factory=list)
+    
+    # 性能
+    processing_time_ms: int = 0
+
+
+@dataclass
 class PipelineHistory:
     """完整流水线历史记录"""
     pipeline_id: str  # 流水线ID
@@ -35,6 +60,7 @@ class PipelineHistory:
     raw_input: str  # 用户原始输入
     
     # 阶段1结果
+    prompt10_id: str = ""
     prompt10_original: str = ""
     prompt10_processed: str = ""
     prompt10_mode: str = ""
@@ -45,8 +71,12 @@ class PipelineHistory:
     prompt10_time_ms: int = 0
     
     # 阶段2结果
+    prompt20_id: str = ""
     prompt20_template: str = ""
     prompt20_variables: List[Dict] = field(default_factory=list)
+    prompt20_variable_count: int = 0
+    prompt20_type_stats: Dict[str, int] = field(default_factory=dict)
+    prompt20_extraction_log: List[str] = field(default_factory=list)
     prompt20_time_ms: int = 0
     
     # 整体状态
@@ -430,5 +460,553 @@ class HistoryManager:
             info(f"HTML对比报告已保存: {output_file}")
         except Exception as e:
             error(f"保存HTML报告失败: {e}")
+        
+        return html
+    
+    # ========================================================================
+    # Prompt 2.0 历史记录管理
+    # ========================================================================
+    
+    def save_prompt20_history(self, history: Prompt20History) -> str:
+        """
+        保存 Prompt 2.0 处理历史
+        
+        Args:
+            history: Prompt 2.0 历史记录
+            
+        Returns:
+            记录ID
+        """
+        prompt20_file = os.path.join(self.storage_dir, "prompt20_history.json")
+        
+        # 加载现有历史
+        all_history = {}
+        if os.path.exists(prompt20_file):
+            try:
+                with open(prompt20_file, 'r', encoding='utf-8') as f:
+                    all_history = json.load(f)
+            except Exception:
+                pass
+        
+        # 添加新记录
+        all_history[history.id] = asdict(history)
+        
+        # 保存到文件
+        try:
+            with open(prompt20_file, 'w', encoding='utf-8') as f:
+                json.dump(all_history, f, ensure_ascii=False, indent=2)
+            info(f"Prompt 2.0 历史记录已保存: {history.id}")
+            return history.id
+        except Exception as e:
+            error(f"保存 Prompt 2.0 历史记录失败: {e}")
+            raise
+    
+    def load_prompt20_history(self, record_id: str) -> Optional[Prompt20History]:
+        """加载指定的 Prompt 2.0 历史记录"""
+        prompt20_file = os.path.join(self.storage_dir, "prompt20_history.json")
+        
+        if not os.path.exists(prompt20_file):
+            return None
+        
+        try:
+            with open(prompt20_file, 'r', encoding='utf-8') as f:
+                all_history = json.load(f)
+            record = all_history.get(record_id)
+            if record:
+                return Prompt20History(**record)
+        except Exception as e:
+            warning(f"加载 Prompt 2.0 历史记录失败: {e}")
+        
+        return None
+    
+    def get_recent_prompt20_history(self, limit: int = 10) -> List[Prompt20History]:
+        """获取最近的 Prompt 2.0 处理历史"""
+        prompt20_file = os.path.join(self.storage_dir, "prompt20_history.json")
+        
+        if not os.path.exists(prompt20_file):
+            return []
+        
+        try:
+            with open(prompt20_file, 'r', encoding='utf-8') as f:
+                all_history = json.load(f)
+            
+            # 按时间戳排序
+            sorted_ids = sorted(
+                all_history.keys(),
+                key=lambda x: all_history[x].get('timestamp', ''),
+                reverse=True
+            )
+            
+            return [
+                Prompt20History(**all_history[id])
+                for id in sorted_ids[:limit]
+            ]
+        except Exception as e:
+            warning(f"加载 Prompt 2.0 历史记录失败: {e}")
+            return []
+    
+    # ========================================================================
+    # 完整流水线历史记录管理
+    # ========================================================================
+    
+    def save_pipeline_history(self, history: PipelineHistory) -> str:
+        """
+        保存完整流水线历史记录
+        
+        Args:
+            history: 流水线历史记录
+            
+        Returns:
+            流水线ID
+        """
+        pipeline_file = os.path.join(self.storage_dir, "pipeline_history.json")
+        
+        # 加载现有历史
+        all_history = {}
+        if os.path.exists(pipeline_file):
+            try:
+                with open(pipeline_file, 'r', encoding='utf-8') as f:
+                    all_history = json.load(f)
+            except Exception:
+                pass
+        
+        # 添加新记录
+        all_history[history.pipeline_id] = asdict(history)
+        
+        # 保存到文件
+        try:
+            with open(pipeline_file, 'w', encoding='utf-8') as f:
+                json.dump(all_history, f, ensure_ascii=False, indent=2)
+            info(f"流水线历史记录已保存: {history.pipeline_id}")
+            return history.pipeline_id
+        except Exception as e:
+            error(f"保存流水线历史记录失败: {e}")
+            raise
+    
+    def load_pipeline_history(self, pipeline_id: str) -> Optional[PipelineHistory]:
+        """加载指定的流水线历史记录"""
+        pipeline_file = os.path.join(self.storage_dir, "pipeline_history.json")
+        
+        if not os.path.exists(pipeline_file):
+            return None
+        
+        try:
+            with open(pipeline_file, 'r', encoding='utf-8') as f:
+                all_history = json.load(f)
+            record = all_history.get(pipeline_id)
+            if record:
+                return PipelineHistory(**record)
+        except Exception as e:
+            warning(f"加载流水线历史记录失败: {e}")
+        
+        return None
+    
+    def get_recent_pipeline_history(self, limit: int = 10) -> List[PipelineHistory]:
+        """获取最近的流水线历史"""
+        pipeline_file = os.path.join(self.storage_dir, "pipeline_history.json")
+        
+        if not os.path.exists(pipeline_file):
+            return []
+        
+        try:
+            with open(pipeline_file, 'r', encoding='utf-8') as f:
+                all_history = json.load(f)
+            
+            sorted_ids = sorted(
+                all_history.keys(),
+                key=lambda x: all_history[x].get('timestamp', ''),
+                reverse=True
+            )
+            
+            return [
+                PipelineHistory(**all_history[id])
+                for id in sorted_ids[:limit]
+            ]
+        except Exception as e:
+            warning(f"加载流水线历史记录失败: {e}")
+            return []
+    
+    # ========================================================================
+    # 完整流水线对比展示
+    # ========================================================================
+    
+    def format_pipeline_comparison(self, history: PipelineHistory) -> str:
+        """
+        格式化完整流水线对比展示
+        
+        Args:
+            history: 流水线历史记录
+            
+        Returns:
+            格式化的对比文本
+        """
+        lines = []
+        
+        # 标题
+        lines.append("█" * 80)
+        lines.append("█" + " " * 28 + "完整流水线处理报告" + " " * 29 + "█")
+        lines.append("█" * 80)
+        lines.append("")
+        lines.append(f"流水线 ID: {history.pipeline_id}")
+        lines.append(f"处理时间: {history.timestamp}")
+        lines.append(f"整体状态: {history.overall_status}")
+        lines.append(f"总耗时: {history.total_time_ms}ms")
+        lines.append("")
+        
+        # ===== 阶段 1: Prompt 1.0 =====
+        lines.append("=" * 80)
+        lines.append("【阶段 1: Prompt 1.0 预处理】")
+        lines.append("=" * 80)
+        lines.append("")
+        lines.append("┌─ 原始输入 ─────────────────────────────────────────────────────────────────┐")
+        for line in history.raw_input.split('\n'):
+            lines.append(f"│ {line}")
+        lines.append("└────────────────────────────────────────────────────────────────────────────┘")
+        lines.append("")
+        lines.append("┌─ 标准化输出 (Prompt 1.0) ───────────────────────────────────────────────────┐")
+        for line in history.prompt10_processed.split('\n'):
+            lines.append(f"│ {line}")
+        lines.append("└────────────────────────────────────────────────────────────────────────────┘")
+        lines.append("")
+        
+        # 术语替换
+        if history.prompt10_terminology_changes:
+            lines.append("【术语替换】")
+            for old, new in history.prompt10_terminology_changes.items():
+                if new:
+                    lines.append(f"  • '{old}' → '{new}'")
+                else:
+                    lines.append(f"  • '{old}' → (删除)")
+            lines.append("")
+        
+        lines.append(f"处理耗时: {history.prompt10_time_ms}ms | 状态: {history.prompt10_status}")
+        lines.append("")
+        
+        # ===== 阶段 2: Prompt 2.0 =====
+        lines.append("=" * 80)
+        lines.append("【阶段 2: Prompt 2.0 结构化】")
+        lines.append("=" * 80)
+        lines.append("")
+        lines.append("┌─ 参数化模板 (Prompt 2.0) ───────────────────────────────────────────────────┐")
+        for line in history.prompt20_template.split('\n'):
+            lines.append(f"│ {line}")
+        lines.append("└────────────────────────────────────────────────────────────────────────────┘")
+        lines.append("")
+        
+        # 变量注册表
+        lines.append("【变量注册表】")
+        lines.append(f"共 {history.prompt20_variable_count} 个变量")
+        if history.prompt20_type_stats:
+            stats_str = ", ".join([f"{k}: {v}" for k, v in history.prompt20_type_stats.items()])
+            lines.append(f"类型分布: {stats_str}")
+        lines.append("")
+        
+        for var in history.prompt20_variables[:10]:  # 只显示前10个
+            lines.append(f"  • {var.get('variable', 'N/A')}: {var.get('value', 'N/A')} ({var.get('type', 'N/A')})")
+            lines.append(f"    原文: \"{var.get('original_text', 'N/A')}\"")
+        
+        if len(history.prompt20_variables) > 10:
+            lines.append(f"  ... 还有 {len(history.prompt20_variables) - 10} 个变量")
+        
+        lines.append("")
+        lines.append(f"处理耗时: {history.prompt20_time_ms}ms")
+        lines.append("")
+        
+        # ===== 总结 =====
+        lines.append("=" * 80)
+        lines.append("【处理总结】")
+        lines.append("=" * 80)
+        lines.append(f"  原始输入长度: {len(history.raw_input)} 字符")
+        lines.append(f"  标准化后长度: {len(history.prompt10_processed)} 字符")
+        lines.append(f"  识别变量数量: {history.prompt20_variable_count} 个")
+        lines.append(f"  总处理耗时: {history.total_time_ms}ms")
+        lines.append("█" * 80)
+        
+        return "\n".join(lines)
+    
+    def print_pipeline_comparison(self, history: PipelineHistory):
+        """打印流水线对比展示"""
+        comparison_text = self.format_pipeline_comparison(history)
+        info("\n" + comparison_text)
+    
+    def export_pipeline_html(self, history: PipelineHistory, output_file: Optional[str] = None) -> str:
+        """
+        导出完整流水线为HTML格式
+        
+        Args:
+            history: 流水线历史记录
+            output_file: 输出文件路径
+            
+        Returns:
+            HTML内容
+        """
+        if output_file is None:
+            output_file = os.path.join(
+                self.storage_dir,
+                f"pipeline_{history.pipeline_id}.html"
+            )
+        
+        # 变量表格HTML
+        variables_html = ""
+        for var in history.prompt20_variables:
+            variables_html += f"""
+                <tr>
+                    <td><code>{var.get('variable', 'N/A')}</code></td>
+                    <td>"{var.get('original_text', 'N/A')}"</td>
+                    <td><strong>{var.get('value', 'N/A')}</strong></td>
+                    <td><span class="type-badge">{var.get('type', 'N/A')}</span></td>
+                </tr>
+"""
+        
+        # 术语替换HTML
+        terminology_html = ""
+        for old, new in history.prompt10_terminology_changes.items():
+            if new:
+                terminology_html += f'<div class="term-item"><span class="old">{old}</span> → <span class="new">{new}</span></div>'
+            else:
+                terminology_html += f'<div class="term-item"><span class="old">{old}</span> → <span class="deleted">(删除)</span></div>'
+        
+        html = f"""
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流水线报告 - {history.pipeline_id}</title>
+    <style>
+        * {{ box-sizing: border-box; }}
+        body {{
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }}
+        .container {{
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }}
+        h1 {{
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }}
+        .subtitle {{
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }}
+        .meta-bar {{
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }}
+        .meta-item {{
+            text-align: center;
+        }}
+        .meta-item .label {{
+            color: #666;
+            font-size: 12px;
+        }}
+        .meta-item .value {{
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }}
+        .stage {{
+            margin: 30px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+        }}
+        .stage-header {{
+            padding: 15px 20px;
+            font-weight: bold;
+            color: white;
+        }}
+        .stage-1 .stage-header {{ background: linear-gradient(90deg, #667eea, #764ba2); }}
+        .stage-2 .stage-header {{ background: linear-gradient(90deg, #11998e, #38ef7d); }}
+        .stage-content {{
+            padding: 20px;
+        }}
+        .text-box {{
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+            white-space: pre-wrap;
+            font-family: 'Consolas', monospace;
+            line-height: 1.8;
+        }}
+        .text-box.template {{
+            border-left-color: #11998e;
+        }}
+        .term-changes {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }}
+        .term-item {{
+            background: #fff3cd;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }}
+        .old {{ color: #d32f2f; text-decoration: line-through; }}
+        .new {{ color: #388e3c; font-weight: bold; }}
+        .deleted {{ color: #999; font-style: italic; }}
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }}
+        th, td {{
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }}
+        th {{
+            background: #f8f9fa;
+            font-weight: bold;
+        }}
+        .type-badge {{
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }}
+        .type-badge {{ background: #e3f2fd; color: #1976d2; }}
+        code {{
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+        }}
+        .stats {{
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }}
+        .stat-card {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }}
+        .stat-card .number {{
+            font-size: 32px;
+            font-weight: bold;
+        }}
+        .stat-card .label {{
+            font-size: 14px;
+            opacity: 0.9;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 完整流水线处理报告</h1>
+        <p class="subtitle">Prompt 1.0 预处理 → Prompt 2.0 结构化</p>
+        
+        <div class="meta-bar">
+            <div class="meta-item">
+                <div class="label">流水线 ID</div>
+                <div class="value">{history.pipeline_id}</div>
+            </div>
+            <div class="meta-item">
+                <div class="label">处理时间</div>
+                <div class="value">{history.timestamp}</div>
+            </div>
+            <div class="meta-item">
+                <div class="label">状态</div>
+                <div class="value">{'✅ ' + history.overall_status if history.overall_status == 'success' else '⚠️ ' + history.overall_status}</div>
+            </div>
+            <div class="meta-item">
+                <div class="label">总耗时</div>
+                <div class="value">{history.total_time_ms}ms</div>
+            </div>
+        </div>
+        
+        <!-- 阶段 1 -->
+        <div class="stage stage-1">
+            <div class="stage-header">📝 阶段 1: Prompt 1.0 预处理 (耗时 {history.prompt10_time_ms}ms)</div>
+            <div class="stage-content">
+                <h4>原始输入</h4>
+                <div class="text-box">{history.raw_input}</div>
+                
+                <h4>标准化输出</h4>
+                <div class="text-box">{history.prompt10_processed}</div>
+                
+                <h4>术语替换 ({len(history.prompt10_terminology_changes)} 处)</h4>
+                <div class="term-changes">{terminology_html if terminology_html else '<span style="color:#999">无术语替换</span>'}</div>
+            </div>
+        </div>
+        
+        <!-- 阶段 2 -->
+        <div class="stage stage-2">
+            <div class="stage-header">🔧 阶段 2: Prompt 2.0 结构化 (耗时 {history.prompt20_time_ms}ms)</div>
+            <div class="stage-content">
+                <h4>参数化模板</h4>
+                <div class="text-box template">{history.prompt20_template}</div>
+                
+                <h4>变量注册表 ({history.prompt20_variable_count} 个变量)</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>变量名</th>
+                            <th>原文片段</th>
+                            <th>提取值</th>
+                            <th>类型</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {variables_html}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 统计 -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="number">{len(history.raw_input)}</div>
+                <div class="label">原始字符数</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">{len(history.prompt10_processed)}</div>
+                <div class="label">标准化字符数</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">{len(history.prompt10_terminology_changes)}</div>
+                <div class="label">术语替换</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">{history.prompt20_variable_count}</div>
+                <div class="label">识别变量</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+"""
+        
+        # 保存HTML文件
+        try:
+            with open(output_file, 'w', encoding='utf-8') as f:
+                f.write(html)
+            info(f"流水线HTML报告已保存: {output_file}")
+        except Exception as e:
+            error(f"保存流水线HTML报告失败: {e}")
         
         return html

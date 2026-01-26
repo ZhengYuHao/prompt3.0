@@ -27,6 +27,10 @@ from prompt_structurizer import (
     LLMEntityExtractor  # 真实 LLM 实体抽取器
 )
 
+# 导入历史记录管理
+from history_manager import HistoryManager, PipelineHistory
+from data_models import generate_id, get_timestamp
+
 
 # ============================================================================
 # 复杂测试场景设计
@@ -243,7 +247,7 @@ def run_full_pipeline():
     # 执行预处理
     prompt10_result = preprocessor.process(
         RAW_INPUT,
-        save_history=False,
+        save_history=True,  # 保存历史记录
         show_comparison=False
     )
     
@@ -513,6 +517,57 @@ def run_full_pipeline():
     info("█" * 80)
     info("█" + " " * 32 + "演示完成" + " " * 36 + "█")
     info("█" * 80)
+    
+    # =========================================================================
+    # 保存完整流水线历史记录
+    # =========================================================================
+    info("\n>>> 保存流水线历史记录...")
+    
+    # 统计变量类型
+    type_stats = {}
+    for var in variable_metas:
+        dtype = var.data_type
+        type_stats[dtype] = type_stats.get(dtype, 0) + 1
+    
+    # 创建流水线历史记录
+    pipeline_history = PipelineHistory(
+        pipeline_id=generate_id(),
+        timestamp=get_timestamp(),
+        raw_input=RAW_INPUT,
+        
+        # 阶段1结果
+        prompt10_id=prompt10_result.id,
+        prompt10_original=prompt10_result.original_text,
+        prompt10_processed=prompt10_result.processed_text,
+        prompt10_mode=prompt10_result.mode,
+        prompt10_steps=[s.to_dict() for s in prompt10_result.steps],
+        prompt10_terminology_changes=prompt10_result.terminology_changes,
+        prompt10_ambiguity_detected=prompt10_result.ambiguity_detected,
+        prompt10_status=prompt10_result.status,
+        prompt10_time_ms=prompt10_result.processing_time_ms,
+        
+        # 阶段2结果
+        prompt20_id=generate_id(),
+        prompt20_template=template,
+        prompt20_variables=variable_registry,
+        prompt20_variable_count=len(variable_metas),
+        prompt20_type_stats=type_stats,
+        prompt20_extraction_log=[],
+        prompt20_time_ms=0,
+        
+        # 整体状态
+        overall_status="success",
+        total_time_ms=prompt10_result.processing_time_ms,
+        error_message=None
+    )
+    
+    # 保存历史记录
+    history_manager = HistoryManager()
+    history_manager.save_pipeline_history(pipeline_history)
+    
+    info(f"✅ 流水线历史已保存: {pipeline_history.pipeline_id}")
+    info(f"📁 查看历史: python3 view_history.py pipeline")
+    info(f"📄 导出报告: python3 view_history.py export-pipeline")
 
 
 if __name__ == "__main__":

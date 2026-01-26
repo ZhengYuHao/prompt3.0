@@ -13,6 +13,7 @@ from data_models import (
     ProcessingMode, ProcessingStatus, Prompt10Result, Prompt20Result,
     FullPipelineResult, generate_id, get_timestamp
 )
+from history_manager import HistoryManager, PipelineHistory
 
 # 导入处理模块
 from prompt_preprocessor import PromptPreprocessor
@@ -64,6 +65,7 @@ class PromptPipeline:
         )
         
         self.use_mock = use_mock_llm
+        self.history_manager = HistoryManager()
     
     def run(
         self,
@@ -124,7 +126,10 @@ class PromptPipeline:
             info("\n>>> 阶段 2: Prompt 2.0 结构化")
             info("-" * 50)
             
-            prompt20_result = self.structurizer.process_from_prompt10(prompt10_result)
+            prompt20_result = self.structurizer.process_from_prompt10(
+                prompt10_result,
+                save_history=save_history
+            )
             result.prompt20_result = prompt20_result
             
             # 设置最终输出
@@ -141,10 +146,60 @@ class PromptPipeline:
         
         result.total_time_ms = int((time.time() - start_time) * 1000)
         
+        # 保存完整流水线历史记录
+        if save_history:
+            self._save_pipeline_history(result)
+        
         # 打印最终结果
         self._print_result(result)
         
         return result
+    
+    def _save_pipeline_history(self, result: FullPipelineResult):
+        """保存完整流水线历史记录"""
+        # 统计变量类型
+        type_stats = {}
+        if result.prompt20_result:
+            for var in result.prompt20_result.variables:
+                dtype = var.data_type
+                type_stats[dtype] = type_stats.get(dtype, 0) + 1
+        
+        history = PipelineHistory(
+            pipeline_id=result.pipeline_id,
+            timestamp=result.timestamp,
+            raw_input=result.raw_input,
+            
+            # 阶段1结果
+            prompt10_id=result.prompt10_result.id if result.prompt10_result else "",
+            prompt10_original=result.prompt10_result.original_text if result.prompt10_result else "",
+            prompt10_processed=result.prompt10_result.processed_text if result.prompt10_result else "",
+            prompt10_mode=result.prompt10_result.mode if result.prompt10_result else "",
+            prompt10_steps=[s.to_dict() for s in result.prompt10_result.steps] if result.prompt10_result else [],
+            prompt10_terminology_changes=result.prompt10_result.terminology_changes if result.prompt10_result else {},
+            prompt10_ambiguity_detected=result.prompt10_result.ambiguity_detected if result.prompt10_result else False,
+            prompt10_status=result.prompt10_result.status if result.prompt10_result else "",
+            prompt10_time_ms=result.prompt10_result.processing_time_ms if result.prompt10_result else 0,
+            
+            # 阶段2结果
+            prompt20_id=result.prompt20_result.id if result.prompt20_result else "",
+            prompt20_template=result.prompt20_result.template_text if result.prompt20_result else "",
+            prompt20_variables=result.prompt20_result.variable_registry if result.prompt20_result else [],
+            prompt20_variable_count=len(result.prompt20_result.variables) if result.prompt20_result else 0,
+            prompt20_type_stats=type_stats,
+            prompt20_extraction_log=result.prompt20_result.extraction_log if result.prompt20_result else [],
+            prompt20_time_ms=result.prompt20_result.processing_time_ms if result.prompt20_result else 0,
+            
+            # 整体状态
+            overall_status=result.overall_status,
+            total_time_ms=result.total_time_ms,
+            error_message=result.error_message
+        )
+        
+        try:
+            self.history_manager.save_pipeline_history(history)
+            info(f"流水线历史记录已保存: {result.pipeline_id}")
+        except Exception as e:
+            warning(f"保存流水线历史记录失败: {e}")
     
     def _print_result(self, result: FullPipelineResult):
         """打印流水线结果"""

@@ -17,6 +17,7 @@ from data_models import (
     DataType, VariableMeta, Prompt10Result, Prompt20Result,
     create_prompt20_result, generate_id, get_timestamp
 )
+from history_manager import HistoryManager, Prompt20History
 
 # ========== 配置日志系统 ==========
 logger = setup_logger("prompt3.0.step2")
@@ -302,13 +303,19 @@ class PromptStructurizer:
         self.conflict_resolver = EntityConflictResolver()
         self.extraction_log = []
         self.use_mock = use_mock
+        self.history_manager = HistoryManager()
     
-    def process_from_prompt10(self, prompt10_result: Prompt10Result) -> Prompt20Result:
+    def process_from_prompt10(
+        self, 
+        prompt10_result: Prompt10Result,
+        save_history: bool = True
+    ) -> Prompt20Result:
         """
         从 Prompt 1.0 结果进行处理
         
         Args:
             prompt10_result: Prompt 1.0 的处理结果
+            save_history: 是否保存历史记录
             
         Returns:
             Prompt20Result: Prompt 2.0 结构化结果
@@ -337,7 +344,7 @@ class PromptStructurizer:
         
         processing_time_ms = int((time.time() - start_time) * 1000)
         
-        return Prompt20Result(
+        result = Prompt20Result(
             id=generate_id(),
             timestamp=get_timestamp(),
             source_prompt10_id=prompt10_result.id,
@@ -348,6 +355,38 @@ class PromptStructurizer:
             extraction_log=structure.extraction_log,
             processing_time_ms=processing_time_ms
         )
+        
+        # 保存历史记录
+        if save_history:
+            self._save_history(result)
+        
+        return result
+    
+    def _save_history(self, result: Prompt20Result):
+        """保存 Prompt 2.0 处理历史"""
+        # 统计变量类型
+        type_stats = {}
+        for var in result.variables:
+            dtype = var.data_type
+            type_stats[dtype] = type_stats.get(dtype, 0) + 1
+        
+        history = Prompt20History(
+            id=result.id,
+            timestamp=result.timestamp,
+            source_prompt10_id=result.source_prompt10_id,
+            input_text=result.original_text,
+            template_text=result.template_text,
+            variables=result.variable_registry,
+            variable_count=len(result.variables),
+            type_stats=type_stats,
+            extraction_log=result.extraction_log,
+            processing_time_ms=result.processing_time_ms
+        )
+        
+        try:
+            self.history_manager.save_prompt20_history(history)
+        except Exception as e:
+            warning(f"保存 Prompt 2.0 历史记录失败: {e}")
     
     def process(self, clean_text: str) -> PromptStructure:
         """

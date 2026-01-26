@@ -1,5 +1,5 @@
 """
-2.py 模块功能演示
+prompt_structurizer.py 模块功能演示
 展示实体抽取与变量定义的完整流程
 """
 
@@ -7,11 +7,13 @@ import json
 import re
 from typing import List, Dict, Any
 
-# 导入 2.py 的核心组件
-import sys
-sys.path.insert(0, '.')
-
 from logger import info, warning, error
+from prompt_structurizer import (
+    HallucinationFirewall,
+    TypeCleaner,
+    EntityConflictResolver,
+    VariableMeta
+)
 
 # ============================================================================
 # 增强的模拟 LLM 抽取器（模拟真实 LLM 的复杂输出）
@@ -143,16 +145,7 @@ class EnhancedMockExtractor:
         return entities
 
 
-# ============================================================================
-# 导入 2.py 的核心类
-# ============================================================================
-
-# 读取并执行 2.py（排除 main 部分）
-with open('2.py', 'r', encoding='utf-8') as f:
-    code = f.read()
-    # 只执行到 main 函数之前
-    code_parts = code.split("# ========== 使用示例 ==========")
-    exec(code_parts[0])
+# 核心类已在文件顶部导入
 
 
 # ============================================================================
@@ -173,7 +166,7 @@ def demo_complex_extraction():
 """.strip()
 
     info("=" * 80)
-    info("【2.py 模块功能完整演示】")
+    info("【prompt_structurizer 模块功能完整演示】")
     info("=" * 80)
     
     info("\n" + "─" * 80)

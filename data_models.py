@@ -74,7 +74,7 @@ class StepSnapshot:
 class Prompt10Result:
     """
     Prompt 1.0 预处理结果
-    1.py 的输出，同时也是 2.py 的输入
+    prompt_preprocessor.py 的输出，同时也是 prompt_structurizer.py 的输入
     """
     # 基本信息
     id: str                          # 唯一标识符
@@ -156,7 +156,7 @@ class VariableMeta:
 class Prompt20Result:
     """
     Prompt 2.0 结构化结果
-    2.py 的输出
+    prompt_structurizer.py 的输出
     """
     # 基本信息
     id: str                          # 唯一标识符

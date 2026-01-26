@@ -15,29 +15,8 @@ from data_models import (
 )
 
 # 导入处理模块
-# 注意: 1.py 中的 PromptPreprocessor 和 2.py 中的 PromptStructurizer
-import sys
-import importlib.util
-
-def _import_module_by_path(module_name: str, file_path: str):
-    """通过文件路径导入模块"""
-    import os
-    spec = importlib.util.spec_from_file_location(module_name, file_path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[module_name] = module
-    spec.loader.exec_module(module)
-    return module
-
-# 获取当前目录
-import os
-_current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# 导入 1.py 和 2.py
-_module1 = _import_module_by_path("module1", os.path.join(_current_dir, "1.py"))
-_module2 = _import_module_by_path("module2", os.path.join(_current_dir, "2.py"))
-
-PromptPreprocessor = _module1.PromptPreprocessor
-PromptStructurizer = _module2.PromptStructurizer
+from prompt_preprocessor import PromptPreprocessor
+from prompt_structurizer import PromptStructurizer
 
 
 class PromptPipeline:

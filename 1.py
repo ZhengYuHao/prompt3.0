@@ -9,10 +9,13 @@
 import os
 import re
 import json
+import time
+from datetime import datetime
 from typing import Dict, List, Tuple, Optional, Literal
 from dataclasses import dataclass
 from enum import Enum
 from logger import info, warning, error, debug
+from history_manager import HistoryManager, ProcessingHistory
 
 try:
     from openai import OpenAI
@@ -129,6 +132,9 @@ class PromptPreprocessor:
         # 日志记录
         self.processing_log: List[str] = []
         self.warnings: List[str] = []
+        
+        # 历史记录管理器
+        self.history_manager = HistoryManager()
     
     # ========================================================================
     # 阶段 1.1: 术语标准化 (基于规则)
@@ -330,7 +336,7 @@ class PromptPreprocessor:
     # 主处理流程
     # ========================================================================
     
-    def process(self, raw_text: str) -> ProcessingResult:
+    def process(self, raw_text: str, save_history: bool = True, show_comparison: bool = True) -> ProcessingResult:
         """
         主处理入口
         
@@ -338,7 +344,16 @@ class PromptPreprocessor:
           Dictionary模式: 规则 → LLM润色 → 歧义检测
           Smart模式: 纯LLM端到端
           Hybrid模式: 规则 + LLM智能兜底
+        
+        Args:
+            raw_text: 原始输入文本
+            save_history: 是否保存处理历史
+            show_comparison: 是否显示对比结果
         """
+        # 记录处理开始时间
+        start_time = time.time()
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
         # 重置日志
         self.processing_log = []
         self.warnings = []
@@ -351,6 +366,7 @@ class PromptPreprocessor:
         terminology_changes = {}
         ambiguity_detected = False
         processed_text = raw_text
+        success = False
         
         try:
             if self.mode == ProcessingMode.SMART:
@@ -402,6 +418,7 @@ class PromptPreprocessor:
                             f"【修复后的文本】: {processed_text}"
                         )
             
+            success = True
             info("\n[处理完成] [OK]")
             
         except ValueError as e:
@@ -430,6 +447,14 @@ class PromptPreprocessor:
                     for old, new in result.terminology_changes.items():
                         info(f"  {old} → {new}")
                 info("─"*60)
+                
+                # 保存历史记录
+                if save_history:
+                    self._save_processing_history(
+                        timestamp, raw_text, processed_text, terminology_changes,
+                        ambiguity_detected, success=False, start_time=start_time
+                    )
+                
                 return result  # 返回结果而不是抛出异常，让调用者可以看到修复结果
             raise
         
@@ -446,7 +471,51 @@ class PromptPreprocessor:
         # 打印处理日志
         self._print_result(result)
         
+        # 保存历史记录
+        if save_history:
+            self._save_processing_history(
+                timestamp, raw_text, processed_text, terminology_changes,
+                ambiguity_detected, success=True, start_time=start_time
+            )
+            
+            # 显示对比
+            if show_comparison:
+                history = self.history_manager.get_history(timestamp)
+                if history:
+                    self.history_manager.print_comparison(history)
+        
         return result
+    
+    def _save_processing_history(
+        self,
+        timestamp: str,
+        original_text: str,
+        processed_text: str,
+        terminology_changes: Dict[str, str],
+        ambiguity_detected: bool,
+        success: bool,
+        start_time: float
+    ):
+        """保存处理历史"""
+        processing_time_ms = int((time.time() - start_time) * 1000)
+        
+        history = ProcessingHistory(
+            timestamp=timestamp,
+            original_text=original_text,
+            processed_text=processed_text,
+            mode=self.mode.value,
+            steps_log=self.processing_log.copy(),
+            warnings=self.warnings.copy(),
+            terminology_changes=terminology_changes.copy(),
+            ambiguity_detected=ambiguity_detected,
+            success=success,
+            processing_time_ms=processing_time_ms
+        )
+        
+        try:
+            self.history_manager.save_history(history)
+        except Exception as e:
+            warning(f"保存处理历史失败: {e}")
     
     def _print_result(self, result: ProcessingResult):
         """打印处理结果"""
@@ -700,7 +769,42 @@ if __name__ == "__main__":
 3. 生产环境推荐: 混合模式
    - 核心术语用词表强制对齐
    - 未覆盖的部分交给LLM智能处理
+
+4. 历史记录功能:
+   - 每次处理都会自动保存到 processing_history/history.json
+   - 使用 history_manager 可以查看和对比历史记录
+   - 支持导出HTML格式的对比报告
 """)
+    
+    
+    # ------------------------------------------------------------------------
+    # 场景7: 查看处理历史记录
+    # ------------------------------------------------------------------------
+    info("\n" + "█"*60)
+    info("█  场景7: 查看处理历史记录")
+    info("█"*60)
+    
+    history_manager = HistoryManager()
+    recent_history = history_manager.get_recent_history(limit=5)
+    
+    if recent_history:
+        info(f"\n找到 {len(recent_history)} 条最近的处理记录:")
+        for i, hist in enumerate(recent_history, 1):
+            info(f"\n记录 {i}:")
+            info(f"  时间: {hist.timestamp}")
+            info(f"  模式: {hist.mode}")
+            info(f"  状态: {'✅ 成功' if hist.success else '⚠️ 检测到歧义'}")
+            info(f"  原始文本: {hist.original_text[:50]}...")
+            info(f"  处理后文本: {hist.processed_text[:50]}...")
+        
+        # 展示最新一条记录的详细对比
+        if recent_history:
+            info("\n" + "="*60)
+            info("最新记录的详细对比:")
+            info("="*60)
+            history_manager.print_comparison(recent_history[0])
+    else:
+        info("暂无处理历史记录")
 
 
 

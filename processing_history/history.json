@@ -1,0 +1,75 @@
+{
+  "2026-01-26 11:33:17": {
+    "timestamp": "2026-01-26 11:33:17",
+    "original_text": "帮我搞一个RAG的大模型应用,chain要复杂一点。",
+    "processed_text": "请为我开发一个处理链复杂的大型语言模型(LLM)应用，用于检索增强生成(RAG)。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 3 类术语共 3 处 - {'RAG': '检索增强生成(RAG)', '大模型': '大型语言模型(LLM)', 'chain': '处理链(Chain)'}",
+      "[OK] LLM语义重构完成",
+      "[WARN] 检测到句法歧义: 存在歧义，不清楚是要开发一个处理链复杂的大型语言模型应用，还是要开发一个用于检索增强生成的应用。"
+    ],
+    "warnings": [
+      "[WARN] 检测到句法歧义: 存在歧义，不清楚是要开发一个处理链复杂的大型语言模型应用，还是要开发一个用于检索增强生成的应用。"
+    ],
+    "terminology_changes": {
+      "RAG": "检索增强生成(RAG)",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)"
+    },
+    "ambiguity_detected": true,
+    "success": false,
+    "processing_time_ms": 5828
+  },
+  "2026-01-26 11:33:23": {
+    "timestamp": "2026-01-26 11:33:23",
+    "original_text": "我们想做一个基于大模型的智能应用，用RAG做检索增强，配合Agent做决策。链式处理chain要设计得完整一点，避免出现幻觉。可以考虑用CoT做推理，Prompt要写清楚。如果效果不好再考虑微调，不要搞成那种套壳的玩意儿。另外检索模块要能处理多轮对话，保持上下文一致。整体希望检索准、生成稳，尽量少出现幻觉，必要时再上微调优化效果。",
+    "processed_text": "我们计划开发一个基于大型语言模型(LLM)的智能应用，利用检索增强生成(RAG)进行信息检索优化，并结合智能代理(Agent)进行决策支持。要确保链式处理链(Chain)的设计完备，避免出现模型幻觉(Hallucination)。可以考虑使用思维链(Chain-of-Thought)进行推理，提示词(Prompt)需表述清晰。若效果不佳，再考虑进行模型微调(Fine-tuning)，避免变成基于API的简单封装应用。此外，检索模块需支持多轮对话，保持上下文连贯。总体目标是确保检索准确、生成稳定，尽量减少模型幻觉(Hallucination)的出现，必要时可进行模型微调(Fine-tuning)以优化效果。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 9 类术语共 11 处 - {'大模型': '大型语言模型(LLM)', 'RAG': '检索增强生成(RAG)', 'Agent': '智能代理(Agent)', 'chain': '处理链(Chain)', '幻觉': '模型幻觉(Hallucination)', 'CoT': '思维链(Chain-of-Thought)', 'Prompt': '提示词(Prompt)', '微调': '模型微调(Fine-tuning)', '套壳': '基于API的封装应用'}",
+      "[OK] LLM语义重构完成",
+      "[WARN] 检测到句法歧义: 无法确定是否要避免模型幻觉(Hallucination)还是避免出现模型幻觉。"
+    ],
+    "warnings": [
+      "[WARN] 检测到句法歧义: 无法确定是否要避免模型幻觉(Hallucination)还是避免出现模型幻觉。"
+    ],
+    "terminology_changes": {
+      "大模型": "大型语言模型(LLM)",
+      "RAG": "检索增强生成(RAG)",
+      "Agent": "智能代理(Agent)",
+      "chain": "处理链(Chain)",
+      "幻觉": "模型幻觉(Hallucination)",
+      "CoT": "思维链(Chain-of-Thought)",
+      "Prompt": "提示词(Prompt)",
+      "微调": "模型微调(Fine-tuning)",
+      "套壳": "基于API的封装应用"
+    },
+    "ambiguity_detected": true,
+    "success": false,
+    "processing_time_ms": 3605
+  },
+  "2026-01-26 11:33:27": {
+    "timestamp": "2026-01-26 11:33:27",
+    "original_text": "这个需求你看着办吧，我们大概想要一个RAG加大模型的应用，chain要复杂点，别搞一下那种简单的。意思就是能检索、能生成就行，稍微像样一点，差不多满足业务就成。具体你随便弄一下，弄好就成。不需要搞太复杂点，可能加个Agent、用点RAG就差不多了。你那边先弄好一版，我们再看效果，那个具体的实现细节你们随便定就行。",
+    "processed_text": "请设计一个结合检索增强生成(RAG)和大型语言模型(LLM)的应用程序，其中处理链要更加复杂，确保功能完善。应用程序需要具备检索和生成功能，并且要有一定的质量，以满足业务需求。你可以先完成一个初版，我们之后再评估效果。在设计中可以考虑加入智能代理(Agent)和利用检索增强生成(RAG)技术，但不要让系统变得过于复杂。实现细节可以由你们自行决定。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 4 类术语共 5 处 - {'RAG': '检索增强生成(RAG)', '大模型': '大型语言模型(LLM)', 'chain': '处理链(Chain)', 'Agent': '智能代理(Agent)'}",
+      "[OK] LLM语义重构完成",
+      "[WARN] 检测到歧义词 ['意思', '那个', '随便', '搞一下', '弄一下', '弄好', '稍微', '复杂点', '看着办', '差不多', '大概', '可能']，但已生成修复版本"
+    ],
+    "warnings": [
+      "[WARN] 检测到歧义词共 12 个: ['意思', '那个', '随便', '搞一下', '弄一下', '弄好', '稍微', '复杂点', '看着办', '差不多', '大概', '可能']"
+    ],
+    "terminology_changes": {
+      "RAG": "检索增强生成(RAG)",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "Agent": "智能代理(Agent)"
+    },
+    "ambiguity_detected": true,
+    "success": false,
+    "processing_time_ms": 2012
+  }
+}

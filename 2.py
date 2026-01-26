@@ -5,18 +5,14 @@ S.E.D.E Framework - Step 2: 实体抽取与变量定义 (Entity Extraction & Var
 
 import json
 import re
-import logging
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, asdict
 from enum import Enum
 from collections import defaultdict
+from logger import info, warning, error, debug, setup_logger
 
 # ========== 配置日志系统 ==========
-logging.basicConfig(
-    level=logging.INFO,
-    format='[%(levelname)s] %(message)s'
-)
-logger = logging.getLogger(__name__)
+logger = setup_logger("prompt3.0.step2")
 
 
 # ========== 数据类型定义 ==========
@@ -430,10 +426,10 @@ def main():
     # 输入: Prompt 1.0 (已清洗文本)
     input_text = "请为一位有3年经验的Java程序员生成一个为期2周的Python学习计划,重点关注数据分析。"
     
-    print("=" * 60)
-    print("S.E.D.E Framework - Step 2: 实体抽取与变量定义")
-    print("=" * 60)
-    print(f"\n【输入 - Prompt 1.0】:\n{input_text}\n")
+    info("=" * 60)
+    info("S.E.D.E Framework - Step 2: 实体抽取与变量定义")
+    info("=" * 60)
+    info(f"\n【输入 - Prompt 1.0】:\n{input_text}\n")
     
     # 创建处理器
     structurizer = PromptStructurizer()
@@ -442,32 +438,32 @@ def main():
     result = structurizer.process(input_text)
     
     # 输出结果
-    print("\n" + "=" * 60)
-    print("【输出 - Prompt 2.0 模板】:")
-    print("=" * 60)
-    print(result.template_text)
+    info("\n" + "=" * 60)
+    info("【输出 - Prompt 2.0 模板】:")
+    info("=" * 60)
+    info(result.template_text)
     
-    print("\n" + "=" * 60)
-    print("【变量注册表 (Variable Registry)】:")
-    print("=" * 60)
-    print(json.dumps(result.variable_registry, indent=2, ensure_ascii=False))
+    info("\n" + "=" * 60)
+    info("【变量注册表 (Variable Registry)】:")
+    info("=" * 60)
+    info(json.dumps(result.variable_registry, indent=2, ensure_ascii=False))
     
-    print("\n" + "=" * 60)
-    print("【处理日志】:")
-    print("=" * 60)
+    info("\n" + "=" * 60)
+    info("【处理日志】:")
+    info("=" * 60)
     for log in result.extraction_log:
-        print(f"  {log}")
+        info(f"  {log}")
     
-    print("\n" + "=" * 60)
-    print("【验证: 模板回填】:")
-    print("=" * 60)
+    info("\n" + "=" * 60)
+    info("【验证: 模板回填】:")
+    info("=" * 60)
     # 演示如何使用模板
     filled_template = result.template_text
     for var in result.variable_registry:
         placeholder = f"{{{{{var['variable']}}}}}"
         filled_template = filled_template.replace(placeholder, str(var['value']))
-    print(filled_template)
-    print(f"\n原文一致性: {filled_template == input_text}")
+    info(filled_template)
+    info(f"\n原文一致性: {filled_template == input_text}")
 
 
 if __name__ == "__main__":

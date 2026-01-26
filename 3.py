@@ -11,6 +11,7 @@ from typing import List, Dict, Set, Optional, Tuple, Any
 from dataclasses import dataclass, field
 from enum import Enum
 from copy import deepcopy
+from logger import info, warning, error, debug
 
 
 # ============================================================
@@ -700,7 +701,7 @@ class SelfCorrectionLoop:
         result = None
         
         for attempt in range(self.max_retries):
-            print(f"\n🔄 第 {attempt + 1} 次编译尝试...")
+            info(f"\n🔄 第 {attempt + 1} 次编译尝试...")
             
             # 转译
             dsl_code = self.transpiler.transpile(prompt_2_0)
@@ -709,20 +710,20 @@ class SelfCorrectionLoop:
             result = self.validator.validate(dsl_code)
             
             if result.is_valid:
-                print(f"✅ 编译成功！")
+                info(f"✅ 编译成功！")
                 return True, dsl_code, result
             else:
-                print(f"❌ 编译失败，发现 {len(result.errors)} 个错误")
-                for error in result.errors[:3]:  # 只显示前3个错误
-                    print(f"  {error}")
+                error(f"❌ 编译失败，发现 {len(result.errors)} 个错误")
+                for err in result.errors[:3]:  # 只显示前3个错误
+                    error(f"  {err}")
                 
                 if attempt < self.max_retries - 1:
                     # 准备错误反馈给 LLM
                     error_feedback = self._generate_error_feedback(dsl_code, result)
                     prompt_2_0['error_feedback'] = error_feedback
-                    print(f"  正在准备修正...")
+                    info(f"  正在准备修正...")
         
-        print(f"\n❌ 经过 {self.max_retries} 次尝试仍未通过验证，需要人工介入")
+        error(f"\n❌ 经过 {self.max_retries} 次尝试仍未通过验证，需要人工介入")
         return False, dsl_code, result
     
     def _generate_error_feedback(self, dsl_code: str, result: ValidationResult) -> str:
@@ -744,9 +745,9 @@ class SelfCorrectionLoop:
 def main():
     """完整的逻辑重构与代码化流程演示"""
     
-    print("=" * 60)
-    print("S.E.D.E 第三步：逻辑重构与代码化")
-    print("=" * 60)
+    info("=" * 60)
+    info("S.E.D.E 第三步：逻辑重构与代码化")
+    info("=" * 60)
     
     # 1. 准备输入：Prompt 2.0（来自第二步）
     prompt_2_0 = {
@@ -764,15 +765,16 @@ def main():
             {'name': 'summarize_text', 'arguments': ['article', 'max_length'], 'result': 'summary'}
         ]   }
     # 2. 执行完整流程
+    compiler = SelfCorrectionLoop()
     success, dsl_code, result = compiler.compile_with_retry(prompt_2_0)
     if success:
-        print("\n✅ 编译成功！")
-        print("DSL 代码:")
-        print(dsl_code)
-        print("\n验证结果:")
-        print(result.get_report())
+        info("\n✅ 编译成功！")
+        info("DSL 代码:")
+        info(dsl_code)
+        info("\n验证结果:")
+        info(result.get_report())
     else:
-        print("\n❌ 编译失败，需要人工介入")
-        print("DSL 代码:")
-        print(dsl_code)
+        error("\n❌ 编译失败，需要人工介入")
+        info("DSL 代码:")
+        info(dsl_code)
         

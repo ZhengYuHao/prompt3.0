@@ -13,6 +13,7 @@ from typing import List, Dict, Set, Tuple, Optional
 from dataclasses import dataclass, field
 from enum import Enum
 from collections import defaultdict
+from logger import info, warning, error, debug
 
 
 # ============================================================================
@@ -183,7 +184,7 @@ class DependencyAnalyzer:
             # 记录变量的生产者
             for out_var in block.outputs:
                 if out_var in self.var_producer:
-                    print(f"⚠️ 警告: 变量 {out_var} 被重复定义")
+                    warning(f"变量 {out_var} 被重复定义")
                 self.var_producer[out_var] = block.id
         
         # Step 2: 建立依赖边
@@ -196,14 +197,14 @@ class DependencyAnalyzer:
                     block.dependencies.add(producer_id)
                 elif not producer_id and block.type != BlockType.IF:
                     # IF 语句可以使用外部输入变量
-                    print(f"⚠️ 未定义变量: {in_var} 在块 {block.id} 中使用")
+                    warning(f"未定义变量: {in_var} 在块 {block.id} 中使用")
     
     def detect_cycles(self) -> bool:
         """检测循环依赖"""
         try:
             cycles = list(nx.simple_cycles(self.graph))
             if cycles:
-                print(f"❌ 检测到循环依赖: {cycles}")
+                error(f"检测到循环依赖: {cycles}")
                 return True
             return False
         except:
@@ -301,9 +302,9 @@ class DependencyAnalyzer:
             
             plt.title("代码依赖关系图 (Dependency DAG)", fontsize=14)
             plt.savefig(output_file, dpi=300, bbox_inches='tight')
-            print(f"✅ 依赖图已保存至: {output_file}")
+            info(f"依赖图已保存至: {output_file}")
         except ImportError:
-            print("⚠️ matplotlib 未安装，跳过可视化")
+            warning("matplotlib 未安装，跳过可视化")
 
 
 # ============================================================================
@@ -501,17 +502,17 @@ class WaActCompiler:
         Returns:
             (模块列表, 主函数代码)
         """
-        print("=" * 60)
-        print("WaAct Compiler v2.0 - 开始编译")
-        print("=" * 60)
+        info("=" * 60)
+        info("WaAct Compiler v2.0 - 开始编译")
+        info("=" * 60)
         
         # Stage 1: 词法解析
-        print("\n[Stage 1] 词法解析 (Lexical Parsing)...")
+        info("\n[Stage 1] 词法解析 (Lexical Parsing)...")
         blocks = self.parser.parse(dsl_code)
-        print(f"✅ 解析出 {len(blocks)} 个代码块")
+        info(f"✅ 解析出 {len(blocks)} 个代码块")
         
         # Stage 2: 依赖分析
-        print("\n[Stage 2] 依赖分析 (Dependency Analysis)...")
+        info("\n[Stage 2] 依赖分析 (Dependency Analysis)...")
         analyzer = DependencyAnalyzer(blocks)
         analyzer.build_graph()
         
@@ -522,37 +523,37 @@ class WaActCompiler:
         # 死代码检测
         dead_code = analyzer.find_dead_code()
         if dead_code:
-            print(f"⚠️ 发现 {len(dead_code)} 个死代码块: {dead_code}")
+            warning(f"发现 {len(dead_code)} 个死代码块: {dead_code}")
         
-        print("✅ 依赖图构建完成")
+        info("✅ 依赖图构建完成")
         
         if visualize:
             analyzer.visualize()
         
         # Stage 3: 模块聚类
-        print(f"\n[Stage 3] 模块聚类 (Strategy: {clustering_strategy})...")
+        info(f"\n[Stage 3] 模块聚类 (Strategy: {clustering_strategy})...")
         clusters = analyzer.analyze_clusters(clustering_strategy)
-        print(f"✅ 拆分为 {len(clusters)} 个模块")
+        info(f"✅ 拆分为 {len(clusters)} 个模块")
         
         # Stage 4: 代码生成
-        print("\n[Stage 4] 代码生成 (Code Synthesis)...")
+        info("\n[Stage 4] 代码生成 (Code Synthesis)...")
         modules = []
         
         for i, cluster in enumerate(clusters, 1):
             module = self.synthesizer.generate_module(cluster, i)
             modules.append(module)
-            print(f"  ├─ Module {i}: {module.name} "
+            info(f"  ├─ Module {i}: {module.name} "
                   f"({'async' if module.is_async else 'sync'})")
         
         # Stage 5: 主控生成
-        print("\n[Stage 5] 主控编排 (Orchestration)...")
+        info("\n[Stage 5] 主控编排 (Orchestration)...")
         main_inputs = self._extract_main_inputs(blocks)
         main_code = self.synthesizer.generate_orchestrator(modules, main_inputs)
-        print("✅ 主工作流生成完成")
+        info("✅ 主工作流生成完成")
         
-        print("\n" + "=" * 60)
-        print("编译成功！")
-        print("=" * 60)
+        info("\n" + "=" * 60)
+        info("编译成功！")
+        info("=" * 60)
         
         return modules, main_code
     
@@ -606,13 +607,14 @@ class WaActCompiler:
             '    }',
             '    ',
             '    result = asyncio.run(main_workflow(test_input))',
-            '    print("执行结果:", result)'
+            '    from logger import info',
+            '    info("执行结果:", result)'
         ])
         
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write('\n'.join(lines))
         
-        print(f"\n✅ 代码已导出至: {output_path}")
+        info(f"\n✅ 代码已导出至: {output_path}")
 
 
 # ============================================================================
@@ -646,20 +648,20 @@ ENDIF
     )
     
     # 打印结果
-    print("\n" + "=" * 60)
-    print("生成的模块代码:")
-    print("=" * 60)
+    info("\n" + "=" * 60)
+    info("生成的模块代码:")
+    info("=" * 60)
     
     for i, module in enumerate(modules, 1):
-        print(f"\n{'─' * 60}")
-        print(f"Module {i}: {module.name}")
-        print('─' * 60)
-        print(module.to_python())
+        info(f"\n{'─' * 60}")
+        info(f"Module {i}: {module.name}")
+        info('─' * 60)
+        info(module.to_python())
     
-    print("\n" + "=" * 60)
-    print("主工作流代码:")
-    print("=" * 60)
-    print(main_code)
+    info("\n" + "=" * 60)
+    info("主工作流代码:")
+    info("=" * 60)
+    info(main_code)
     
     # 导出文件
     compiler.export_to_file(modules, main_code, "generated_workflow.py")

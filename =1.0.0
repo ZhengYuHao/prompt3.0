@@ -1,0 +1,26 @@
+Looking in indexes: https://pypi.tuna.tsinghua.edu.cn/simple
+Collecting openai
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/b5/df/c306f7375d42bafb379934c2df4c2fa3964656c8c782bac75ee10c102818/openai-2.15.0-py3-none-any.whl (1.1 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 5.2 MB/s eta 0:00:00
+Collecting anyio<5,>=3.5.0 (from openai)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/38/0e/27be9fdef66e72d64c0cdc3cc2823101b80585f8119b5c112c2e8f5f7dab/anyio-4.12.1-py3-none-any.whl (113 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 113.6/113.6 kB 5.7 MB/s eta 0:00:00
+Requirement already satisfied: distro<2,>=1.7.0 in ./venv/lib/python3.12/site-packages (from openai) (1.9.0)
+Collecting httpx<1,>=0.23.0 (from openai)
+  Using cached https://pypi.tuna.tsinghua.edu.cn/packages/2a/39/e50c7c3a983047577ee07d2a9e53faf5a69493943ec3f6a384bdc792deb2/httpx-0.28.1-py3-none-any.whl (73 kB)
+Requirement already satisfied: jiter<1,>=0.10.0 in ./venv/lib/python3.12/site-packages (from openai) (0.12.0)
+Collecting pydantic<3,>=1.9.0 (from openai)
+  Using cached https://pypi.tuna.tsinghua.edu.cn/packages/5a/87/b70ad306ebb6f9b585f114d0ac2137d792b48be34d732d60e597c2f8465a/pydantic-2.12.5-py3-none-any.whl (463 kB)
+Requirement already satisfied: sniffio in ./venv/lib/python3.12/site-packages (from openai) (1.3.1)
+Requirement already satisfied: tqdm>4 in ./venv/lib/python3.12/site-packages (from openai) (4.67.1)
+Requirement already satisfied: typing-extensions<5,>=4.11 in ./venv/lib/python3.12/site-packages (from openai) (4.15.0)
+Requirement already satisfied: idna>=2.8 in ./venv/lib/python3.12/site-packages (from anyio<5,>=3.5.0->openai) (3.11)
+Requirement already satisfied: certifi in ./venv/lib/python3.12/site-packages (from httpx<1,>=0.23.0->openai) (2026.1.4)
+Collecting httpcore==1.* (from httpx<1,>=0.23.0->openai)
+  Using cached https://pypi.tuna.tsinghua.edu.cn/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl (78 kB)
+Requirement already satisfied: h11>=0.16 in ./venv/lib/python3.12/site-packages (from httpcore==1.*->httpx<1,>=0.23.0->openai) (0.16.0)
+Requirement already satisfied: annotated-types>=0.6.0 in ./venv/lib/python3.12/site-packages (from pydantic<3,>=1.9.0->openai) (0.7.0)
+Requirement already satisfied: pydantic-core==2.41.5 in ./venv/lib/python3.12/site-packages (from pydantic<3,>=1.9.0->openai) (2.41.5)
+Requirement already satisfied: typing-inspection>=0.4.2 in ./venv/lib/python3.12/site-packages (from pydantic<3,>=1.9.0->openai) (0.4.2)
+Installing collected packages: httpcore, anyio, pydantic, httpx, openai
+Successfully installed anyio-4.12.1 httpcore-1.0.9 httpx-0.28.1 openai-2.15.0 pydantic-2.12.5

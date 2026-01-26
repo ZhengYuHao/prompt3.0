@@ -6,11 +6,18 @@
   - 智能模式 (Smart Mode): 纯LLM驱动的自适应处理
 """
 
+import os
 import re
 import json
 from typing import Dict, List, Tuple, Optional, Literal
 from dataclasses import dataclass
 from enum import Enum
+from logger import info, warning, error, debug
+
+try:
+    from openai import OpenAI
+except ImportError:
+    OpenAI = None  # type: ignore
 
 
 # ============================================================================
@@ -36,31 +43,56 @@ class ProcessingMode(Enum):
 
 
 # ============================================================================
-# LLM 接口封装 (生产环境请替换为真实API)
+# LLM 接口封装（桥接 GPT，兼容 OpenAI API）
 # ============================================================================
 
+# 默认桥接地址与 Key；生产环境建议使用环境变量 RCOUYI_API_KEY，勿将 key 提交仓库
+RCOUYI_BASE_URL = "https://api.rcouyi.com/v1"
+RCOUYI_API_KEY_DEFAULT = "sk-0JL8T592b6roD3uaDaD0Ac0f081c4040810d978e38CdAa01"
+
+
 class LLMInterface:
-    """LLM调用接口的抽象层"""
+    """LLM 调用接口：桥接 https://api.rcouyi.com/v1（OpenAI 兼容）"""
     
-    def __init__(self, model: str = "gpt-3.5-turbo", temperature: float = 0.1):
+    def __init__(
+        self,
+        model: str = "gpt-3.5-turbo",
+        temperature: float = 0.1,
+        base_url: Optional[str] = None,
+        api_key: Optional[str] = None,
+    ):
         self.model = model
         self.temperature = temperature
+        self.base_url = base_url or os.environ.get("RCOUYI_BASE_URL", RCOUYI_BASE_URL)
+        self.api_key = api_key or os.environ.get("RCOUYI_API_KEY", RCOUYI_API_KEY_DEFAULT)
+        self._client: Optional["OpenAI"] = None
+    
+    def _get_client(self) -> "OpenAI":
+        if OpenAI is None:
+            raise RuntimeError("请先安装 openai: pip install openai")
+        if self._client is None:
+            self._client = OpenAI(base_url=self.base_url, api_key=self.api_key)
+        return self._client
     
     def call(self, system_prompt: str, user_content: str) -> str:
         """
-        调用LLM接口
-        生产环境中替换为真实的API调用 (OpenAI/Claude/本地模型)
+        调用桥接 GPT API（OpenAI 兼容）。
         """
-        # 模拟返回 - 实际使用时请替换
-        print(f"[LLM调用] 模型: {self.model}, Temperature: {self.temperature}")
-        print(f"[System] {system_prompt[:100]}...")
-        print(f"[User] {user_content[:100]}...")
+        info(f"[LLM调用] 模型: {self.model}, Temperature: {self.temperature}")
+        debug(f"[System] {system_prompt[:100]}...")
+        debug(f"[User] {user_content[:100]}...")
         
-        # 这里应该是真实的API调用
-        # response = openai.ChatCompletion.create(...)
-        # return response.choices[0].message.content
-        
-        return f"[模拟LLM输出]: {user_content}"
+        client = self._get_client()
+        resp = client.chat.completions.create(
+            model=self.model,
+            temperature=self.temperature,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_content},
+            ],
+        )
+        text = (resp.choices[0].message.content or "").strip()
+        return text
 
 
 # ============================================================================
@@ -112,7 +144,8 @@ class PromptPreprocessor:
         if not self.term_mapping:
             return text, {}
         
-        changes = {}
+        changes: Dict[str, str] = {}
+        occurrences: List[str] = []
         
         # 按关键词长度降序排列 (防止短词误伤长词)
         sorted_terms = sorted(self.term_mapping.keys(), key=len, reverse=True)
@@ -124,14 +157,15 @@ class PromptPreprocessor:
             original = match.group(0)
             replacement = self.term_mapping[original]
             changes[original] = replacement
+            occurrences.append(original)
             return replacement
         
         normalized_text = pattern.sub(replace_func, text)
         
         if changes:
-            self.processing_log.append(
-                f"✓ 术语对齐: 替换了 {len(changes)} 处 - {changes}"
-            )
+            n_types, n_total = len(changes), len(occurrences)
+            msg = f"[OK] 术语对齐: {n_types} 类术语共 {n_total} 处 - {changes}"
+            self.processing_log.append(msg)
         
         return normalized_text, changes
     
@@ -151,8 +185,9 @@ class PromptPreprocessor:
         ]
         
         if found_ambiguities:
+            n = len(found_ambiguities)
             self.warnings.append(
-                f"⚠ 检测到歧义词: {found_ambiguities}"
+                f"[WARN] 检测到歧义词共 {n} 个: {found_ambiguities}"
             )
         
         return bool(found_ambiguities), found_ambiguities
@@ -187,7 +222,7 @@ class PromptPreprocessor:
 """
         
         result = self.llm.call(system_prompt, text)
-        self.processing_log.append("✓ LLM语义重构完成")
+        self.processing_log.append("[OK] LLM语义重构完成")
         
         return result
     
@@ -223,13 +258,24 @@ class PromptPreprocessor:
 """
         
         result = self.llm.call(system_prompt, text)
+        raw = (result or "").strip()
         
-        if "PASS" in result.upper():
-            self.processing_log.append("✓ 结构歧义检查: 通过")
+        def _is_pass(r: str) -> bool:
+            if "PASS" in r.upper():
+                return True
+            # 兼容模型用中文回复：简短且含无歧义/通过，且非歧义描述
+            if len(r) > 80:
+                return False
+            if any(kw in r for kw in ("无歧义", "通过", "无严重歧义", "清晰无歧义")):
+                if not any(bad in r for bad in ("存在歧义", "有歧义", "存在严重歧义")):
+                    return True
+            return False
+        
+        if _is_pass(raw):
+            self.processing_log.append("[OK] 结构歧义检查: 通过")
             return None
-        else:
-            self.warnings.append(f"⚠ 检测到句法歧义: {result}")
-            return result
+        self.warnings.append(f"[WARN] 检测到句法歧义: {raw}")
+        return raw
     
     # ========================================================================
     # 智能模式: 纯LLM端到端处理
@@ -274,10 +320,10 @@ class PromptPreprocessor:
         # 检查是否包含歧义标记
         if "[AMBIGUITY:" in result:
             ambiguity_part = result.split("[AMBIGUITY:")[1].split("]")[0]
-            self.warnings.append(f"⚠ LLM检测到歧义: {ambiguity_part}")
+            self.warnings.append(f"[WARN] LLM检测到歧义: {ambiguity_part}")
             result = result.split("[AMBIGUITY:")[0].strip()
         
-        self.processing_log.append("✓ 智能模式处理完成")
+        self.processing_log.append("[OK] 智能模式处理完成")
         return result
     
     # ========================================================================
@@ -297,10 +343,10 @@ class PromptPreprocessor:
         self.processing_log = []
         self.warnings = []
         
-        print(f"\n{'='*60}")
-        print(f"[开始处理] 模式: {self.mode.value}")
-        print(f"[原始输入] {raw_text}")
-        print(f"{'='*60}\n")
+        info(f"\n{'='*60}")
+        info(f"[开始处理] 模式: {self.mode.value}")
+        info(f"[原始输入] {raw_text}")
+        info(f"{'='*60}\n")
         
         terminology_changes = {}
         ambiguity_detected = False
@@ -326,12 +372,19 @@ class PromptPreprocessor:
                 
                 if has_ambiguity:
                     ambiguity_detected = True
+                    # 即使检测到歧义词，也先进行LLM修复，然后再抛出异常
+                    # 这样用户可以看到修复后的结果
+                    info("[INFO] 检测到歧义词，但将继续进行LLM修复以展示修复结果...")
+                    processed_text = self._smooth_with_llm(processed_text)
+                    # 保存修复后的文本，然后抛出异常
+                    self.processing_log.append(f"[WARN] 检测到歧义词 {ambiguous_words}，但已生成修复版本")
                     raise ValueError(
                         f"【流程中断】检测到歧义词 {ambiguous_words}\n"
-                        f"建议: 请明确指代对象后重新输入"
+                        f"建议: 请明确指代对象后重新输入\n"
+                        f"【修复后的文本】: {processed_text}"
                     )
                 
-                # 步骤3: LLM语义重构 (LLM层)
+                # 步骤3: LLM语义重构 (LLM层) - 这里会修复文本
                 processed_text = self._smooth_with_llm(processed_text)
                 
                 # 步骤4: 深层歧义检测 (LLM层)
@@ -341,15 +394,43 @@ class PromptPreprocessor:
                     )
                     if structural_ambiguity:
                         ambiguity_detected = True
+                        # 保存修复后的文本，然后抛出异常
+                        self.processing_log.append(f"[WARN] 检测到句法歧义: {structural_ambiguity}")
                         raise ValueError(
                             f"【流程中断】检测到句法歧义\n"
-                            f"详情: {structural_ambiguity}"
+                            f"详情: {structural_ambiguity}\n"
+                            f"【修复后的文本】: {processed_text}"
                         )
             
-            print("\n[处理完成] ✓")
+            info("\n[处理完成] [OK]")
             
         except ValueError as e:
-            print(f"\n[处理失败] ✗\n{e}")
+            error("\n[处理失败] [FAIL]")
+            # 避免在 Windows GBK 下打印含中文的 e 导致 UnicodeEncodeError 崩溃
+            _msg = str(e)
+            if "检测到歧义词" in _msg or "检测到句法歧义" in _msg:
+                warning("(歧义阻断，已拦截 — 属预期行为)")
+                # 即使有歧义，也构建结果对象以展示修复后的文本
+                result = ProcessingResult(
+                    original_text=raw_text,
+                    processed_text=processed_text,  # 保存修复后的文本
+                    steps_log=self.processing_log,
+                    warnings=self.warnings,
+                    terminology_changes=terminology_changes,
+                    ambiguity_detected=True
+                )
+                # 展示修复结果
+                info("\n" + "─"*60)
+                info("【修复结果展示】:")
+                info("─"*60)
+                info(f"原始文本: {raw_text}")
+                info(f"修复后文本: {processed_text}")
+                if result.terminology_changes:
+                    info("\n术语替换:")
+                    for old, new in result.terminology_changes.items():
+                        info(f"  {old} → {new}")
+                info("─"*60)
+                return result  # 返回结果而不是抛出异常，让调用者可以看到修复结果
             raise
         
         # 构建结果对象
@@ -369,24 +450,24 @@ class PromptPreprocessor:
     
     def _print_result(self, result: ProcessingResult):
         """打印处理结果"""
-        print("\n" + "─"*60)
-        print("处理日志:")
+        info("\n" + "─"*60)
+        info("处理日志:")
         for log in result.steps_log:
-            print(f"  {log}")
+            info(f"  {log}")
         
         if result.warnings:
-            print("\n警告信息:")
-            for warning in result.warnings:
-                print(f"  {warning}")
+            info("\n警告信息:")
+            for warn_msg in result.warnings:
+                warning(f"  {warn_msg}")
         
         if result.terminology_changes:
-            print("\n术语替换:")
+            info("\n术语替换:")
             for old, new in result.terminology_changes.items():
-                print(f"  {old} → {new}")
+                info(f"  {old} → {new}")
         
-        print("\n" + "─"*60)
-        print(f"[最终输出]\n{result.processed_text}")
-        print("="*60 + "\n")
+        info("\n" + "─"*60)
+        info(f"[最终输出]\n{result.processed_text}")
+        info("="*60 + "\n")
 
 
 # ============================================================================
@@ -403,7 +484,7 @@ class ConfigLoader:
             with open(file_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except FileNotFoundError:
-            print(f"⚠ 配置文件不存在: {file_path},使用默认配置")
+            warning(f"配置文件不存在: {file_path},使用默认配置")
             return {}
     
     @staticmethod
@@ -413,7 +494,7 @@ class ConfigLoader:
             with open(file_path, 'r', encoding='utf-8') as f:
                 return [line.strip() for line in f if line.strip()]
         except FileNotFoundError:
-            print(f"⚠ 配置文件不存在: {file_path},使用默认配置")
+            warning(f"配置文件不存在: {file_path},使用默认配置")
             return []
     
     @staticmethod
@@ -435,10 +516,30 @@ class ConfigLoader:
     def get_default_blacklist() -> List[str]:
         """默认歧义词黑名单"""
         return [
-            "意思", "那个", "随便", "搞一下", "弄好",
+            "意思", "那个", "随便", "搞一下", "弄一下", "弄好",
             "稍微", "简单点", "复杂点", "看着办",
             "差不多", "大概", "可能"
         ]
+
+
+# ============================================================================
+# 复杂示例（约200字，用于验证术语密集 + 歧义阻断）
+# ============================================================================
+
+COMPLEX_EXAMPLE_TERMINOLOGY = (
+    "我们想做一个基于大模型的智能应用，用RAG做检索增强，配合Agent做决策。"
+    "链式处理chain要设计得完整一点，避免出现幻觉。可以考虑用CoT做推理，Prompt要写清楚。"
+    "如果效果不好再考虑微调，不要搞成那种套壳的玩意儿。"
+    "另外检索模块要能处理多轮对话，保持上下文一致。"
+    "整体希望检索准、生成稳，尽量少出现幻觉，必要时再上微调优化效果。"
+)
+
+COMPLEX_EXAMPLE_AMBIGUITY = (
+    "这个需求你看着办吧，我们大概想要一个RAG加大模型的应用，chain要复杂点，别搞一下那种简单的。"
+    "意思就是能检索、能生成就行，稍微像样一点，差不多满足业务就成。"
+    "具体你随便弄一下，弄好就成。不需要搞太复杂点，可能加个Agent、用点RAG就差不多了。"
+    "你那边先弄好一版，我们再看效果，那个具体的实现细节你们随便定就行。"
+)
 
 
 # ============================================================================
@@ -446,13 +547,19 @@ class ConfigLoader:
 # ============================================================================
 
 if __name__ == "__main__":
-    
+    import sys
+    if sys.platform == "win32":
+        try:
+            sys.stdout.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
+
     # ------------------------------------------------------------------------
     # 场景1: 词表模式 (Dictionary Mode) - 最高确定性
     # ------------------------------------------------------------------------
-    print("\n" + "█"*60)
-    print("█  场景1: 词表模式 (基于预定义规则)")
-    print("█"*60)
+    info("\n" + "█"*60)
+    info("█  场景1: 词表模式 (基于预定义规则)")
+    info("█"*60)
     
     processor_dict = PromptPreprocessor(
         mode=ProcessingMode.DICTIONARY,
@@ -466,30 +573,30 @@ if __name__ == "__main__":
     try:
         result1 = processor_dict.process(test_case_1)
     except ValueError as e:
-        print(f"处理失败: {e}")
+        error(f"处理失败: {e}")
     
     
     # ------------------------------------------------------------------------
     # 场景2: 歧义词触发中断
     # ------------------------------------------------------------------------
-    print("\n" + "█"*60)
-    print("█  场景2: 歧义词检测 (触发中断)")
-    print("█"*60)
+    info("\n" + "█"*60)
+    info("█  场景2: 歧义词检测 (触发中断)")
+    info("█"*60)
     
     test_case_2 = "这个需求没啥意思,你看着办。"
     
     try:
         result2 = processor_dict.process(test_case_2)
     except ValueError as e:
-        print(f"✓ 成功拦截歧义输入")
+        info("[OK] 成功拦截歧义输入")
     
     
     # ------------------------------------------------------------------------
     # 场景3: 智能模式 (Smart Mode) - 无需配置词表
     # ------------------------------------------------------------------------
-    print("\n" + "█"*60)
-    print("█  场景3: 智能模式 (纯LLM驱动)")
-    print("█"*60)
+    info("\n" + "█"*60)
+    info("█  场景3: 智能模式 (纯LLM驱动)")
+    info("█"*60)
     
     processor_smart = PromptPreprocessor(
         mode=ProcessingMode.SMART,
@@ -501,15 +608,15 @@ if __name__ == "__main__":
     try:
         result3 = processor_smart.process(test_case_3)
     except ValueError as e:
-        print(f"处理失败: {e}")
+        error(f"处理失败: {e}")
     
     
     # ------------------------------------------------------------------------
     # 场景4: 从配置文件加载 (生产环境推荐)
     # ------------------------------------------------------------------------
-    print("\n" + "█"*60)
-    print("█  场景4: 配置文件加载示例")
-    print("█"*60)
+    info("\n" + "█"*60)
+    info("█  场景4: 配置文件加载示例")
+    info("█"*60)
     
     # 示例: 如何保存配置到文件
     # import json
@@ -524,7 +631,7 @@ if __name__ == "__main__":
     # term_map = ConfigLoader.load_term_mapping('term_mapping.json')
     # blacklist = ConfigLoader.load_blacklist('ambiguity_blacklist.txt')
     
-    print("""
+    info("""
 配置文件格式:
 
 1. term_mapping.json (术语映射表):
@@ -541,10 +648,45 @@ if __name__ == "__main__":
     """)
     
     
-    print("\n" + "█"*60)
-    print("█  系统演示完成")
-    print("█"*60)
-    print("""
+    # ------------------------------------------------------------------------
+    # 场景5: 复杂示例 - 术语密集（约200字，无歧义词，应完整通过）
+    # ------------------------------------------------------------------------
+    info("\n" + "█"*60)
+    info("█  场景5: 复杂示例 - 术语密集（约200字）")
+    info("█"*60)
+    
+    try:
+        result5 = processor_dict.process(COMPLEX_EXAMPLE_TERMINOLOGY)
+        info(f"  [统计] 术语替换 {len(result5.terminology_changes)} 类，"
+              f"步骤数 {len(result5.steps_log)}，警告数 {len(result5.warnings)}")
+    except ValueError as e:
+        error(f"  处理失败: {e}")
+    
+    
+    # ------------------------------------------------------------------------
+    # 场景6: 复杂示例 - 歧义触发（约200字，含多处黑名单词，应拦截）
+    # 说明：此场景预期「处理失败」— 流程在歧义检测阶段中断，即成功拦截。
+    # ------------------------------------------------------------------------
+    info("\n" + "█"*60)
+    info("█  场景6: 复杂示例 - 歧义触发（约200字）")
+    info("█"*60)
+    
+    try:
+        result6 = processor_dict.process(COMPLEX_EXAMPLE_AMBIGUITY)
+        warning("  [未预期] 应被歧义拦截却通过了")
+    except ValueError as e:
+        info("  [OK] 成功拦截歧义输入（复杂长文本）")
+        try:
+            detail = str(e).replace("\n", " ").strip()
+            info(f"  [详情] {detail[:200]}{'...' if len(detail) > 200 else ''}")
+        except Exception:
+            info("  [详情] 已拦截，含黑名单歧义词。")
+    
+    
+    info("\n" + "█"*60)
+    info("█  系统演示完成")
+    info("█"*60)
+    info("""
 使用建议:
 
 1. 词表模式: 适用于术语固定的专业领域(法律、医疗、金融)
@@ -562,22 +704,10 @@ if __name__ == "__main__":
 
 
 
-#生产环境部署
-
-
-#只需替换 LLMInterface.call() 方法为真实的API调用:
-# OpenAI示例
-import openai
-def call(self, system_prompt, user_content):
-    response = openai.ChatCompletion.create(
-        model=self.model,
-        temperature=self.temperature,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_content}
-        ]
-    )
-    return response.choices[0].message.content
+# -----------------------------------------------------------------------------
+# 生产环境：建议通过环境变量配置 RCOUYI_BASE_URL / RCOUYI_API_KEY，勿提交 key。
+# 依赖: pip install openai
+# -----------------------------------------------------------------------------
 
 
 

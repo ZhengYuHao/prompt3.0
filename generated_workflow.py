@@ -7,10 +7,63 @@ from typing import Dict, Any
 from llm_client import invoke_function  # 需要实现 LLM 客户端
 
 
-async def step_1_generate_output():
+async def step_1_design_rag_app():
     """Auto-generated module"""
-    result = await invoke_function('generate_output', )
-    return result
+    retrieval_modes = ['向量检索', '关键词检索', '混合检索']
+    rag_app = CALL design_rag_app(
+    return rag_app, retrieval_modes
+
+
+async def step_2_deploy_to_kubernetes(language_support, max_dialogue_rounds, tech_stack):
+    """Auto-generated module"""
+    tech_stack=tech_stack,
+    llm_backend=True,
+    dialogue_history_limit=max_dialogue_rounds,
+    language_support=language_support
+    deployment_result = CALL deploy_to_kubernetes(
+    return deployment_result
+
+
+async def step_3_integrate_monitoring(architecture_type, deployment_environment, service_count):
+    """Auto-generated module"""
+    environment=deployment_environment,
+    architecture=architecture_type,
+    service_count=service_count
+    monitoring_result = CALL integrate_monitoring(
+    return monitoring_result
+
+
+async def step_4_integrate_logging(monitoring_system):
+    """Auto-generated module"""
+    system=monitoring_system
+    logging_result = CALL integrate_logging(
+    return logging_result
+
+
+async def step_5_process_dialogue_round(logging_system, max_dialogue_rounds, round):
+    """Auto-generated module"""
+    logging_system=logging_system
+    FOR round IN range(max_dialogue_rounds)
+    llm_result = CALL process_dialogue_round(
+    return llm_result
+
+
+def step_6_process(dialogue_history, language_support, response_time_limit_seconds):
+    """Auto-generated module"""
+    history=dialogue_history,
+    language_support=language_support,
+    response_time_limit=response_time_limit_seconds
+    return None
+
+
+def step_7_process(rag_app, retrieval_modes):
+    """Auto-generated module"""
+    retrieval_modes=retrieval_modes,
+    app=rag_app,
+    app=rag_app,
+    app=rag_app,
+    app=rag_app,
+    return None
 
 
 async def main_workflow(input_params: dict):
@@ -18,7 +71,7 @@ async def main_workflow(input_params: dict):
     主工作流 - 自动生成
     
     Args:
-        input_params: 包含 [] 的字典
+        input_params: 包含 ['architecture_type', 'deployment_environment', 'dialogue_history', 'language_support', 'logging_system', 'max_dialogue_rounds', 'monitoring_system', 'response_time_limit_seconds', 'round', 'service_count', 'tech_stack'] 的字典
     
     Returns:
         执行结果上下文
@@ -26,8 +79,26 @@ async def main_workflow(input_params: dict):
     # 初始化上下文
     ctx = input_params.copy()
 
-    # Module 1: step_1_generate_output
-    ctx["result"] = await step_1_generate_output()
+    # Module 1: step_1_design_rag_app
+    ctx["rag_app"], ctx["retrieval_modes"] = await step_1_design_rag_app()
+
+    # Module 2: step_2_deploy_to_kubernetes
+    ctx["deployment_result"] = await step_2_deploy_to_kubernetes(ctx.get("language_support"), ctx.get("max_dialogue_rounds"), ctx.get("tech_stack"))
+
+    # Module 3: step_3_integrate_monitoring
+    ctx["monitoring_result"] = await step_3_integrate_monitoring(ctx.get("architecture_type"), ctx.get("deployment_environment"), ctx.get("service_count"))
+
+    # Module 4: step_4_integrate_logging
+    ctx["logging_result"] = await step_4_integrate_logging(ctx.get("monitoring_system"))
+
+    # Module 5: step_5_process_dialogue_round
+    ctx["llm_result"] = await step_5_process_dialogue_round(ctx.get("logging_system"), ctx.get("max_dialogue_rounds"), ctx.get("round"))
+
+    # Module 6: step_6_process
+    await step_6_process(ctx.get("dialogue_history"), ctx.get("language_support"), ctx.get("response_time_limit_seconds"))
+
+    # Module 7: step_7_process
+    await step_7_process(ctx.get("rag_app"), ctx.get("retrieval_modes"))
 
     return ctx
 

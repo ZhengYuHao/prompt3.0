@@ -45,7 +45,7 @@ from history_manager import HistoryManager, PipelineHistory
 # 配置
 # ============================================================================
 # 是否使用模拟 LLM 客户端（设为 True 可避免真实 API 调用）
-USE_MOCK = True  # 默认使用模拟客户端，避免意外 API 调用
+USE_MOCK = False  # 默认使用模拟客户端，避免意外 API 调用
 # 如果要使用真实 LLM，请设置为 False 并确保配置了有效的 API 密钥
 # USE_MOCK = False
 
@@ -640,6 +640,27 @@ def run_full_pipeline():
         dtype = var.data_type
         type_stats[dtype] = type_stats.get(dtype, 0) + 1
     
+    # 准备第四阶段数据
+    prompt40_modules_dict = []
+    prompt40_module_count = 0
+    prompt40_main_code = ""
+    prompt40_time_ms = 0
+    
+    if success:
+        # 转换 ModuleDefinition 对象为字典，排除不可序列化的字段
+        for module in modules:
+            module_dict = {
+                'name': module.name,
+                'inputs': module.inputs,
+                'outputs': module.outputs,
+                'is_async': module.is_async,
+                # 不保存 original_blocks，因为包含不可序列化的枚举
+            }
+            prompt40_modules_dict.append(module_dict)
+        prompt40_module_count = len(modules)
+        prompt40_main_code = main_code
+        prompt40_time_ms = codegen_time
+    
     # 创建流水线历史记录
     pipeline_history = PipelineHistory(
         pipeline_id=generate_id(),
@@ -672,9 +693,16 @@ def run_full_pipeline():
         prompt30_validation_result=validation_result.to_dict() if success else {},
         prompt30_time_ms=dsl_compile_time,
         
+        # 阶段4结果 (代码生成)
+        prompt40_id=generate_id(),
+        prompt40_modules=prompt40_modules_dict,
+        prompt40_module_count=prompt40_module_count,
+        prompt40_main_code=prompt40_main_code,
+        prompt40_time_ms=prompt40_time_ms,
+        
         # 整体状态
         overall_status="success" if success else "partial",
-        total_time_ms=prompt10_result.processing_time_ms + dsl_compile_time,
+        total_time_ms=prompt10_result.processing_time_ms + dsl_compile_time + prompt40_time_ms,
         error_message=None
     )
     

@@ -85,6 +85,13 @@ class PipelineHistory:
     prompt30_validation_result: Dict[str, Any] = field(default_factory=dict)
     prompt30_time_ms: int = 0
     
+    # 阶段4结果 (代码生成)
+    prompt40_id: str = ""
+    prompt40_modules: List[Dict] = field(default_factory=list)
+    prompt40_module_count: int = 0
+    prompt40_main_code: str = ""
+    prompt40_time_ms: int = 0
+    
     # 整体状态
     overall_status: str = ""
     total_time_ms: int = 0

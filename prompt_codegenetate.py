@@ -106,7 +106,7 @@ class PseudoCodeParser:
     
     def parse(self, dsl_code: str) -> List[CodeBlock]:
         """
-        解析 DSL 代码为原子块列表
+        解析 DSL 代码为原子块列表（支持多行CALL语句）
         
         Args:
             dsl_code: Prompt 3.0 伪代码
@@ -117,14 +117,67 @@ class PseudoCodeParser:
         blocks = []
         lines = dsl_code.strip().split('\n')
         block_counter = 0
+        i = 0
         
-        for line_num, line in enumerate(lines, 1):
-            line = line.strip()
+        while i < len(lines):
+            line = lines[i].strip()
             
             # 跳过空行和注释
             if not line or line.startswith("#") or line.startswith("DEFINE"):
+                i += 1
                 continue
             
+            # 检查是否是多行CALL语句
+            if "CALL" in line and "(" in line and ")" not in line:
+                # 收集多行CALL的所有行
+                call_lines = [line]
+                i += 1
+                while i < len(lines):
+                    next_line = lines[i].strip()
+                    if not next_line:
+                        i += 1
+                        continue
+                    call_lines.append(next_line)
+                    if ")" in next_line:
+                        i += 1
+                        break
+                    i += 1
+                
+                # 合并为单个block
+                full_call = '\n'.join(call_lines)
+                block_type = BlockType.CALL
+                
+                # 提取变量
+                vars_in_call = set()
+                for cl in call_lines:
+                    vars_in_call.update(self._extract_vars(cl))
+                
+                # 提取输出（从第一行）
+                outputs = set()
+                inputs = set()
+                if "=" in call_lines[0]:
+                    left, right = call_lines[0].split("=", 1)
+                    outputs = self._extract_vars(left)
+                
+                # 从所有行提取输入
+                for cl in call_lines:
+                    if "=" in cl:
+                        _, right = cl.split("=", 1)
+                        inputs.update(self._extract_vars(right))
+                
+                blocks.append(CodeBlock(
+                    id=f"OP_{block_counter}",
+                    type=block_type,
+                    code_lines=call_lines,
+                    inputs=inputs,
+                    outputs=outputs,
+                    line_number=i - len(call_lines) + 1,
+                    is_async=True
+                ))
+                block_counter += 1
+                continue
+            
+            # 单行处理
             block_type = self._classify_block_type(line)
             vars_in_line = self._extract_vars(line)
             
@@ -138,9 +191,10 @@ class PseudoCodeParser:
                     code_lines=[line],
                     inputs=vars_in_line,
                     outputs=set(),
-                    line_number=line_num
+                    line_number=i + 1
                 ))
                 block_counter += 1
+                i += 1
                 continue
             
             # 赋值或函数调用
@@ -157,10 +211,12 @@ class PseudoCodeParser:
                     code_lines=[line],
                     inputs=inputs,
                     outputs=outputs,
-                    line_number=line_num,
+                    line_number=i + 1,
                     is_async=is_async
                 ))
                 block_counter += 1
+            
+            i += 1
         
         return blocks
 
@@ -326,33 +382,78 @@ class ModuleSynthesizer:
         
     def _translate_call(self, pseudo_line: str) -> str:
         """
-        将伪代码的 CALL 转换为 Python LLM 调用
+        将伪代码的 CALL 转换为 Python LLM 调用（增强容错性）
         
         示例:
         {{result}} = CALL generate_outline({{topic}}, {{level}})
         =>
         result = await invoke_function('generate_outline', topic=topic, level=level)
+        
+        支持的容错模式:
+        - 缺失右括号: {{result}} = CALL func(
+        - 参数为空: {{result}} = CALL func()
+        - 参数包含中文字符
         """
         # 提取变量名（去除 {{}}）
         cleaned = pseudo_line.replace("{{", "").replace("}}", "")
         
-        # 匹配 result = CALL func(arg1, arg2)
-        match = re.match(r'(\w+)\s*=\s*CALL\s+(\w+)\s*\((.*?)\)', cleaned)
-        if not match:
-            return cleaned
+        # 容错模式1: 标准格式 result = CALL func(arg1, arg2)
+        match = re.match(r'(\w+)\s*=\s*CALL\s+(\w+)\s*\((.*?)\)\s*$', cleaned)
+        if match:
+            result_var = match.group(1)
+            func_name = match.group(2)
+            args_str = match.group(3)
+            return self._format_call(result_var, func_name, args_str)
         
-        result_var = match.group(1)
-        func_name = match.group(2)
-        args_str = match.group(3)
+        # 容错模式2: 缺失右括号 result = CALL func(
+        match = re.match(r'(\w+)\s*=\s*CALL\s+(\w+)\s*\(\s*$', cleaned)
+        if match:
+            result_var = match.group(1)
+            func_name = match.group(2)
+            return f"{result_var} = await invoke_function('{func_name}')"
         
-        # 解析参数
-        args = [arg.strip() for arg in args_str.split(',') if arg.strip()]
-        kwargs = ', '.join([f"{arg}={arg}" for arg in args])
+        # 容错模式3: 参数后跟换行 result = CALL func(arg1, arg2
+        match = re.match(r'(\w+)\s*=\s*CALL\s+(\w+)\s*\((.*?)\s*$', cleaned)
+        if match:
+            result_var = match.group(1)
+            func_name = match.group(2)
+            args_str = match.group(3)
+            return self._format_call(result_var, func_name, args_str)
         
-        return f"{result_var} = await invoke_function('{func_name}', {kwargs})"
+        # 容错模式4: 多行参数（匹配到参数名列表）
+        match = re.match(r'(\w+)\s*=\s*CALL\s+(\w+)', cleaned)
+        if match:
+            result_var = match.group(1)
+            func_name = match.group(2)
+            warning(f"CALL 语句格式不完整，使用默认调用: {pseudo_line}")
+            return f"{result_var} = await invoke_function('{func_name}')"
+        
+        # 无法解析，返回原始行并警告
+        warning(f"无法解析 CALL 语句: {pseudo_line}")
+        return cleaned
+    
+    def _format_call(self, result_var: str, func_name: str, args_str: str) -> str:
+        """格式化参数并生成 invoke_function 调用"""
+        if not args_str.strip():
+            return f"{result_var} = await invoke_function('{func_name}')"
+        
+        # 解析参数（支持中文变量名、逗号分隔）
+        args = []
+        for arg in args_str.split(','):
+            arg = arg.strip()
+            if arg:
+                # 检查是否是参数赋值格式 param=value
+                if '=' in arg:
+                    args.append(arg)
+                else:
+                    # 纯变量名，转换为 keyword argument
+                    args.append(f"{arg}={arg}")
+        
+        kwargs_str = ', '.join(args)
+        return f"{result_var} = await invoke_function('{func_name}', {kwargs_str})"
     
     def _clean_line(self, line: str) -> str:
-        """清理伪代码为 Python 代码"""
+        """清理伪代码为 Python 代码（增强 FOR 循环转换）"""
         # 去除 {{}}
         cleaned = line.replace("{{", "").replace("}}", "")
         
@@ -360,8 +461,36 @@ class ModuleSynthesizer:
         cleaned = re.sub(r'^IF\s+', 'if ', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'^ELSE$', 'else:', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'^ENDIF$', '', cleaned, flags=re.IGNORECASE)
-        cleaned = re.sub(r'^FOR\s+\{\{(\w+)\}\}\s+IN\s+\{\{(\w+)\}\}', r'for \1 in \2:', cleaned, flags=re.IGNORECASE)
+        
+        # 增强 FOR 循环转换（支持多种格式）
+        # 格式1: FOR var IN range(end)
+        match = re.match(r'^FOR\s+(\w+)\s+IN\s+range\((\w+)\)\s*$', cleaned, flags=re.IGNORECASE)
+        if match:
+            loop_var, end_var = match.groups()
+            cleaned = f"for {loop_var} in range({end_var}):"
+        # 格式2: FOR var IN range(start, end)
+        elif not re.search(r'for\s+\w+\s+in\s+', cleaned, flags=re.IGNORECASE):
+            # 尝试原有的 {{}} 格式
+            match = re.sub(r'^FOR\s+\{\{(\w+)\}\}\s+IN\s+\{\{(\w+)\}\}', r'for \1 in \2:', cleaned, flags=re.IGNORECASE)
+            if match != cleaned:
+                cleaned = match
+            # 尝试简化格式: FOR var IN iterable
+            elif re.match(r'^FOR\s+\w+\s+IN\s+\w+\s*$', cleaned, flags=re.IGNORECASE):
+                cleaned = re.sub(r'^FOR\s+(\w+)\s+IN\s+(\w+)', r'for \1 in \2:', cleaned, flags=re.IGNORECASE)
+        
         cleaned = re.sub(r'^ENDFOR$', '', cleaned, flags=re.IGNORECASE)
+        
+        # 转换逻辑运算符（DSL -> Python）
+        cleaned = re.sub(r'\bAND\b', ' and ', cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r'\bOR\b', ' or ', cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r'\bNOT\b', ' not ', cleaned, flags=re.IGNORECASE)
+        
+        # 转换 IN 运算符（DSL -> Python）
+        cleaned = re.sub(r'\bIN\b', ' in ', cleaned)
+        
+        # 确保if语句以冒号结尾（如果还没有）
+        if cleaned.strip().startswith('if ') and not cleaned.strip().endswith(':'):
+            cleaned = cleaned.strip() + ':'
         
         # 处理 CALL
         if "CALL" in line:
@@ -386,12 +515,6 @@ class ModuleSynthesizer:
             
             if block.is_async:
                 is_async = True
-            
-            # 转换代码行
-            for line in block.code_lines:
-                cleaned = self._clean_line(line)
-                if cleaned and cleaned.strip():
-                    body_lines.append(cleaned)
         
         # 真实的外部输入 = 所需输入 - 内部产生的变量
         external_inputs = sorted(list(all_inputs - internal_vars))
@@ -405,15 +528,105 @@ class ModuleSynthesizer:
         code_lines = [f"{async_kw}def {func_name}({', '.join(external_inputs)}):"]
         code_lines.append('    """Auto-generated module"""')
         
-        for line in body_lines:
-            if line.strip():
-                code_lines.append(f"    {line}")
+        # 转换代码行并处理多行CALL语句
+        for block in cluster:
+            # 检查是否是多行CALL block
+            is_multiline_call = len(block.code_lines) > 1 and any("CALL" in line for line in block.code_lines)
+            
+            if is_multiline_call:
+                # 多行CALL：合并后一次性转换
+                translated = self._parse_multiline_call(block.code_lines)
+                if translated and translated.strip():
+                    code_lines.append(f"    {translated}")
+            else:
+                # 单行处理
+                for line in block.code_lines:
+                    # 检查原始行是否包含CALL
+                    if "CALL" in line:
+                        # 单行CALL，直接转换
+                        if '(' in line and ')' in line:
+                            cleaned = self._clean_line(line)
+                            code_lines.append(f"    {cleaned}")
+                        else:
+                            # 异常情况：单行CALL不完整，尝试处理
+                            warning(f"单行CALL语句格式异常: {line}")
+                            cleaned = self._clean_line(line)
+                            if cleaned and cleaned.strip():
+                                code_lines.append(f"    {cleaned}")
+                    elif line.strip():
+                        # 其他代码行
+                        cleaned = self._clean_line(line)
+                        if cleaned and cleaned.strip():
+                            code_lines.append(f"    {cleaned}")
         
         # 返回值
         if final_outputs:
             code_lines.append(f"    return {', '.join(final_outputs)}")
         else:
             code_lines.append("    return None")
+        
+        body_code = '\n'.join(code_lines)
+        
+        return ModuleDefinition(
+            name=func_name,
+            inputs=external_inputs,
+            outputs=final_outputs,
+            body_code=body_code,
+            is_async=is_async,
+            original_blocks=cluster
+        )
+    
+    def _flush_call_buffer(self, code_lines: List[str], call_buffer: List[str]) -> None:
+        """将多行CALL语句缓冲区转换为单行并添加到code_lines"""
+        if not call_buffer:
+            return
+        
+        # 检查缓冲区中是否有CALL语句
+        has_call = any("CALL" in line for line in call_buffer)
+        
+        if has_call:
+            # 直接解析多行CALL
+            translated = self._parse_multiline_call(call_buffer)
+            if translated and translated.strip():
+                code_lines.append(f"    {translated}")
+        else:
+            # 普通参数行，直接转换后添加
+            for line in call_buffer:
+                cleaned = self._clean_line(line)
+                if cleaned and cleaned.strip():
+                    code_lines.append(f"    {cleaned}")
+    
+    def _parse_multiline_call(self, lines: List[str]) -> str:
+        """解析多行CALL语句"""
+        if not lines:
+            return ""
+        
+        # 第一行: {{result}} = CALL func_name(
+        first_line = lines[0].replace("{{", "").replace("}}", "").strip()
+        match = re.match(r'(\w+)\s*=\s*CALL\s+(\w+)\s*\(\s*$', first_line)
+        if not match:
+            warning(f"无法解析多行CALL起始行: {first_line}")
+            return ""
+        
+        result_var = match.group(1)
+        func_name = match.group(2)
+        
+        # 收集参数
+        args = []
+        for line in lines[1:]:
+            cleaned = line.replace("{{", "").replace("}}", "").strip()
+            # 移除尾随逗号
+            if cleaned.endswith(','):
+                cleaned = cleaned[:-1].strip()
+            if cleaned and '=' in cleaned:
+                args.append(cleaned)
+        
+        # 生成invoke_function调用
+        kwargs_str = ', '.join(args)
+        if kwargs_str:
+            return f"{result_var} = await invoke_function('{func_name}', {kwargs_str})"
+        else:
+            return f"{result_var} = await invoke_function('{func_name}')"
         
         body_code = '\n'.join(code_lines)
         
@@ -443,13 +656,12 @@ class ModuleSynthesizer:
         
         return f"step_{module_id}_process"
     
-    def generate_orchestrator(self, modules: List[ModuleDefinition], 
+    def generate_orchestrator(self, modules: List[ModuleDefinition],
                              main_inputs: List[str]) -> str:
-        """生成主控函数（工作流编排器）"""
-        
+        """生成主控函数（工作流编排器） - 验证 is_async 标记正确性"""
+
         has_async = any(m.is_async for m in modules)
         async_kw = "async " if has_async else ""
-        await_kw = "await " if has_async else ""
         
         lines = [
             f"{async_kw}def main_workflow(input_params: dict):",
@@ -466,12 +678,15 @@ class ModuleSynthesizer:
             '    ctx = input_params.copy()',
             ''
         ]
-        
+
         for i, module in enumerate(modules, 1):
             lines.append(f'    # Module {i}: {module.name}')
             
             # 准备参数
             args = ', '.join([f'ctx.get("{arg}")' for arg in module.inputs])
+            
+            # 根据模块的 is_async 状态决定是否使用 await
+            await_kw = "await " if module.is_async else ""
             
             if module.outputs:
                 targets = ', '.join([f'ctx["{out}"]' for out in module.outputs])
@@ -554,6 +769,10 @@ class WaActCompiler:
             info(f"  ├─ Module {i}: {module.name} "
                   f"({'async' if module.is_async else 'sync'})")
         
+        # Stage 4.5: 语法验证
+        info("\n[Stage 4.5] 语法验证 (Syntax Validation)...")
+        self._validate_generated_code(modules)
+        
         # Stage 5: 主控生成
         info("\n[Stage 5] 主控编排 (Orchestration)...")
         main_inputs = self._extract_main_inputs(blocks)
@@ -578,6 +797,61 @@ class WaActCompiler:
         # 外部输入 = 使用但未生产的变量
         external = all_inputs - all_outputs
         return sorted(list(external))
+    
+    def _validate_generated_code(self, modules: List[ModuleDefinition]) -> None:
+        """验证生成的代码语法正确性（AST 解析）"""
+        import ast
+        import io
+        import sys
+        
+        errors = []
+        warnings_list = []
+        
+        for module in modules:
+            try:
+                # 尝试解析生成的代码为 AST
+                ast.parse(module.body_code)
+                debug(f"  ✅ {module.name}: 语法正确")
+            except SyntaxError as e:
+                error_msg = f"  ❌ {module.name}: 语法错误 - {e.msg} (行 {e.lineno})"
+                errors.append(error_msg)
+                error(error_msg)
+                continue
+            
+            # 检查是否有残留的 DSL 关键字
+            dsl_keywords = ['CALL', 'FOR round IN', '{{', '}}', 'ENDIF', 'ENDFOR']
+            for keyword in dsl_keywords:
+                if keyword in module.body_code:
+                    warning_msg = f"  ⚠️ {module.name}: 发现残留的 DSL 关键字 '{keyword}'"
+                    warnings_list.append(warning_msg)
+                    warning(warning_msg)
+            
+            # 检查是否所有 CALL 语句都已转换
+            if 'CALL' in module.body_code and 'await invoke_function' not in module.body_code:
+                error_msg = f"  ❌ {module.name}: CALL 语句未正确转换"
+                errors.append(error_msg)
+                error(error_msg)
+            
+            # 检查异步标记一致性
+            if module.is_async and 'await' not in module.body_code and 'async def' not in module.body_code:
+                warning_msg = f"  ⚠️ {module.name}: 标记为 async 但未使用 await"
+                warnings_list.append(warning_msg)
+                warning(warning_msg)
+            elif not module.is_async and 'await' in module.body_code:
+                warning_msg = f"  ⚠️ {module.name}: 标记为 sync 但包含 await"
+                warnings_list.append(warning_msg)
+                warning(warning_msg)
+        
+        # 汇总报告
+        if errors:
+            raise ValueError(
+                f"语法验证失败，发现 {len(errors)} 个错误：\n" + "\n".join(errors)
+            )
+        
+        if warnings_list:
+            info(f"发现 {len(warnings_list)} 个警告，请检查代码质量")
+        
+        info("✅ 语法验证通过")
     
     def export_to_file(self, modules: List[ModuleDefinition], 
                        main_code: str, 

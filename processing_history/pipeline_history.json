@@ -739,5 +739,2526 @@
     "overall_status": "success",
     "total_time_ms": 25835,
     "error_message": null
+  },
+  "0f28da9d": {
+    "pipeline_id": "0f28da9d",
+    "timestamp": "2026-01-27 14:38:11",
+    "raw_input": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_id": "16e170df",
+    "prompt10_original": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_processed": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus监控和ELK日志系统(Elasticsearch、Logstash、Kibana)。应用需支持中英文双语，响应时间控制在两秒以内。",
+    "prompt10_mode": "dictionary",
+    "prompt10_steps": [
+      {
+        "step_name": "术语对齐",
+        "step_index": 1,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": [
+          "替换 16 处"
+        ]
+      },
+      {
+        "step_name": "术语对齐",
+        "step_index": 2,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": []
+      },
+      {
+        "step_name": "LLM语义重构",
+        "step_index": 3,
+        "input_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus监控和ELK日志系统(Elasticsearch、Logstash、Kibana)。应用需支持中英文双语，响应时间控制在两秒以内。",
+        "changes": {
+          "标准化": "335字 → 278字"
+        },
+        "duration_ms": 4571,
+        "notes": []
+      }
+    ],
+    "prompt10_terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "prompt10_ambiguity_detected": false,
+    "prompt10_status": "success",
+    "prompt10_time_ms": 4572,
+    "prompt20_id": "0f62ed6d",
+    "prompt20_template": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需支持{{retrieval_modes_count}}。{{team_members_count}}，其中{{java_developers_count}}，{{python_developers_count}}。{{project_duration_weeks}}，{{project_budget}}。{{tech_stack}}。系统需支持多轮对话，能够{{dialogue_history_rounds}}。部署环境为{{deployment_environment}}，采用微服务架构，{{microservice_count}}。需集成{{monitoring_system}}和{{logging_system}}。应用需支持{{language_support}}，{{response_time_limit}}。",
+    "prompt20_variables": [
+      {
+        "variable": "retrieval_modes_count",
+        "original_text": "三种以上的检索模式",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "team_members_count",
+        "original_text": "团队成员共五人",
+        "value": 5,
+        "type": "Integer"
+      },
+      {
+        "variable": "java_developers_count",
+        "original_text": "两名负责Java开发",
+        "value": 2,
+        "type": "Integer"
+      },
+      {
+        "variable": "python_developers_count",
+        "original_text": "三名负责Python开发",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "project_duration_weeks",
+        "original_text": "项目周期约为八周",
+        "value": 8,
+        "type": "Integer"
+      },
+      {
+        "variable": "project_budget",
+        "original_text": "预算为五十万元",
+        "value": 500000,
+        "type": "Integer"
+      },
+      {
+        "variable": "tech_stack",
+        "original_text": "技术栈包括LangChain、Milvus和FastAPI",
+        "value": [
+          "LangChain",
+          "Milvus",
+          "FastAPI"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "dialogue_history_rounds",
+        "original_text": "保存约二十轮的历史上下文",
+        "value": 20,
+        "type": "Integer"
+      },
+      {
+        "variable": "deployment_environment",
+        "original_text": "Kubernetes集群",
+        "value": "Kubernetes集群",
+        "type": "String"
+      },
+      {
+        "variable": "microservice_count",
+        "original_text": "服务数量约为十个",
+        "value": 10,
+        "type": "Integer"
+      },
+      {
+        "variable": "monitoring_system",
+        "original_text": "Prometheus监控",
+        "value": "Prometheus监控",
+        "type": "String"
+      },
+      {
+        "variable": "logging_system",
+        "original_text": "ELK日志系统(Elasticsearch、Logstash、Kibana)",
+        "value": [
+          "Elasticsearch",
+          "Logstash",
+          "Kibana"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "language_support",
+        "original_text": "中英文双语",
+        "value": "中英文双语",
+        "type": "Enum"
+      },
+      {
+        "variable": "response_time_limit",
+        "original_text": "响应时间控制在两秒以内",
+        "value": 2,
+        "type": "Integer"
+      }
+    ],
+    "prompt20_variable_count": 14,
+    "prompt20_type_stats": {
+      "Integer": 9,
+      "List": 2,
+      "String": 2,
+      "Enum": 1
+    },
+    "prompt20_extraction_log": [],
+    "prompt20_time_ms": 0,
+    "prompt30_id": "a47351e3",
+    "prompt30_dsl_code": "DEFINE {{retrieval_modes_count}}: Integer = 3\nDEFINE {{team_members_count}}: Integer = 5\nDEFINE {{java_developers_count}}: Integer = 2\nDEFINE {{python_developers_count}}: Integer = 3\nDEFINE {{project_duration_weeks}}: Integer = 8\nDEFINE {{project_budget}}: Integer = 500000\nDEFINE {{tech_stack}}: List = ['LangChain', 'Milvus', 'FastAPI']\nDEFINE {{dialogue_history_rounds}}: Integer = 20\nDEFINE {{deployment_environment}}: String = \"Kubernetes集群\"\nDEFINE {{microservice_count}}: Integer = 10\nDEFINE {{monitoring_system}}: String = \"Prometheus监控\"\nDEFINE {{logging_system}}: List = ['Elasticsearch', 'Logstash', 'Kibana']\nDEFINE {{language_support}}: String = \"中英文双语\"\nDEFINE {{response_time_limit}}: Integer = 2\nDEFINE {{rag_app}}: Any\nDEFINE {{team_structure}}: Dict\nDEFINE {{project_plan}}: Dict\nDEFINE {{system_architecture}}: Dict\nDEFINE {{dialogue_context}}: Dict\nDEFINE {{deployment_plan}}: Dict\nDEFINE {{monitoring_integration}}: Dict\nDEFINE {{logging_integration}}: Dict\nDEFINE {{language_config}}: Dict\nDEFINE {{performance_config}}: Dict\n{{rag_app}} = CALL develop_rag_app(\n    retrieval_modes_count={{retrieval_modes_count}},\n    tech_stack={{tech_stack}}\n)\n{{team_structure}} = CALL define_team_structure(\n    total_members={{team_members_count}},\n    java_devs={{java_developers_count}},\n    python_devs={{python_developers_count}}\n)\n{{project_plan}} = CALL create_project_plan(\n    duration_weeks={{project_duration_weeks}},\n    budget={{project_budget}}\n)\n{{system_architecture}} = CALL design_system_architecture(\n    tech_stack={{tech_stack}},\n    microservice_count={{microservice_count}},\n    deployment_environment={{deployment_environment}}\n)\n{{dialogue_context}} = CALL configure_dialogue_context(\n    history_rounds={{dialogue_history_rounds}}\n)\n{{deployment_plan}} = CALL setup_deployment(\n    environment={{deployment_environment}},\n    microservice_count={{microservice_count}}\n)\n{{monitoring_integration}} = CALL integrate_monitoring(\n    system={{monitoring_system}}\n)\n{{logging_integration}} = CALL integrate_logging(\n    logging_system={{logging_system}}\n)\n{{language_config}} = CALL configure_language_support(\n    support={{language_support}}\n)\n{{performance_config}} = CALL set_performance_config(\n    response_time_limit={{response_time_limit}}\n)\nRETURN {{rag_app}}",
+    "prompt30_validation_result": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "defined_variables": {
+        "retrieval_modes_count": {
+          "name": "retrieval_modes_count",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 1
+        },
+        "team_members_count": {
+          "name": "team_members_count",
+          "var_type": "Integer",
+          "initial_value": "5",
+          "line_number": 2
+        },
+        "java_developers_count": {
+          "name": "java_developers_count",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 3
+        },
+        "python_developers_count": {
+          "name": "python_developers_count",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 4
+        },
+        "project_duration_weeks": {
+          "name": "project_duration_weeks",
+          "var_type": "Integer",
+          "initial_value": "8",
+          "line_number": 5
+        },
+        "project_budget": {
+          "name": "project_budget",
+          "var_type": "Integer",
+          "initial_value": "500000",
+          "line_number": 6
+        },
+        "tech_stack": {
+          "name": "tech_stack",
+          "var_type": "List",
+          "initial_value": "['LangChain', 'Milvus', 'FastAPI']",
+          "line_number": 7
+        },
+        "dialogue_history_rounds": {
+          "name": "dialogue_history_rounds",
+          "var_type": "Integer",
+          "initial_value": "20",
+          "line_number": 8
+        },
+        "deployment_environment": {
+          "name": "deployment_environment",
+          "var_type": "String",
+          "initial_value": "\"Kubernetes集群\"",
+          "line_number": 9
+        },
+        "microservice_count": {
+          "name": "microservice_count",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 10
+        },
+        "monitoring_system": {
+          "name": "monitoring_system",
+          "var_type": "String",
+          "initial_value": "\"Prometheus监控\"",
+          "line_number": 11
+        },
+        "logging_system": {
+          "name": "logging_system",
+          "var_type": "List",
+          "initial_value": "['Elasticsearch', 'Logstash', 'Kibana']",
+          "line_number": 12
+        },
+        "language_support": {
+          "name": "language_support",
+          "var_type": "String",
+          "initial_value": "\"中英文双语\"",
+          "line_number": 13
+        },
+        "response_time_limit": {
+          "name": "response_time_limit",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 14
+        },
+        "rag_app": {
+          "name": "rag_app",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 15
+        },
+        "team_structure": {
+          "name": "team_structure",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 16
+        },
+        "project_plan": {
+          "name": "project_plan",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 17
+        },
+        "system_architecture": {
+          "name": "system_architecture",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 18
+        },
+        "dialogue_context": {
+          "name": "dialogue_context",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 19
+        },
+        "deployment_plan": {
+          "name": "deployment_plan",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 20
+        },
+        "monitoring_integration": {
+          "name": "monitoring_integration",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 21
+        },
+        "logging_integration": {
+          "name": "logging_integration",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 22
+        },
+        "language_config": {
+          "name": "language_config",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 23
+        },
+        "performance_config": {
+          "name": "performance_config",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 24
+        }
+      },
+      "function_calls": [],
+      "control_blocks": [],
+      "max_nesting_depth": 0
+    },
+    "prompt30_time_ms": 10702,
+    "prompt40_id": "d48cbd9d",
+    "prompt40_modules": [
+      {
+        "name": "step_1_develop_rag_app",
+        "inputs": [],
+        "outputs": [
+          "rag_app"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_2_define_team_structure",
+        "inputs": [
+          "retrieval_modes_count",
+          "tech_stack"
+        ],
+        "outputs": [
+          "team_structure"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_3_create_project_plan",
+        "inputs": [
+          "java_developers_count",
+          "python_developers_count",
+          "team_members_count"
+        ],
+        "outputs": [
+          "project_plan"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_4_design_system_architecture",
+        "inputs": [
+          "project_budget",
+          "project_duration_weeks"
+        ],
+        "outputs": [
+          "system_architecture"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_5_configure_dialogue_context",
+        "inputs": [
+          "deployment_environment",
+          "microservice_count",
+          "tech_stack"
+        ],
+        "outputs": [
+          "dialogue_context"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_6_setup_deployment",
+        "inputs": [
+          "dialogue_history_rounds"
+        ],
+        "outputs": [
+          "deployment_plan"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_7_integrate_monitoring",
+        "inputs": [
+          "deployment_environment",
+          "microservice_count"
+        ],
+        "outputs": [
+          "monitoring_integration"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_8_integrate_logging",
+        "inputs": [
+          "monitoring_system"
+        ],
+        "outputs": [
+          "logging_integration"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_9_configure_language_support",
+        "inputs": [
+          "logging_system"
+        ],
+        "outputs": [
+          "language_config"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_10_set_performance_config",
+        "inputs": [
+          "language_support"
+        ],
+        "outputs": [
+          "performance_config"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_11_process",
+        "inputs": [
+          "response_time_limit"
+        ],
+        "outputs": [],
+        "is_async": false
+      }
+    ],
+    "prompt40_module_count": 11,
+    "prompt40_main_code": "async def main_workflow(input_params: dict):\n    \"\"\"\n    主工作流 - 自动生成\n    \n    Args:\n        input_params: 包含 ['deployment_environment', 'dialogue_history_rounds', 'java_developers_count', 'language_support', 'logging_system', 'microservice_count', 'monitoring_system', 'project_budget', 'project_duration_weeks', 'python_developers_count', 'response_time_limit', 'retrieval_modes_count', 'team_members_count', 'tech_stack'] 的字典\n    \n    Returns:\n        执行结果上下文\n    \"\"\"\n    # 初始化上下文\n    ctx = input_params.copy()\n\n    # Module 1: step_1_develop_rag_app\n    ctx[\"rag_app\"] = await step_1_develop_rag_app()\n\n    # Module 2: step_2_define_team_structure\n    ctx[\"team_structure\"] = await step_2_define_team_structure(ctx.get(\"retrieval_modes_count\"), ctx.get(\"tech_stack\"))\n\n    # Module 3: step_3_create_project_plan\n    ctx[\"project_plan\"] = await step_3_create_project_plan(ctx.get(\"java_developers_count\"), ctx.get(\"python_developers_count\"), ctx.get(\"team_members_count\"))\n\n    # Module 4: step_4_design_system_architecture\n    ctx[\"system_architecture\"] = await step_4_design_system_architecture(ctx.get(\"project_budget\"), ctx.get(\"project_duration_weeks\"))\n\n    # Module 5: step_5_configure_dialogue_context\n    ctx[\"dialogue_context\"] = await step_5_configure_dialogue_context(ctx.get(\"deployment_environment\"), ctx.get(\"microservice_count\"), ctx.get(\"tech_stack\"))\n\n    # Module 6: step_6_setup_deployment\n    ctx[\"deployment_plan\"] = await step_6_setup_deployment(ctx.get(\"dialogue_history_rounds\"))\n\n    # Module 7: step_7_integrate_monitoring\n    ctx[\"monitoring_integration\"] = await step_7_integrate_monitoring(ctx.get(\"deployment_environment\"), ctx.get(\"microservice_count\"))\n\n    # Module 8: step_8_integrate_logging\n    ctx[\"logging_integration\"] = await step_8_integrate_logging(ctx.get(\"monitoring_system\"))\n\n    # Module 9: step_9_configure_language_support\n    ctx[\"language_config\"] = await step_9_configure_language_support(ctx.get(\"logging_system\"))\n\n    # Module 10: step_10_set_performance_config\n    ctx[\"performance_config\"] = await step_10_set_performance_config(ctx.get(\"language_support\"))\n\n    # Module 11: step_11_process\n    step_11_process(ctx.get(\"response_time_limit\"))\n\n    return ctx",
+    "prompt40_time_ms": 3,
+    "overall_status": "success",
+    "total_time_ms": 15277,
+    "error_message": null
+  },
+  "0a58a436": {
+    "pipeline_id": "0a58a436",
+    "timestamp": "2026-01-27 14:38:46",
+    "raw_input": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_id": "4dcb8370",
+    "prompt10_original": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_processed": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)实现监控与日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "prompt10_mode": "dictionary",
+    "prompt10_steps": [
+      {
+        "step_name": "术语对齐",
+        "step_index": 1,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": [
+          "替换 16 处"
+        ]
+      },
+      {
+        "step_name": "术语对齐",
+        "step_index": 2,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": []
+      },
+      {
+        "step_name": "LLM语义重构",
+        "step_index": 3,
+        "input_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)实现监控与日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+        "changes": {
+          "标准化": "335字 → 301字"
+        },
+        "duration_ms": 4907,
+        "notes": []
+      }
+    ],
+    "prompt10_terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "prompt10_ambiguity_detected": false,
+    "prompt10_status": "success",
+    "prompt10_time_ms": 4908,
+    "prompt20_id": "ae6779a2",
+    "prompt20_template": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需设计为较复杂结构，支持{{retrieval_modes}}。{{team_members}}，其中{{java_developers}}，{{python_developers}}。{{project_duration_weeks}}，预算为{{budget}}。技术栈包括{{tech_stack}}。系统需支持多轮对话，能够保存{{dialogue_rounds}}。部署环境为{{deployment_env}}，采用微服务架构，{{microservice_count}}。需集成{{monitoring_stack}}实现监控与日志管理。系统需支持{{bilingual_support}}，响应时间控制在{{response_time_limit}}。",
+    "prompt20_variables": [
+      {
+        "variable": "retrieval_modes",
+        "original_text": "三种以上的检索模式",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "team_members",
+        "original_text": "团队成员共五人",
+        "value": 5,
+        "type": "Integer"
+      },
+      {
+        "variable": "java_developers",
+        "original_text": "两名负责Java开发",
+        "value": 2,
+        "type": "Integer"
+      },
+      {
+        "variable": "python_developers",
+        "original_text": "三名负责Python开发",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "project_duration_weeks",
+        "original_text": "项目周期约为八周",
+        "value": 8,
+        "type": "Integer"
+      },
+      {
+        "variable": "budget",
+        "original_text": "五十万元",
+        "value": 500000,
+        "type": "Integer"
+      },
+      {
+        "variable": "tech_stack",
+        "original_text": "LangChain、Milvus和FastAPI",
+        "value": [
+          "LangChain",
+          "Milvus",
+          "FastAPI"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "dialogue_rounds",
+        "original_text": "约二十轮的历史上下文",
+        "value": 20,
+        "type": "Integer"
+      },
+      {
+        "variable": "deployment_env",
+        "original_text": "Kubernetes集群",
+        "value": "Kubernetes集群",
+        "type": "String"
+      },
+      {
+        "variable": "microservice_count",
+        "original_text": "服务数量约为十个",
+        "value": 10,
+        "type": "Integer"
+      },
+      {
+        "variable": "monitoring_stack",
+        "original_text": "Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)",
+        "value": [
+          "Prometheus",
+          "Elasticsearch",
+          "Logstash",
+          "Kibana"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "bilingual_support",
+        "original_text": "中英文双语",
+        "value": true,
+        "type": "Boolean"
+      },
+      {
+        "variable": "response_time_limit",
+        "original_text": "两秒以内",
+        "value": 2,
+        "type": "Integer"
+      }
+    ],
+    "prompt20_variable_count": 13,
+    "prompt20_type_stats": {
+      "Integer": 9,
+      "List": 2,
+      "String": 1,
+      "Boolean": 1
+    },
+    "prompt20_extraction_log": [],
+    "prompt20_time_ms": 0,
+    "prompt30_id": "2c486d47",
+    "prompt30_dsl_code": "",
+    "prompt30_validation_result": {},
+    "prompt30_time_ms": 14970,
+    "prompt40_id": "5108d45c",
+    "prompt40_modules": [],
+    "prompt40_module_count": 0,
+    "prompt40_main_code": "",
+    "prompt40_time_ms": 0,
+    "overall_status": "partial",
+    "total_time_ms": 19878,
+    "error_message": null
+  },
+  "c5ea926f": {
+    "pipeline_id": "c5ea926f",
+    "timestamp": "2026-01-27 14:44:56",
+    "raw_input": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_id": "e6b87ec7",
+    "prompt10_original": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_processed": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够存储约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus进行监控，并使用ELK日志系统(Elasticsearch、Logstash、Kibana)进行日志管理。系统需支持中英文双语，响应时间需控制在两秒以内。",
+    "prompt10_mode": "dictionary",
+    "prompt10_steps": [
+      {
+        "step_name": "术语对齐",
+        "step_index": 1,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": [
+          "替换 16 处"
+        ]
+      },
+      {
+        "step_name": "术语对齐",
+        "step_index": 2,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": []
+      },
+      {
+        "step_name": "LLM语义重构",
+        "step_index": 3,
+        "input_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够存储约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus进行监控，并使用ELK日志系统(Elasticsearch、Logstash、Kibana)进行日志管理。系统需支持中英文双语，响应时间需控制在两秒以内。",
+        "changes": {
+          "标准化": "335字 → 306字"
+        },
+        "duration_ms": 5486,
+        "notes": []
+      }
+    ],
+    "prompt10_terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "prompt10_ambiguity_detected": false,
+    "prompt10_status": "success",
+    "prompt10_time_ms": 5486,
+    "prompt20_id": "925ffcea",
+    "prompt20_template": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需设计为较复杂结构，支持三种以上的检索模式。{{team_member_count}}，{{java_developer_count}}，{{python_developer_count}}。{{project_duration_weeks}}，{{project_budget}}。{{tech_stack}}。系统需支持多轮对话，{{history_context_rounds}}。{{deployment_environment}}，采用微服务架构，{{microservice_count}}。需{{monitoring_system}}，并使用{{log_system}}进行日志管理。{{language_support}}，{{response_time_limit}}。",
+    "prompt20_variables": [
+      {
+        "variable": "team_member_count",
+        "original_text": "团队成员共五人",
+        "value": 5,
+        "type": "Integer"
+      },
+      {
+        "variable": "java_developer_count",
+        "original_text": "其中两名负责Java开发",
+        "value": 2,
+        "type": "Integer"
+      },
+      {
+        "variable": "python_developer_count",
+        "original_text": "三名负责Python开发",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "project_duration_weeks",
+        "original_text": "项目周期约为八周",
+        "value": 8,
+        "type": "Integer"
+      },
+      {
+        "variable": "project_budget",
+        "original_text": "预算为五十万元",
+        "value": 500000,
+        "type": "Integer"
+      },
+      {
+        "variable": "tech_stack",
+        "original_text": "技术栈包括LangChain、Milvus和FastAPI",
+        "value": [
+          "LangChain",
+          "Milvus",
+          "FastAPI"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "history_context_rounds",
+        "original_text": "能够存储约二十轮的历史上下文",
+        "value": 20,
+        "type": "Integer"
+      },
+      {
+        "variable": "deployment_environment",
+        "original_text": "部署环境为Kubernetes集群",
+        "value": "Kubernetes集群",
+        "type": "String"
+      },
+      {
+        "variable": "microservice_count",
+        "original_text": "服务数量约为十个",
+        "value": 10,
+        "type": "Integer"
+      },
+      {
+        "variable": "monitoring_system",
+        "original_text": "集成Prometheus进行监控",
+        "value": "Prometheus",
+        "type": "String"
+      },
+      {
+        "variable": "log_system",
+        "original_text": "ELK日志系统(Elasticsearch、Logstash、Kibana)",
+        "value": [
+          "Elasticsearch",
+          "Logstash",
+          "Kibana"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "language_support",
+        "original_text": "系统需支持中英文双语",
+        "value": [
+          "中文",
+          "英文"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "response_time_limit",
+        "original_text": "响应时间需控制在两秒以内",
+        "value": 2,
+        "type": "Integer"
+      }
+    ],
+    "prompt20_variable_count": 13,
+    "prompt20_type_stats": {
+      "Integer": 8,
+      "List": 3,
+      "String": 2
+    },
+    "prompt20_extraction_log": [],
+    "prompt20_time_ms": 0,
+    "prompt30_id": "c5bc4d12",
+    "prompt30_dsl_code": "DEFINE {{team_member_count}}: Integer = 5\nDEFINE {{java_developer_count}}: Integer = 2\nDEFINE {{python_developer_count}}: Integer = 3\nDEFINE {{project_duration_weeks}}: Integer = 8\nDEFINE {{project_budget}}: Integer = 500000\nDEFINE {{tech_stack}}: List = ['LangChain', 'Milvus', 'FastAPI']\nDEFINE {{history_context_rounds}}: Integer = 20\nDEFINE {{deployment_environment}}: String = Kubernetes集群\nDEFINE {{microservice_count}}: Integer = 10\nDEFINE {{monitoring_system}}: String = Prometheus\nDEFINE {{log_system}}: List = ['Elasticsearch', 'Logstash', 'Kibana']\nDEFINE {{language_support}}: List = ['中文', '英文']\nDEFINE {{response_time_limit}}: Integer = 2\nDEFINE {{rag_app_spec}}: Dict\n{{rag_app_spec}} = CALL generate_rag_app_spec(\n    team_member_count={{team_member_count}},\n    java_developer_count={{java_developer_count}},\n    python_developer_count={{python_developer_count}},\n    project_duration_weeks={{project_duration_weeks}},\n    project_budget={{project_budget}},\n    tech_stack={{tech_stack}},\n    history_context_rounds={{history_context_rounds}},\n    deployment_environment={{deployment_environment}},\n    microservice_count={{microservice_count}},\n    monitoring_system={{monitoring_system}},\n    log_system={{log_system}},\n    language_support={{language_support}},\n    response_time_limit={{response_time_limit}}\n)\nDEFINE {{retrieval_modes}}: List\n{{retrieval_modes}} = CALL design_retrieval_modes(min_modes=3, tech_stack={{tech_stack}})\nDEFINE {{chain_structure}}: Dict\n{{chain_structure}} = CALL design_complex_chain_structure(retrieval_modes={{retrieval_modes}}, history_context_rounds={{history_context_rounds}})\nDEFINE {{deployment_plan}}: Dict\n{{deployment_plan}} = CALL generate_deployment_plan(\n    environment={{deployment_environment}},\n    microservice_count={{microservice_count}},\n    monitoring_system={{monitoring_system}},\n    log_system={{log_system}}\n)\nDEFINE {{language_support_config}}: Dict\n{{language_support_config}} = CALL configure_language_support(languages={{language_support}})\nDEFINE {{response_time_constraint}}: Dict\n{{response_time_constraint}} = CALL set_response_time_limit(limit={{response_time_limit}})\nRETURN {{rag_app_spec}}",
+    "prompt30_validation_result": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "defined_variables": {
+        "team_member_count": {
+          "name": "team_member_count",
+          "var_type": "Integer",
+          "initial_value": "5",
+          "line_number": 1
+        },
+        "java_developer_count": {
+          "name": "java_developer_count",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 2
+        },
+        "python_developer_count": {
+          "name": "python_developer_count",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 3
+        },
+        "project_duration_weeks": {
+          "name": "project_duration_weeks",
+          "var_type": "Integer",
+          "initial_value": "8",
+          "line_number": 4
+        },
+        "project_budget": {
+          "name": "project_budget",
+          "var_type": "Integer",
+          "initial_value": "500000",
+          "line_number": 5
+        },
+        "tech_stack": {
+          "name": "tech_stack",
+          "var_type": "List",
+          "initial_value": "['LangChain', 'Milvus', 'FastAPI']",
+          "line_number": 6
+        },
+        "history_context_rounds": {
+          "name": "history_context_rounds",
+          "var_type": "Integer",
+          "initial_value": "20",
+          "line_number": 7
+        },
+        "deployment_environment": {
+          "name": "deployment_environment",
+          "var_type": "String",
+          "initial_value": "Kubernetes集群",
+          "line_number": 8
+        },
+        "microservice_count": {
+          "name": "microservice_count",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 9
+        },
+        "monitoring_system": {
+          "name": "monitoring_system",
+          "var_type": "String",
+          "initial_value": "Prometheus",
+          "line_number": 10
+        },
+        "log_system": {
+          "name": "log_system",
+          "var_type": "List",
+          "initial_value": "['Elasticsearch', 'Logstash', 'Kibana']",
+          "line_number": 11
+        },
+        "language_support": {
+          "name": "language_support",
+          "var_type": "List",
+          "initial_value": "['中文', '英文']",
+          "line_number": 12
+        },
+        "response_time_limit": {
+          "name": "response_time_limit",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 13
+        },
+        "rag_app_spec": {
+          "name": "rag_app_spec",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 14
+        },
+        "retrieval_modes": {
+          "name": "retrieval_modes",
+          "var_type": "List",
+          "initial_value": null,
+          "line_number": 30
+        },
+        "chain_structure": {
+          "name": "chain_structure",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 32
+        },
+        "deployment_plan": {
+          "name": "deployment_plan",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 34
+        },
+        "language_support_config": {
+          "name": "language_support_config",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 41
+        },
+        "response_time_constraint": {
+          "name": "response_time_constraint",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 43
+        }
+      },
+      "function_calls": [
+        {
+          "function_name": "design_retrieval_modes",
+          "arguments": [
+            "min_modes=3",
+            "tech_stack={{tech_stack}}"
+          ],
+          "result_var": "retrieval_modes",
+          "line_number": 31
+        },
+        {
+          "function_name": "design_complex_chain_structure",
+          "arguments": [
+            "retrieval_modes={{retrieval_modes}}",
+            "history_context_rounds={{history_context_rounds}}"
+          ],
+          "result_var": "chain_structure",
+          "line_number": 33
+        },
+        {
+          "function_name": "configure_language_support",
+          "arguments": [
+            "languages={{language_support}}"
+          ],
+          "result_var": "language_support_config",
+          "line_number": 42
+        },
+        {
+          "function_name": "set_response_time_limit",
+          "arguments": [
+            "limit={{response_time_limit}}"
+          ],
+          "result_var": "response_time_constraint",
+          "line_number": 44
+        }
+      ],
+      "control_blocks": [],
+      "max_nesting_depth": 0
+    },
+    "prompt30_time_ms": 3790,
+    "prompt40_id": "2e901cc4",
+    "prompt40_modules": [
+      {
+        "name": "step_1_generate_rag_app_spec",
+        "inputs": [
+          "deployment_environment",
+          "history_context_rounds",
+          "java_developer_count",
+          "language_support",
+          "log_system",
+          "microservice_count",
+          "monitoring_system",
+          "project_budget",
+          "project_duration_weeks",
+          "python_developer_count",
+          "response_time_limit",
+          "team_member_count",
+          "tech_stack"
+        ],
+        "outputs": [
+          "rag_app_spec"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_2_design_retrieval_modes",
+        "inputs": [
+          "tech_stack"
+        ],
+        "outputs": [
+          "retrieval_modes"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_3_generate_deployment_plan",
+        "inputs": [
+          "deployment_environment",
+          "log_system",
+          "microservice_count",
+          "monitoring_system"
+        ],
+        "outputs": [
+          "deployment_plan"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_4_configure_language_support",
+        "inputs": [
+          "language_support"
+        ],
+        "outputs": [
+          "language_support_config"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_5_set_response_time_limit",
+        "inputs": [
+          "response_time_limit"
+        ],
+        "outputs": [
+          "response_time_constraint"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_6_design_complex_chain_structure",
+        "inputs": [
+          "history_context_rounds",
+          "retrieval_modes"
+        ],
+        "outputs": [
+          "chain_structure"
+        ],
+        "is_async": true
+      }
+    ],
+    "prompt40_module_count": 6,
+    "prompt40_main_code": "async def main_workflow(input_params: dict):\n    \"\"\"\n    主工作流 - 自动生成\n    \n    Args:\n        input_params: 包含 ['deployment_environment', 'history_context_rounds', 'java_developer_count', 'language_support', 'log_system', 'microservice_count', 'monitoring_system', 'project_budget', 'project_duration_weeks', 'python_developer_count', 'response_time_limit', 'team_member_count', 'tech_stack'] 的字典\n    \n    Returns:\n        执行结果上下文\n    \"\"\"\n    # 初始化上下文\n    ctx = input_params.copy()\n\n    # Module 1: step_1_generate_rag_app_spec\n    ctx[\"rag_app_spec\"] = await step_1_generate_rag_app_spec(ctx.get(\"deployment_environment\"), ctx.get(\"history_context_rounds\"), ctx.get(\"java_developer_count\"), ctx.get(\"language_support\"), ctx.get(\"log_system\"), ctx.get(\"microservice_count\"), ctx.get(\"monitoring_system\"), ctx.get(\"project_budget\"), ctx.get(\"project_duration_weeks\"), ctx.get(\"python_developer_count\"), ctx.get(\"response_time_limit\"), ctx.get(\"team_member_count\"), ctx.get(\"tech_stack\"))\n\n    # Module 2: step_2_design_retrieval_modes\n    ctx[\"retrieval_modes\"] = await step_2_design_retrieval_modes(ctx.get(\"tech_stack\"))\n\n    # Module 3: step_3_generate_deployment_plan\n    ctx[\"deployment_plan\"] = await step_3_generate_deployment_plan(ctx.get(\"deployment_environment\"), ctx.get(\"log_system\"), ctx.get(\"microservice_count\"), ctx.get(\"monitoring_system\"))\n\n    # Module 4: step_4_configure_language_support\n    ctx[\"language_support_config\"] = await step_4_configure_language_support(ctx.get(\"language_support\"))\n\n    # Module 5: step_5_set_response_time_limit\n    ctx[\"response_time_constraint\"] = await step_5_set_response_time_limit(ctx.get(\"response_time_limit\"))\n\n    # Module 6: step_6_design_complex_chain_structure\n    ctx[\"chain_structure\"] = await step_6_design_complex_chain_structure(ctx.get(\"history_context_rounds\"), ctx.get(\"retrieval_modes\"))\n\n    return ctx",
+    "prompt40_time_ms": 4,
+    "overall_status": "success",
+    "total_time_ms": 9280,
+    "error_message": null
+  },
+  "da81513b": {
+    "pipeline_id": "da81513b",
+    "timestamp": "2026-01-27 14:46:52",
+    "raw_input": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_id": "69287c18",
+    "prompt10_original": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_processed": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需设计为较复杂结构，支持至少三种检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期为八周，预算约为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成监控和日志系统，使用Prometheus和ELK日志系统(Elasticsearch、Logstash、Kibana)。应用需支持中英文双语，响应时间控制在两秒以内。",
+    "prompt10_mode": "dictionary",
+    "prompt10_steps": [
+      {
+        "step_name": "术语对齐",
+        "step_index": 1,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": [
+          "替换 16 处"
+        ]
+      },
+      {
+        "step_name": "术语对齐",
+        "step_index": 2,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": []
+      },
+      {
+        "step_name": "LLM语义重构",
+        "step_index": 3,
+        "input_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需设计为较复杂结构，支持至少三种检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期为八周，预算约为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成监控和日志系统，使用Prometheus和ELK日志系统(Elasticsearch、Logstash、Kibana)。应用需支持中英文双语，响应时间控制在两秒以内。",
+        "changes": {
+          "标准化": "335字 → 293字"
+        },
+        "duration_ms": 4545,
+        "notes": []
+      }
+    ],
+    "prompt10_terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "prompt10_ambiguity_detected": false,
+    "prompt10_status": "success",
+    "prompt10_time_ms": 4545,
+    "prompt20_id": "09a2bb88",
+    "prompt20_template": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需设计为较复杂结构，{{retrieval_modes_count}}。{{team_members_count}}，其中{{java_developers_count}}，{{python_developers_count}}。{{project_duration_weeks}}，{{project_budget_rmb}}。技术栈包括{{tech_stack}}。系统需支持多轮对话，能够保存{{dialogue_history_rounds}}。部署环境为{{deployment_environment}}，采用微服务架构，{{microservices_count}}。需集成监控和日志系统，使用{{monitoring_system}}和{{logging_system}}。应用需支持{{bilingual_support}}，{{response_time_limit_seconds}}。",
+    "prompt20_variables": [
+      {
+        "variable": "retrieval_modes_count",
+        "original_text": "支持至少三种检索模式",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "team_members_count",
+        "original_text": "团队成员共五人",
+        "value": 5,
+        "type": "Integer"
+      },
+      {
+        "variable": "java_developers_count",
+        "original_text": "两名负责Java开发",
+        "value": 2,
+        "type": "Integer"
+      },
+      {
+        "variable": "python_developers_count",
+        "original_text": "三名负责Python开发",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "project_duration_weeks",
+        "original_text": "项目周期为八周",
+        "value": 8,
+        "type": "Integer"
+      },
+      {
+        "variable": "project_budget_rmb",
+        "original_text": "预算约为五十万元",
+        "value": 500000,
+        "type": "Integer"
+      },
+      {
+        "variable": "tech_stack",
+        "original_text": "LangChain、Milvus和FastAPI",
+        "value": [
+          "LangChain",
+          "Milvus",
+          "FastAPI"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "dialogue_history_rounds",
+        "original_text": "约二十轮历史上下文",
+        "value": 20,
+        "type": "Integer"
+      },
+      {
+        "variable": "deployment_environment",
+        "original_text": "Kubernetes集群",
+        "value": "Kubernetes集群",
+        "type": "String"
+      },
+      {
+        "variable": "microservices_count",
+        "original_text": "服务数量约为十个",
+        "value": 10,
+        "type": "Integer"
+      },
+      {
+        "variable": "monitoring_system",
+        "original_text": "Prometheus",
+        "value": "Prometheus",
+        "type": "String"
+      },
+      {
+        "variable": "logging_system",
+        "original_text": "ELK日志系统(Elasticsearch、Logstash、Kibana)",
+        "value": [
+          "Elasticsearch",
+          "Logstash",
+          "Kibana"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "bilingual_support",
+        "original_text": "中英文双语",
+        "value": true,
+        "type": "Boolean"
+      },
+      {
+        "variable": "response_time_limit_seconds",
+        "original_text": "响应时间控制在两秒以内",
+        "value": 2,
+        "type": "Integer"
+      }
+    ],
+    "prompt20_variable_count": 14,
+    "prompt20_type_stats": {
+      "Integer": 9,
+      "List": 2,
+      "String": 2,
+      "Boolean": 1
+    },
+    "prompt20_extraction_log": [],
+    "prompt20_time_ms": 0,
+    "prompt30_id": "6773fbf5",
+    "prompt30_dsl_code": "DEFINE {{retrieval_modes_count}}: Integer = 3\nDEFINE {{team_members_count}}: Integer = 5\nDEFINE {{java_developers_count}}: Integer = 2\nDEFINE {{python_developers_count}}: Integer = 3\nDEFINE {{project_duration_weeks}}: Integer = 8\nDEFINE {{project_budget_rmb}}: Integer = 500000\nDEFINE {{tech_stack}}: List = ['LangChain', 'Milvus', 'FastAPI']\nDEFINE {{dialogue_history_rounds}}: Integer = 20\nDEFINE {{deployment_environment}}: String = Kubernetes集群\nDEFINE {{microservices_count}}: Integer = 10\nDEFINE {{monitoring_system}}: String = Prometheus\nDEFINE {{logging_system}}: List = ['Elasticsearch', 'Logstash', 'Kibana']\nDEFINE {{bilingual_support}}: Boolean = True\nDEFINE {{response_time_limit_seconds}}: Integer = 2\nDEFINE {{rag_app_spec}}: Dict\n{{rag_app_spec}} = CALL design_rag_application(\n    retrieval_modes={{retrieval_modes_count}},\n    llm_backend=True,\n    chain_complexity=\"complex\",\n    team_members={{team_members_count}},\n    java_devs={{java_developers_count}},\n    python_devs={{python_developers_count}},\n    duration_weeks={{project_duration_weeks}},\n    budget_rmb={{project_budget_rmb}},\n    tech_stack={{tech_stack}},\n    dialogue_history_rounds={{dialogue_history_rounds}},\n    deployment_env={{deployment_environment}},\n    microservices={{microservices_count}},\n    monitoring={{monitoring_system}},\n    logging={{logging_system}},\n    bilingual={{bilingual_support}},\n    response_time_limit={{response_time_limit_seconds}}\n)\nRETURN {{rag_app_spec}}",
+    "prompt30_validation_result": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "defined_variables": {
+        "retrieval_modes_count": {
+          "name": "retrieval_modes_count",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 1
+        },
+        "team_members_count": {
+          "name": "team_members_count",
+          "var_type": "Integer",
+          "initial_value": "5",
+          "line_number": 2
+        },
+        "java_developers_count": {
+          "name": "java_developers_count",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 3
+        },
+        "python_developers_count": {
+          "name": "python_developers_count",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 4
+        },
+        "project_duration_weeks": {
+          "name": "project_duration_weeks",
+          "var_type": "Integer",
+          "initial_value": "8",
+          "line_number": 5
+        },
+        "project_budget_rmb": {
+          "name": "project_budget_rmb",
+          "var_type": "Integer",
+          "initial_value": "500000",
+          "line_number": 6
+        },
+        "tech_stack": {
+          "name": "tech_stack",
+          "var_type": "List",
+          "initial_value": "['LangChain', 'Milvus', 'FastAPI']",
+          "line_number": 7
+        },
+        "dialogue_history_rounds": {
+          "name": "dialogue_history_rounds",
+          "var_type": "Integer",
+          "initial_value": "20",
+          "line_number": 8
+        },
+        "deployment_environment": {
+          "name": "deployment_environment",
+          "var_type": "String",
+          "initial_value": "Kubernetes集群",
+          "line_number": 9
+        },
+        "microservices_count": {
+          "name": "microservices_count",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 10
+        },
+        "monitoring_system": {
+          "name": "monitoring_system",
+          "var_type": "String",
+          "initial_value": "Prometheus",
+          "line_number": 11
+        },
+        "logging_system": {
+          "name": "logging_system",
+          "var_type": "List",
+          "initial_value": "['Elasticsearch', 'Logstash', 'Kibana']",
+          "line_number": 12
+        },
+        "bilingual_support": {
+          "name": "bilingual_support",
+          "var_type": "Boolean",
+          "initial_value": "True",
+          "line_number": 13
+        },
+        "response_time_limit_seconds": {
+          "name": "response_time_limit_seconds",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 14
+        },
+        "rag_app_spec": {
+          "name": "rag_app_spec",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 15
+        }
+      },
+      "function_calls": [],
+      "control_blocks": [],
+      "max_nesting_depth": 0
+    },
+    "prompt30_time_ms": 4921,
+    "prompt40_id": "39e1d2a1",
+    "prompt40_modules": [
+      {
+        "name": "step_1_design_rag_application",
+        "inputs": [
+          "bilingual_support",
+          "deployment_environment",
+          "dialogue_history_rounds",
+          "java_developers_count",
+          "logging_system",
+          "microservices_count",
+          "monitoring_system",
+          "project_budget_rmb",
+          "project_duration_weeks",
+          "python_developers_count",
+          "response_time_limit_seconds",
+          "retrieval_modes_count",
+          "team_members_count",
+          "tech_stack"
+        ],
+        "outputs": [
+          "rag_app_spec"
+        ],
+        "is_async": true
+      }
+    ],
+    "prompt40_module_count": 1,
+    "prompt40_main_code": "async def main_workflow(input_params: dict):\n    \"\"\"\n    主工作流 - 自动生成\n    \n    Args:\n        input_params: 包含 ['bilingual_support', 'deployment_environment', 'dialogue_history_rounds', 'java_developers_count', 'logging_system', 'microservices_count', 'monitoring_system', 'project_budget_rmb', 'project_duration_weeks', 'python_developers_count', 'response_time_limit_seconds', 'retrieval_modes_count', 'team_members_count', 'tech_stack'] 的字典\n    \n    Returns:\n        执行结果上下文\n    \"\"\"\n    # 初始化上下文\n    ctx = input_params.copy()\n\n    # Module 1: step_1_design_rag_application\n    ctx[\"rag_app_spec\"] = await step_1_design_rag_application(ctx.get(\"bilingual_support\"), ctx.get(\"deployment_environment\"), ctx.get(\"dialogue_history_rounds\"), ctx.get(\"java_developers_count\"), ctx.get(\"logging_system\"), ctx.get(\"microservices_count\"), ctx.get(\"monitoring_system\"), ctx.get(\"project_budget_rmb\"), ctx.get(\"project_duration_weeks\"), ctx.get(\"python_developers_count\"), ctx.get(\"response_time_limit_seconds\"), ctx.get(\"retrieval_modes_count\"), ctx.get(\"team_members_count\"), ctx.get(\"tech_stack\"))\n\n    return ctx",
+    "prompt40_time_ms": 3,
+    "overall_status": "success",
+    "total_time_ms": 9469,
+    "error_message": null
+  },
+  "3640f99c": {
+    "pipeline_id": "3640f99c",
+    "timestamp": "2026-01-27 14:48:35",
+    "raw_input": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_id": "3fe589d3",
+    "prompt10_original": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_processed": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够存储约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus和ELK日志系统(Elasticsearch、Logstash、Kibana)实现监控与日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "prompt10_mode": "dictionary",
+    "prompt10_steps": [
+      {
+        "step_name": "术语对齐",
+        "step_index": 1,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": [
+          "替换 16 处"
+        ]
+      },
+      {
+        "step_name": "术语对齐",
+        "step_index": 2,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": []
+      },
+      {
+        "step_name": "LLM语义重构",
+        "step_index": 3,
+        "input_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够存储约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus和ELK日志系统(Elasticsearch、Logstash、Kibana)实现监控与日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+        "changes": {
+          "标准化": "335字 → 293字"
+        },
+        "duration_ms": 6758,
+        "notes": []
+      }
+    ],
+    "prompt10_terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "prompt10_ambiguity_detected": false,
+    "prompt10_status": "success",
+    "prompt10_time_ms": 6758,
+    "prompt20_id": "4a732c40",
+    "prompt20_template": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链需设计为较复杂结构，支持三种以上的检索模式。{{team_member_count}}，其中{{java_developer_count}}，{{python_developer_count}}。{{project_duration_weeks}}，{{budget_rmb}}。技术栈包括{{tech_stack}}。系统需支持多轮对话，能够存储{{max_dialog_rounds}}。部署环境为{{deployment_env}}，采用微服务架构，{{service_count}}。需集成{{monitoring_systems}}实现监控与日志管理。系统需支持{{language_support}}，{{response_time_limit_seconds}}。",
+    "prompt20_variables": [
+      {
+        "variable": "team_member_count",
+        "original_text": "团队成员共五人",
+        "value": 5,
+        "type": "Integer"
+      },
+      {
+        "variable": "java_developer_count",
+        "original_text": "两名负责Java开发",
+        "value": 2,
+        "type": "Integer"
+      },
+      {
+        "variable": "python_developer_count",
+        "original_text": "三名负责Python开发",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "project_duration_weeks",
+        "original_text": "项目周期约为八周",
+        "value": 8,
+        "type": "Integer"
+      },
+      {
+        "variable": "budget_rmb",
+        "original_text": "预算为五十万元",
+        "value": 500000,
+        "type": "Integer"
+      },
+      {
+        "variable": "tech_stack",
+        "original_text": "LangChain、Milvus和FastAPI",
+        "value": [
+          "LangChain",
+          "Milvus",
+          "FastAPI"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "max_dialog_rounds",
+        "original_text": "约二十轮历史上下文",
+        "value": 20,
+        "type": "Integer"
+      },
+      {
+        "variable": "deployment_env",
+        "original_text": "Kubernetes集群",
+        "value": "Kubernetes集群",
+        "type": "String"
+      },
+      {
+        "variable": "service_count",
+        "original_text": "服务数量约为十个",
+        "value": 10,
+        "type": "Integer"
+      },
+      {
+        "variable": "monitoring_systems",
+        "original_text": "Prometheus和ELK日志系统(Elasticsearch、Logstash、Kibana)",
+        "value": [
+          "Prometheus",
+          "Elasticsearch",
+          "Logstash",
+          "Kibana"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "language_support",
+        "original_text": "中英文双语",
+        "value": [
+          "中文",
+          "英文"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "response_time_limit_seconds",
+        "original_text": "响应时间控制在两秒以内",
+        "value": 2,
+        "type": "Integer"
+      }
+    ],
+    "prompt20_variable_count": 12,
+    "prompt20_type_stats": {
+      "Integer": 8,
+      "List": 3,
+      "String": 1
+    },
+    "prompt20_extraction_log": [],
+    "prompt20_time_ms": 0,
+    "prompt30_id": "75c90698",
+    "prompt30_dsl_code": "DEFINE {{team_member_count}}: Integer = 5\nDEFINE {{java_developer_count}}: Integer = 2\nDEFINE {{python_developer_count}}: Integer = 3\nDEFINE {{project_duration_weeks}}: Integer = 8\nDEFINE {{budget_rmb}}: Integer = 500000\nDEFINE {{tech_stack}}: List = ['LangChain', 'Milvus', 'FastAPI']\nDEFINE {{max_dialog_rounds}}: Integer = 20\nDEFINE {{deployment_env}}: String = Kubernetes集群\nDEFINE {{service_count}}: Integer = 10\nDEFINE {{monitoring_systems}}: List = ['Prometheus', 'Elasticsearch', 'Logstash', 'Kibana']\nDEFINE {{language_support}}: List = ['中文', '英文']\nDEFINE {{response_time_limit_seconds}}: Integer = 2\nDEFINE {{retrieval_modes}}: List = []\nDEFINE {{rag_app_spec}}: Dict\nDEFINE {{monitoring_integrated}}: Boolean = False\nDEFINE {{multi_round_dialog_supported}}: Boolean = False\nDEFINE {{response_time_compliant}}: Boolean = False\nIF {{team_member_count}} == 5 AND {{java_developer_count}} == 2 AND {{python_developer_count}} == 3\nENDIF\nIF {{project_duration_weeks}} == 8 AND {{budget_rmb}} == 500000\nENDIF\nIF 'LangChain' IN {{tech_stack}} AND 'Milvus' IN {{tech_stack}} AND 'FastAPI' IN {{tech_stack}}\nENDIF\nIF {{max_dialog_rounds}} >= 20\n    {{multi_round_dialog_supported}} = True\nENDIF\nIF {{deployment_env}} == \"Kubernetes集群\" AND {{service_count}} == 10\nENDIF\nIF 'Prometheus' IN {{monitoring_systems}} AND 'Elasticsearch' IN {{monitoring_systems}} AND 'Logstash' IN {{monitoring_systems}} AND 'Kibana' IN {{monitoring_systems}}\n    {{monitoring_integrated}} = True\nENDIF\nIF '中文' IN {{language_support}} AND '英文' IN {{language_support}}\nENDIF\nIF {{response_time_limit_seconds}} <= 2\n    {{response_time_compliant}} = True\nENDIF\n{{retrieval_modes}} = CALL design_retrieval_modes(min_count=3)\n{{rag_app_spec}} = CALL generate_rag_app_spec(\n    tech_stack={{tech_stack}},\n    retrieval_modes={{retrieval_modes}},\n    multi_round_dialog_supported={{multi_round_dialog_supported}},\n    max_dialog_rounds={{max_dialog_rounds}},\n    deployment_env={{deployment_env}},\n    service_count={{service_count}},\n    monitoring_integrated={{monitoring_integrated}},\n    language_support={{language_support}},\n    response_time_compliant={{response_time_compliant}},\n    budget={{budget_rmb}},\n    project_duration={{project_duration_weeks}}\n)\nRETURN {{rag_app_spec}}",
+    "prompt30_validation_result": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "defined_variables": {
+        "team_member_count": {
+          "name": "team_member_count",
+          "var_type": "Integer",
+          "initial_value": "5",
+          "line_number": 1
+        },
+        "java_developer_count": {
+          "name": "java_developer_count",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 2
+        },
+        "python_developer_count": {
+          "name": "python_developer_count",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 3
+        },
+        "project_duration_weeks": {
+          "name": "project_duration_weeks",
+          "var_type": "Integer",
+          "initial_value": "8",
+          "line_number": 4
+        },
+        "budget_rmb": {
+          "name": "budget_rmb",
+          "var_type": "Integer",
+          "initial_value": "500000",
+          "line_number": 5
+        },
+        "tech_stack": {
+          "name": "tech_stack",
+          "var_type": "List",
+          "initial_value": "['LangChain', 'Milvus', 'FastAPI']",
+          "line_number": 6
+        },
+        "max_dialog_rounds": {
+          "name": "max_dialog_rounds",
+          "var_type": "Integer",
+          "initial_value": "20",
+          "line_number": 7
+        },
+        "deployment_env": {
+          "name": "deployment_env",
+          "var_type": "String",
+          "initial_value": "Kubernetes集群",
+          "line_number": 8
+        },
+        "service_count": {
+          "name": "service_count",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 9
+        },
+        "monitoring_systems": {
+          "name": "monitoring_systems",
+          "var_type": "List",
+          "initial_value": "['Prometheus', 'Elasticsearch', 'Logstash', 'Kibana']",
+          "line_number": 10
+        },
+        "language_support": {
+          "name": "language_support",
+          "var_type": "List",
+          "initial_value": "['中文', '英文']",
+          "line_number": 11
+        },
+        "response_time_limit_seconds": {
+          "name": "response_time_limit_seconds",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 12
+        },
+        "retrieval_modes": {
+          "name": "retrieval_modes",
+          "var_type": "List",
+          "initial_value": "[]",
+          "line_number": 13
+        },
+        "rag_app_spec": {
+          "name": "rag_app_spec",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 14
+        },
+        "monitoring_integrated": {
+          "name": "monitoring_integrated",
+          "var_type": "Boolean",
+          "initial_value": "False",
+          "line_number": 15
+        },
+        "multi_round_dialog_supported": {
+          "name": "multi_round_dialog_supported",
+          "var_type": "Boolean",
+          "initial_value": "False",
+          "line_number": 16
+        },
+        "response_time_compliant": {
+          "name": "response_time_compliant",
+          "var_type": "Boolean",
+          "initial_value": "False",
+          "line_number": 17
+        }
+      },
+      "function_calls": [
+        {
+          "function_name": "design_retrieval_modes",
+          "arguments": [
+            "min_count=3"
+          ],
+          "result_var": "retrieval_modes",
+          "line_number": 37
+        }
+      ],
+      "control_blocks": [],
+      "max_nesting_depth": 1
+    },
+    "prompt30_time_ms": 4482,
+    "prompt40_id": "69310847",
+    "prompt40_modules": [
+      {
+        "name": "step_1_process",
+        "inputs": [
+          "java_developer_count",
+          "python_developer_count",
+          "team_member_count"
+        ],
+        "outputs": [],
+        "is_async": false
+      },
+      {
+        "name": "step_2_process",
+        "inputs": [
+          "budget_rmb",
+          "project_duration_weeks"
+        ],
+        "outputs": [],
+        "is_async": false
+      },
+      {
+        "name": "step_3_process",
+        "inputs": [
+          "tech_stack"
+        ],
+        "outputs": [],
+        "is_async": false
+      },
+      {
+        "name": "step_4_compute_multi_round_dialog_supported",
+        "inputs": [
+          "max_dialog_rounds"
+        ],
+        "outputs": [
+          "multi_round_dialog_supported"
+        ],
+        "is_async": false
+      },
+      {
+        "name": "step_5_process",
+        "inputs": [
+          "deployment_env",
+          "service_count"
+        ],
+        "outputs": [],
+        "is_async": false
+      },
+      {
+        "name": "step_6_compute_monitoring_integrated",
+        "inputs": [
+          "monitoring_systems"
+        ],
+        "outputs": [
+          "monitoring_integrated"
+        ],
+        "is_async": false
+      },
+      {
+        "name": "step_7_process",
+        "inputs": [
+          "language_support"
+        ],
+        "outputs": [],
+        "is_async": false
+      },
+      {
+        "name": "step_8_compute_response_time_compliant",
+        "inputs": [
+          "response_time_limit_seconds"
+        ],
+        "outputs": [
+          "response_time_compliant"
+        ],
+        "is_async": false
+      },
+      {
+        "name": "step_9_design_retrieval_modes",
+        "inputs": [],
+        "outputs": [
+          "retrieval_modes"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_10_generate_rag_app_spec",
+        "inputs": [
+          "budget_rmb",
+          "deployment_env",
+          "language_support",
+          "max_dialog_rounds",
+          "monitoring_integrated",
+          "multi_round_dialog_supported",
+          "project_duration_weeks",
+          "response_time_compliant",
+          "retrieval_modes",
+          "service_count",
+          "tech_stack"
+        ],
+        "outputs": [
+          "rag_app_spec"
+        ],
+        "is_async": true
+      }
+    ],
+    "prompt40_module_count": 10,
+    "prompt40_main_code": "async def main_workflow(input_params: dict):\n    \"\"\"\n    主工作流 - 自动生成\n    \n    Args:\n        input_params: 包含 ['budget_rmb', 'deployment_env', 'java_developer_count', 'language_support', 'max_dialog_rounds', 'monitoring_systems', 'project_duration_weeks', 'python_developer_count', 'response_time_limit_seconds', 'service_count', 'team_member_count', 'tech_stack'] 的字典\n    \n    Returns:\n        执行结果上下文\n    \"\"\"\n    # 初始化上下文\n    ctx = input_params.copy()\n\n    # Module 1: step_1_process\n    step_1_process(ctx.get(\"java_developer_count\"), ctx.get(\"python_developer_count\"), ctx.get(\"team_member_count\"))\n\n    # Module 2: step_2_process\n    step_2_process(ctx.get(\"budget_rmb\"), ctx.get(\"project_duration_weeks\"))\n\n    # Module 3: step_3_process\n    step_3_process(ctx.get(\"tech_stack\"))\n\n    # Module 4: step_4_compute_multi_round_dialog_supported\n    ctx[\"multi_round_dialog_supported\"] = step_4_compute_multi_round_dialog_supported(ctx.get(\"max_dialog_rounds\"))\n\n    # Module 5: step_5_process\n    step_5_process(ctx.get(\"deployment_env\"), ctx.get(\"service_count\"))\n\n    # Module 6: step_6_compute_monitoring_integrated\n    ctx[\"monitoring_integrated\"] = step_6_compute_monitoring_integrated(ctx.get(\"monitoring_systems\"))\n\n    # Module 7: step_7_process\n    step_7_process(ctx.get(\"language_support\"))\n\n    # Module 8: step_8_compute_response_time_compliant\n    ctx[\"response_time_compliant\"] = step_8_compute_response_time_compliant(ctx.get(\"response_time_limit_seconds\"))\n\n    # Module 9: step_9_design_retrieval_modes\n    ctx[\"retrieval_modes\"] = await step_9_design_retrieval_modes()\n\n    # Module 10: step_10_generate_rag_app_spec\n    ctx[\"rag_app_spec\"] = await step_10_generate_rag_app_spec(ctx.get(\"budget_rmb\"), ctx.get(\"deployment_env\"), ctx.get(\"language_support\"), ctx.get(\"max_dialog_rounds\"), ctx.get(\"monitoring_integrated\"), ctx.get(\"multi_round_dialog_supported\"), ctx.get(\"project_duration_weeks\"), ctx.get(\"response_time_compliant\"), ctx.get(\"retrieval_modes\"), ctx.get(\"service_count\"), ctx.get(\"tech_stack\"))\n\n    return ctx",
+    "prompt40_time_ms": 5,
+    "overall_status": "success",
+    "total_time_ms": 11245,
+    "error_message": null
+  },
+  "1bd6b2de": {
+    "pipeline_id": "1bd6b2de",
+    "timestamp": "2026-01-27 14:49:39",
+    "raw_input": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_id": "f19b50ed",
+    "prompt10_original": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_processed": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够存储约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus进行监控，并使用ELK日志系统(Elasticsearch、Logstash、Kibana)进行日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "prompt10_mode": "dictionary",
+    "prompt10_steps": [
+      {
+        "step_name": "术语对齐",
+        "step_index": 1,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": [
+          "替换 16 处"
+        ]
+      },
+      {
+        "step_name": "术语对齐",
+        "step_index": 2,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": []
+      },
+      {
+        "step_name": "LLM语义重构",
+        "step_index": 3,
+        "input_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够存储约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus进行监控，并使用ELK日志系统(Elasticsearch、Logstash、Kibana)进行日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+        "changes": {
+          "标准化": "335字 → 305字"
+        },
+        "duration_ms": 5989,
+        "notes": []
+      }
+    ],
+    "prompt10_terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "prompt10_ambiguity_detected": false,
+    "prompt10_status": "success",
+    "prompt10_time_ms": 5990,
+    "prompt20_id": "93615f54",
+    "prompt20_template": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需设计为较复杂结构，支持{{retrieval_modes}}。{{team_members_count}}，其中{{java_developers_count}}，{{python_developers_count}}。{{project_duration_weeks}}，预算为{{budget}}。技术栈包括{{tech_stack}}。系统需支持多轮对话，能够存储{{conversation_rounds}}。部署环境为{{deployment_environment}}，采用{{architecture}}，{{service_count}}。需集成{{monitoring_system}}，并使用{{logging_system}}进行日志管理。系统需支持{{language_support}}，{{response_time_limit_seconds}}。",
+    "prompt20_variables": [
+      {
+        "variable": "retrieval_modes",
+        "original_text": "三种以上的检索模式",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "team_members_count",
+        "original_text": "团队成员共五人",
+        "value": 5,
+        "type": "Integer"
+      },
+      {
+        "variable": "java_developers_count",
+        "original_text": "两名负责Java开发",
+        "value": 2,
+        "type": "Integer"
+      },
+      {
+        "variable": "python_developers_count",
+        "original_text": "三名负责Python开发",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "project_duration_weeks",
+        "original_text": "项目周期约为八周",
+        "value": 8,
+        "type": "Integer"
+      },
+      {
+        "variable": "budget",
+        "original_text": "五十万元",
+        "value": 500000,
+        "type": "Integer"
+      },
+      {
+        "variable": "tech_stack",
+        "original_text": "LangChain、Milvus和FastAPI",
+        "value": [
+          "LangChain",
+          "Milvus",
+          "FastAPI"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "conversation_rounds",
+        "original_text": "约二十轮的历史上下文",
+        "value": 20,
+        "type": "Integer"
+      },
+      {
+        "variable": "deployment_environment",
+        "original_text": "Kubernetes集群",
+        "value": "Kubernetes集群",
+        "type": "String"
+      },
+      {
+        "variable": "architecture",
+        "original_text": "微服务架构",
+        "value": "微服务架构",
+        "type": "String"
+      },
+      {
+        "variable": "service_count",
+        "original_text": "服务数量约为十个",
+        "value": 10,
+        "type": "Integer"
+      },
+      {
+        "variable": "monitoring_system",
+        "original_text": "Prometheus进行监控",
+        "value": "Prometheus",
+        "type": "String"
+      },
+      {
+        "variable": "logging_system",
+        "original_text": "ELK日志系统(Elasticsearch、Logstash、Kibana)",
+        "value": [
+          "Elasticsearch",
+          "Logstash",
+          "Kibana"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "language_support",
+        "original_text": "中英文双语",
+        "value": "中英文双语",
+        "type": "Enum"
+      },
+      {
+        "variable": "response_time_limit_seconds",
+        "original_text": "响应时间控制在两秒以内",
+        "value": 2,
+        "type": "Integer"
+      }
+    ],
+    "prompt20_variable_count": 15,
+    "prompt20_type_stats": {
+      "Integer": 9,
+      "List": 2,
+      "String": 3,
+      "Enum": 1
+    },
+    "prompt20_extraction_log": [],
+    "prompt20_time_ms": 0,
+    "prompt30_id": "af8bb01a",
+    "prompt30_dsl_code": "DEFINE {{retrieval_modes}}: Integer = 3\nDEFINE {{team_members_count}}: Integer = 5\nDEFINE {{java_developers_count}}: Integer = 2\nDEFINE {{python_developers_count}}: Integer = 3\nDEFINE {{project_duration_weeks}}: Integer = 8\nDEFINE {{budget}}: Integer = 500000\nDEFINE {{tech_stack}}: List = ['LangChain', 'Milvus', 'FastAPI']\nDEFINE {{conversation_rounds}}: Integer = 20\nDEFINE {{deployment_environment}}: String = \"Kubernetes集群\"\nDEFINE {{architecture}}: String = \"微服务架构\"\nDEFINE {{service_count}}: Integer = 10\nDEFINE {{monitoring_system}}: String = \"Prometheus\"\nDEFINE {{logging_system}}: List = ['Elasticsearch', 'Logstash', 'Kibana']\nDEFINE {{language_support}}: String = \"中英文双语\"\nDEFINE {{response_time_limit_seconds}}: Integer = 2\nDEFINE {{rag_app}}: Any\nDEFINE {{team_allocation}}: Dict\nDEFINE {{project_plan}}: Dict\n{{rag_app}} = CALL develop_rag_app(\n    retrieval_modes={{retrieval_modes}},\n    tech_stack={{tech_stack}},\n    conversation_rounds={{conversation_rounds}},\n    deployment_environment={{deployment_environment}},\n    architecture={{architecture}},\n    service_count={{service_count}},\n    monitoring_system={{monitoring_system}},\n    logging_system={{logging_system}},\n    language_support={{language_support}},\n    response_time_limit_seconds={{response_time_limit_seconds}}\n)\n{{team_allocation}} = CALL allocate_team(\n    team_members_count={{team_members_count}},\n    java_developers_count={{java_developers_count}},\n    python_developers_count={{python_developers_count}}\n)\n{{project_plan}} = CALL create_project_plan(\n    project_duration_weeks={{project_duration_weeks}},\n    budget={{budget}}\n)\nRETURN {{rag_app}}",
+    "prompt30_validation_result": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "defined_variables": {
+        "retrieval_modes": {
+          "name": "retrieval_modes",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 1
+        },
+        "team_members_count": {
+          "name": "team_members_count",
+          "var_type": "Integer",
+          "initial_value": "5",
+          "line_number": 2
+        },
+        "java_developers_count": {
+          "name": "java_developers_count",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 3
+        },
+        "python_developers_count": {
+          "name": "python_developers_count",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 4
+        },
+        "project_duration_weeks": {
+          "name": "project_duration_weeks",
+          "var_type": "Integer",
+          "initial_value": "8",
+          "line_number": 5
+        },
+        "budget": {
+          "name": "budget",
+          "var_type": "Integer",
+          "initial_value": "500000",
+          "line_number": 6
+        },
+        "tech_stack": {
+          "name": "tech_stack",
+          "var_type": "List",
+          "initial_value": "['LangChain', 'Milvus', 'FastAPI']",
+          "line_number": 7
+        },
+        "conversation_rounds": {
+          "name": "conversation_rounds",
+          "var_type": "Integer",
+          "initial_value": "20",
+          "line_number": 8
+        },
+        "deployment_environment": {
+          "name": "deployment_environment",
+          "var_type": "String",
+          "initial_value": "\"Kubernetes集群\"",
+          "line_number": 9
+        },
+        "architecture": {
+          "name": "architecture",
+          "var_type": "String",
+          "initial_value": "\"微服务架构\"",
+          "line_number": 10
+        },
+        "service_count": {
+          "name": "service_count",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 11
+        },
+        "monitoring_system": {
+          "name": "monitoring_system",
+          "var_type": "String",
+          "initial_value": "\"Prometheus\"",
+          "line_number": 12
+        },
+        "logging_system": {
+          "name": "logging_system",
+          "var_type": "List",
+          "initial_value": "['Elasticsearch', 'Logstash', 'Kibana']",
+          "line_number": 13
+        },
+        "language_support": {
+          "name": "language_support",
+          "var_type": "String",
+          "initial_value": "\"中英文双语\"",
+          "line_number": 14
+        },
+        "response_time_limit_seconds": {
+          "name": "response_time_limit_seconds",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 15
+        },
+        "rag_app": {
+          "name": "rag_app",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 16
+        },
+        "team_allocation": {
+          "name": "team_allocation",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 17
+        },
+        "project_plan": {
+          "name": "project_plan",
+          "var_type": "Dict",
+          "initial_value": null,
+          "line_number": 18
+        }
+      },
+      "function_calls": [],
+      "control_blocks": [],
+      "max_nesting_depth": 0
+    },
+    "prompt30_time_ms": 10846,
+    "prompt40_id": "255224df",
+    "prompt40_modules": [
+      {
+        "name": "step_1_develop_rag_app",
+        "inputs": [
+          "architecture",
+          "conversation_rounds",
+          "deployment_environment",
+          "language_support",
+          "logging_system",
+          "monitoring_system",
+          "response_time_limit_seconds",
+          "retrieval_modes",
+          "service_count",
+          "tech_stack"
+        ],
+        "outputs": [
+          "rag_app"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_2_allocate_team",
+        "inputs": [
+          "java_developers_count",
+          "python_developers_count",
+          "team_members_count"
+        ],
+        "outputs": [
+          "team_allocation"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_3_create_project_plan",
+        "inputs": [
+          "budget",
+          "project_duration_weeks"
+        ],
+        "outputs": [
+          "project_plan"
+        ],
+        "is_async": true
+      }
+    ],
+    "prompt40_module_count": 3,
+    "prompt40_main_code": "async def main_workflow(input_params: dict):\n    \"\"\"\n    主工作流 - 自动生成\n    \n    Args:\n        input_params: 包含 ['architecture', 'budget', 'conversation_rounds', 'deployment_environment', 'java_developers_count', 'language_support', 'logging_system', 'monitoring_system', 'project_duration_weeks', 'python_developers_count', 'response_time_limit_seconds', 'retrieval_modes', 'service_count', 'team_members_count', 'tech_stack'] 的字典\n    \n    Returns:\n        执行结果上下文\n    \"\"\"\n    # 初始化上下文\n    ctx = input_params.copy()\n\n    # Module 1: step_1_develop_rag_app\n    ctx[\"rag_app\"] = await step_1_develop_rag_app(ctx.get(\"architecture\"), ctx.get(\"conversation_rounds\"), ctx.get(\"deployment_environment\"), ctx.get(\"language_support\"), ctx.get(\"logging_system\"), ctx.get(\"monitoring_system\"), ctx.get(\"response_time_limit_seconds\"), ctx.get(\"retrieval_modes\"), ctx.get(\"service_count\"), ctx.get(\"tech_stack\"))\n\n    # Module 2: step_2_allocate_team\n    ctx[\"team_allocation\"] = await step_2_allocate_team(ctx.get(\"java_developers_count\"), ctx.get(\"python_developers_count\"), ctx.get(\"team_members_count\"))\n\n    # Module 3: step_3_create_project_plan\n    ctx[\"project_plan\"] = await step_3_create_project_plan(ctx.get(\"budget\"), ctx.get(\"project_duration_weeks\"))\n\n    return ctx",
+    "prompt40_time_ms": 3,
+    "overall_status": "success",
+    "total_time_ms": 16839,
+    "error_message": null
+  },
+  "835cb647": {
+    "pipeline_id": "835cb647",
+    "timestamp": "2026-01-27 14:50:36",
+    "raw_input": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_id": "38f96b1e",
+    "prompt10_original": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_processed": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus和ELK日志系统(Elasticsearch、Logstash、Kibana)实现监控与日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "prompt10_mode": "dictionary",
+    "prompt10_steps": [
+      {
+        "step_name": "术语对齐",
+        "step_index": 1,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": [
+          "替换 16 处"
+        ]
+      },
+      {
+        "step_name": "术语对齐",
+        "step_index": 2,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": []
+      },
+      {
+        "step_name": "LLM语义重构",
+        "step_index": 3,
+        "input_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus和ELK日志系统(Elasticsearch、Logstash、Kibana)实现监控与日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+        "changes": {
+          "标准化": "335字 → 293字"
+        },
+        "duration_ms": 6930,
+        "notes": []
+      }
+    ],
+    "prompt10_terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "prompt10_ambiguity_detected": false,
+    "prompt10_status": "success",
+    "prompt10_time_ms": 6931,
+    "prompt20_id": "8e73e801",
+    "prompt20_template": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链需设计为较复杂结构，支持{{retrieval_modes}}。{{team_members_count}}，其中{{java_developers_count}}，{{python_developers_count}}。{{project_duration_weeks}}，{{budget}}。技术栈包括{{tech_stack}}。系统需支持多轮对话，能够保存{{multi_turn_context_rounds}}。部署环境为{{deployment_environment}}，采用微服务架构，{{microservice_count}}。需集成{{monitoring_stack}}实现监控与日志管理。系统需支持{{bilingual_support}}，{{response_time_limit_seconds}}。",
+    "prompt20_variables": [
+      {
+        "variable": "retrieval_modes",
+        "original_text": "三种以上的检索模式",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "team_members_count",
+        "original_text": "团队成员共五人",
+        "value": 5,
+        "type": "Integer"
+      },
+      {
+        "variable": "java_developers_count",
+        "original_text": "两名负责Java开发",
+        "value": 2,
+        "type": "Integer"
+      },
+      {
+        "variable": "python_developers_count",
+        "original_text": "三名负责Python开发",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "project_duration_weeks",
+        "original_text": "项目周期约为八周",
+        "value": 8,
+        "type": "Integer"
+      },
+      {
+        "variable": "budget",
+        "original_text": "预算为五十万元",
+        "value": 500000,
+        "type": "Integer"
+      },
+      {
+        "variable": "tech_stack",
+        "original_text": "LangChain、Milvus和FastAPI",
+        "value": [
+          "LangChain",
+          "Milvus",
+          "FastAPI"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "multi_turn_context_rounds",
+        "original_text": "约二十轮历史上下文",
+        "value": 20,
+        "type": "Integer"
+      },
+      {
+        "variable": "deployment_environment",
+        "original_text": "Kubernetes集群",
+        "value": "Kubernetes集群",
+        "type": "String"
+      },
+      {
+        "variable": "microservice_count",
+        "original_text": "服务数量约为十个",
+        "value": 10,
+        "type": "Integer"
+      },
+      {
+        "variable": "monitoring_stack",
+        "original_text": "Prometheus和ELK日志系统(Elasticsearch、Logstash、Kibana)",
+        "value": [
+          "Prometheus",
+          "Elasticsearch",
+          "Logstash",
+          "Kibana"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "bilingual_support",
+        "original_text": "中英文双语",
+        "value": true,
+        "type": "Boolean"
+      },
+      {
+        "variable": "response_time_limit_seconds",
+        "original_text": "响应时间控制在两秒以内",
+        "value": 2,
+        "type": "Integer"
+      }
+    ],
+    "prompt20_variable_count": 13,
+    "prompt20_type_stats": {
+      "Integer": 9,
+      "List": 2,
+      "String": 1,
+      "Boolean": 1
+    },
+    "prompt20_extraction_log": [],
+    "prompt20_time_ms": 0,
+    "prompt30_id": "13718af8",
+    "prompt30_dsl_code": "DEFINE {{retrieval_modes}}: Integer = 3\nDEFINE {{team_members_count}}: Integer = 5\nDEFINE {{java_developers_count}}: Integer = 2\nDEFINE {{python_developers_count}}: Integer = 3\nDEFINE {{project_duration_weeks}}: Integer = 8\nDEFINE {{budget}}: Integer = 500000\nDEFINE {{tech_stack}}: List = ['LangChain', 'Milvus', 'FastAPI']\nDEFINE {{multi_turn_context_rounds}}: Integer = 20\nDEFINE {{deployment_environment}}: String = Kubernetes集群\nDEFINE {{microservice_count}}: Integer = 10\nDEFINE {{monitoring_stack}}: List = ['Prometheus', 'Elasticsearch', 'Logstash', 'Kibana']\nDEFINE {{bilingual_support}}: Boolean = True\nDEFINE {{response_time_limit_seconds}}: Integer = 2\nDEFINE {{rag_app_design}}: Any\n{{rag_app_design}} = CALL design_rag_application(\n    retrieval_modes={{retrieval_modes}},\n    team_members_count={{team_members_count}},\n    java_developers_count={{java_developers_count}},\n    python_developers_count={{python_developers_count}},\n    project_duration_weeks={{project_duration_weeks}},\n    budget={{budget}},\n    tech_stack={{tech_stack}},\n    multi_turn_context_rounds={{multi_turn_context_rounds}},\n    deployment_environment={{deployment_environment}},\n    microservice_count={{microservice_count}},\n    monitoring_stack={{monitoring_stack}},\n    bilingual_support={{bilingual_support}},\n    response_time_limit_seconds={{response_time_limit_seconds}}\n)\nRETURN {{rag_app_design}}",
+    "prompt30_validation_result": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "defined_variables": {
+        "retrieval_modes": {
+          "name": "retrieval_modes",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 1
+        },
+        "team_members_count": {
+          "name": "team_members_count",
+          "var_type": "Integer",
+          "initial_value": "5",
+          "line_number": 2
+        },
+        "java_developers_count": {
+          "name": "java_developers_count",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 3
+        },
+        "python_developers_count": {
+          "name": "python_developers_count",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 4
+        },
+        "project_duration_weeks": {
+          "name": "project_duration_weeks",
+          "var_type": "Integer",
+          "initial_value": "8",
+          "line_number": 5
+        },
+        "budget": {
+          "name": "budget",
+          "var_type": "Integer",
+          "initial_value": "500000",
+          "line_number": 6
+        },
+        "tech_stack": {
+          "name": "tech_stack",
+          "var_type": "List",
+          "initial_value": "['LangChain', 'Milvus', 'FastAPI']",
+          "line_number": 7
+        },
+        "multi_turn_context_rounds": {
+          "name": "multi_turn_context_rounds",
+          "var_type": "Integer",
+          "initial_value": "20",
+          "line_number": 8
+        },
+        "deployment_environment": {
+          "name": "deployment_environment",
+          "var_type": "String",
+          "initial_value": "Kubernetes集群",
+          "line_number": 9
+        },
+        "microservice_count": {
+          "name": "microservice_count",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 10
+        },
+        "monitoring_stack": {
+          "name": "monitoring_stack",
+          "var_type": "List",
+          "initial_value": "['Prometheus', 'Elasticsearch', 'Logstash', 'Kibana']",
+          "line_number": 11
+        },
+        "bilingual_support": {
+          "name": "bilingual_support",
+          "var_type": "Boolean",
+          "initial_value": "True",
+          "line_number": 12
+        },
+        "response_time_limit_seconds": {
+          "name": "response_time_limit_seconds",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 13
+        },
+        "rag_app_design": {
+          "name": "rag_app_design",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 14
+        }
+      },
+      "function_calls": [],
+      "control_blocks": [],
+      "max_nesting_depth": 0
+    },
+    "prompt30_time_ms": 4338,
+    "prompt40_id": "f1c3dd09",
+    "prompt40_modules": [
+      {
+        "name": "step_1_design_rag_application",
+        "inputs": [
+          "bilingual_support",
+          "budget",
+          "deployment_environment",
+          "java_developers_count",
+          "microservice_count",
+          "monitoring_stack",
+          "multi_turn_context_rounds",
+          "project_duration_weeks",
+          "python_developers_count",
+          "response_time_limit_seconds",
+          "retrieval_modes",
+          "team_members_count",
+          "tech_stack"
+        ],
+        "outputs": [
+          "rag_app_design"
+        ],
+        "is_async": true
+      }
+    ],
+    "prompt40_module_count": 1,
+    "prompt40_main_code": "async def main_workflow(input_params: dict):\n    \"\"\"\n    主工作流 - 自动生成\n    \n    Args:\n        input_params: 包含 ['bilingual_support', 'budget', 'deployment_environment', 'java_developers_count', 'microservice_count', 'monitoring_stack', 'multi_turn_context_rounds', 'project_duration_weeks', 'python_developers_count', 'response_time_limit_seconds', 'retrieval_modes', 'team_members_count', 'tech_stack'] 的字典\n    \n    Returns:\n        执行结果上下文\n    \"\"\"\n    # 初始化上下文\n    ctx = input_params.copy()\n\n    # Module 1: step_1_design_rag_application\n    ctx[\"rag_app_design\"] = await step_1_design_rag_application(ctx.get(\"bilingual_support\"), ctx.get(\"budget\"), ctx.get(\"deployment_environment\"), ctx.get(\"java_developers_count\"), ctx.get(\"microservice_count\"), ctx.get(\"monitoring_stack\"), ctx.get(\"multi_turn_context_rounds\"), ctx.get(\"project_duration_weeks\"), ctx.get(\"python_developers_count\"), ctx.get(\"response_time_limit_seconds\"), ctx.get(\"retrieval_modes\"), ctx.get(\"team_members_count\"), ctx.get(\"tech_stack\"))\n\n    return ctx",
+    "prompt40_time_ms": 2,
+    "overall_status": "success",
+    "total_time_ms": 11271,
+    "error_message": null
   }
 }

@@ -756,5 +756,649 @@
     "ambiguity_detected": false,
     "success": true,
     "processing_time_ms": 9699
+  },
+  "2026-01-27 14:21:06": {
+    "timestamp": "2026-01-27 14:21:06",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需具备较高复杂度，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算约为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)实现监控与日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 7868ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 7868
+  },
+  "2026-01-27 14:22:37": {
+    "timestamp": "2026-01-27 14:22:37",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需具备较高复杂度，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮的上下文历史。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)实现监控与日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 4938ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 4939
+  },
+  "2026-01-27 14:29:04": {
+    "timestamp": "2026-01-27 14:29:04",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算约为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮的上下文历史。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)实现监控与日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 5469ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 5470
+  },
+  "2026-01-27 14:32:03": {
+    "timestamp": "2026-01-27 14:32:03",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus监控和ELK日志系统(Elasticsearch、Logstash、Kibana)。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 4869ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 4869
+  },
+  "2026-01-27 14:34:10": {
+    "timestamp": "2026-01-27 14:34:10",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需支持三种以上的检索模式。团队成员包括两名Java开发和三名Python开发，项目周期为八周，预算约为五十万元。技术栈选用LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus监控和ELK日志系统(Elasticsearch、Logstash、Kibana)。应用需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 5968ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 5969
+  },
+  "2026-01-27 14:35:24": {
+    "timestamp": "2026-01-27 14:35:24",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需支持三种以上的检索模式。团队成员包括两名Java开发和三名Python开发，项目周期约为八周，预算为五十万元。技术栈选用LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus监控和ELK日志系统(Elasticsearch、Logstash、Kibana)。应用需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 4993ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 4994
+  },
+  "2026-01-27 14:37:01": {
+    "timestamp": "2026-01-27 14:37:01",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus监控和ELK日志系统(Elasticsearch、Logstash、Kibana)。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 5081ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 5082
+  },
+  "2026-01-27 14:37:50": {
+    "timestamp": "2026-01-27 14:37:50",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus监控和ELK日志系统(Elasticsearch、Logstash、Kibana)。应用需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 4571ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 4572
+  },
+  "2026-01-27 14:38:19": {
+    "timestamp": "2026-01-27 14:38:19",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)实现监控与日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 4907ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 4908
+  },
+  "2026-01-27 14:38:54": {
+    "timestamp": "2026-01-27 14:38:54",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需支持三种以上的检索模式。团队成员包括两名Java开发和三名Python开发，项目周期约为八周，预算为五十万元。技术栈选用LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus监控和ELK日志系统(Elasticsearch、Logstash、Kibana)。应用需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 4398ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 4399
+  },
+  "2026-01-27 14:40:31": {
+    "timestamp": "2026-01-27 14:40:31",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus和ELK日志系统(Elasticsearch、Logstash、Kibana)实现监控和日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 5065ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 5065
+  },
+  "2026-01-27 14:42:14": {
+    "timestamp": "2026-01-27 14:42:14",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需支持三种以上的检索模式。团队成员包括两名Java开发和三名Python开发，项目周期约为八周，预算为五十万元。技术栈选用LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus监控和ELK日志系统(Elasticsearch、Logstash、Kibana)。应用需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 4910ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 4911
+  },
+  "2026-01-27 14:43:16": {
+    "timestamp": "2026-01-27 14:43:16",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus进行监控，并使用ELK日志系统(Elasticsearch、Logstash、Kibana)进行日志管理。系统需支持中英文双语，响应时间需控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 5162ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 5162
+  },
+  "2026-01-27 14:43:55": {
+    "timestamp": "2026-01-27 14:43:55",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链需设计为较高复杂度，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期为八周，预算约为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus进行监控，并使用ELK日志系统(Elasticsearch、Logstash、Kibana)进行日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 4670ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 4670
+  },
+  "2026-01-27 14:44:42": {
+    "timestamp": "2026-01-27 14:44:42",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够存储约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus进行监控，并使用ELK日志系统(Elasticsearch、Logstash、Kibana)进行日志管理。系统需支持中英文双语，响应时间需控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 5486ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 5486
+  },
+  "2026-01-27 14:45:04": {
+    "timestamp": "2026-01-27 14:45:04",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需设计为较复杂结构，支持不少于三种检索模式。团队规模为五人，其中两名负责Java开发，三名负责Python开发。项目周期预计为八周，预算约为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus监控和ELK日志系统(Elasticsearch、Logstash、Kibana)。应用需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 3898ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 3899
+  },
+  "2026-01-27 14:45:34": {
+    "timestamp": "2026-01-27 14:45:34",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需具备较高复杂度，支持不少于三种检索模式。团队规模为五人，其中两名Java开发，三名Python开发。项目周期约为八周，预算约为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)实现监控与日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 5573ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 5573
+  },
+  "2026-01-27 14:46:34": {
+    "timestamp": "2026-01-27 14:46:34",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需设计为较复杂结构，支持至少三种检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期为八周，预算约为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成监控和日志系统，使用Prometheus和ELK日志系统(Elasticsearch、Logstash、Kibana)。应用需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 4545ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 4545
+  },
+  "2026-01-27 14:47:16": {
+    "timestamp": "2026-01-27 14:47:16",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需支持三种以上的检索模式。团队成员包括两名Java开发和三名Python开发，项目周期约为八周，预算为五十万元。技术栈选用LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus监控和ELK日志系统(Elasticsearch、Logstash、Kibana)。应用需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 4778ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 4778
+  },
+  "2026-01-27 14:48:15": {
+    "timestamp": "2026-01-27 14:48:15",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够存储约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus和ELK日志系统(Elasticsearch、Logstash、Kibana)实现监控与日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 6758ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 6758
+  },
+  "2026-01-27 14:49:16": {
+    "timestamp": "2026-01-27 14:49:16",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链(Chain)需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够存储约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus进行监控，并使用ELK日志系统(Elasticsearch、Logstash、Kibana)进行日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 5989ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 5990
+  },
+  "2026-01-27 14:50:20": {
+    "timestamp": "2026-01-27 14:50:20",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)。处理链需设计为较复杂结构，支持三种以上的检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够保存约二十轮历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus和ELK日志系统(Elasticsearch、Logstash、Kibana)实现监控与日志管理。系统需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 6930ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 6931
+  },
+  "2026-01-27 14:51:18": {
+    "timestamp": "2026-01-27 14:51:18",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用，底层采用大型语言模型(LLM)，处理链需设计为较复杂结构，支持不少于三种检索模式。团队成员共五人，其中两名负责Java开发，三名负责Python开发。项目周期约为八周，预算为五十万元。技术栈包括LangChain、Milvus和FastAPI。系统需支持多轮对话，能够存储约二十轮的历史上下文。部署环境为Kubernetes集群，采用微服务架构，服务数量约为十个。需集成Prometheus进行监控，并使用ELK日志系统(Elasticsearch、Logstash、Kibana)进行日志管理。系统需支持中英文双语，响应时间需控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 5277ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 5277
   }
 }

@@ -337,3 +337,30 @@ def create_prompt20_result(
         variable_registry=variable_registry,
         **kwargs
     )
+
+
+def convert_prompt20_to_dsl_input(prompt20_result: Prompt20Result) -> Dict[str, Any]:
+    """
+    将 Prompt20Result 转换为 DSL 编译器所需的输入格式
+    
+    Args:
+        prompt20_result: Prompt 2.0 结构化结果
+        
+    Returns:
+        DSL 编译器输入字典，包含 variables 和 logic 字段
+    """
+    variables = []
+    for var in prompt20_result.variables:
+        var_dict = {
+            'name': var.name,
+            'type': var.data_type,
+        }
+        if var.value is not None:
+            var_dict['default'] = var.value
+        variables.append(var_dict)
+    
+    return {
+        'variables': variables,
+        'logic': prompt20_result.original_text,  # 使用原始文本作为逻辑描述
+        'context': 'Converted from Prompt 2.0'
+    }

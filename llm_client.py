@@ -342,6 +342,8 @@ class MockLLMClient(UnifiedLLMClient):
             content = self._mock_ambiguity_detection(user_content)
         elif "标准化" in system_prompt or "书面语" in system_prompt:
             content = self._mock_standardization(user_content)
+        elif "DSL" in system_prompt or "逻辑重构" in system_prompt:
+            content = self._mock_dsl_transpilation(user_content)
         else:
             content = f"[模拟响应] {user_content[:50]}..."
         
@@ -405,6 +407,93 @@ class MockLLMClient(UnifiedLLMClient):
         for old, new in replacements.items():
             result = result.replace(old, new)
         return result.strip()
+
+    def _mock_dsl_transpilation(self, user_content: str) -> str:
+        """模拟DSL转译：解析用户输入并生成DSL伪代码"""
+        import re
+        
+        # 解析变量定义
+        variables = []
+        in_variable_section = False
+        lines = user_content.split('\n')
+        
+        for line in lines:
+            line = line.strip()
+            if line.startswith('【变量定义】'):
+                in_variable_section = True
+                continue
+            elif line.startswith('【'):
+                # 进入其他部分
+                in_variable_section = False
+                continue
+            
+            if in_variable_section and line.startswith('-'):
+                # 格式: - var_name: Type [= value]
+                match = re.match(r'-\s*(\w+):\s*(\w+)(?:\s*=\s*(.+))?', line)
+                if match:
+                    var_name, var_type, initial_value = match.groups()
+                    variables.append({
+                        'name': var_name,
+                        'type': var_type,
+                        'initial_value': initial_value
+                    })
+        
+        # 解析逻辑描述（简单关键词检测）
+        logic = ""
+        in_logic_section = False
+        for line in lines:
+            line = line.strip()
+            if line.startswith('【逻辑描述】'):
+                in_logic_section = True
+                continue
+            elif line.startswith('【'):
+                in_logic_section = False
+                continue
+            
+            if in_logic_section:
+                logic = line
+                break
+        
+        # 构建DSL代码
+        dsl_lines = []
+        
+        # 1. 变量定义
+        for var in variables:
+            if var['initial_value']:
+                dsl_lines.append(f"DEFINE {{{{{var['name']}}}}}: {var['type']} = {var['initial_value']}")
+            else:
+                dsl_lines.append(f"DEFINE {{{{{var['name']}}}}}: {var['type']}")
+        
+        # 2. 根据逻辑描述生成控制流
+        if '如果' in logic or '若' in logic:
+            # 简单条件语句
+            dsl_lines.append("")
+            dsl_lines.append("# 条件判断")
+            dsl_lines.append("IF {{condition}} == true")
+            dsl_lines.append("    {{result}} = CALL process_success()")
+            dsl_lines.append("ELSE")
+            dsl_lines.append("    {{result}} = CALL process_failure()")
+            dsl_lines.append("ENDIF")
+        
+        if '对于每个' in logic or '遍历' in logic:
+            # 简单循环
+            dsl_lines.append("")
+            dsl_lines.append("# 循环处理")
+            dsl_lines.append("FOR {{item}} IN {{collection}}")
+            dsl_lines.append("    {{result}} = CALL process_item({{item}})")
+            dsl_lines.append("ENDFOR")
+        
+        # 如果没有生成任何控制流，添加一个默认的CALL
+        if len(dsl_lines) <= len(variables):
+            dsl_lines.append("")
+            dsl_lines.append("# 默认处理")
+            dsl_lines.append("{{output}} = CALL generate_output()")
+        
+        # 3. 添加返回语句
+        dsl_lines.append("")
+        dsl_lines.append("RETURN {{result}}")
+        
+        return '\n'.join(dsl_lines)
 
 
 # ============================================================================

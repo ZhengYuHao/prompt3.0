@@ -12,7 +12,11 @@ import time
 # ============================================================================
 
 from logger import info, warning, error
-from data_models import ProcessingMode, Prompt10Result, StepSnapshot, get_timestamp, generate_id
+from dataclasses import asdict
+from data_models import (
+    ProcessingMode, Prompt10Result, StepSnapshot, get_timestamp, generate_id,
+    create_prompt20_result, convert_prompt20_to_dsl_input
+)
 
 # 导入预处理模块（原 1.py）
 from prompt_preprocessor import PromptPreprocessor
@@ -27,10 +31,20 @@ from prompt_structurizer import (
     LLMEntityExtractor  # 真实 LLM 实体抽取器
 )
 
+# 导入 DSL 编译器模块（原 prompt_dslcompiler.py）
+from prompt_dslcompiler import SelfCorrectionLoop, ValidationResult
+
 # 导入历史记录管理
 from history_manager import HistoryManager, PipelineHistory
-from data_models import generate_id, get_timestamp
 
+
+# ============================================================================
+# 配置
+# ============================================================================
+# 是否使用模拟 LLM 客户端（设为 True 可避免真实 API 调用）
+USE_MOCK = False  # 默认使用模拟客户端，避免意外 API 调用
+# 如果要使用真实 LLM，请设置为 False 并确保配置了有效的 API 密钥
+# USE_MOCK = False
 
 # ============================================================================
 # 复杂测试场景设计
@@ -237,7 +251,7 @@ def run_full_pipeline():
         mode=ProcessingMode.DICTIONARY,
         term_mapping=TERM_MAPPING,
         ambiguity_blacklist=AMBIGUITY_BLACKLIST,
-        use_mock_llm=False,  # 使用真实LLM
+        use_mock_llm=USE_MOCK,  # 根据配置选择模拟或真实LLM
         enable_deep_check=False  # 关闭深度检测以便演示继续
     )
     
@@ -303,8 +317,8 @@ def run_full_pipeline():
     
     info("\n>>> 输入: Prompt 1.0 处理后的标准化文本")
     
-    # 使用真实 LLM 实体抽取器
-    extractor = LLMEntityExtractor(use_mock=False)
+    # 使用 LLM 实体抽取器（根据配置选择模拟或真实）
+    extractor = LLMEntityExtractor(use_mock=USE_MOCK)
     
     # 阶段 2.1: 语义扫描
     info("\n" + "─" * 60)
@@ -422,7 +436,25 @@ def run_full_pipeline():
         variable_registry.append(registry_entry)
     
     info(json.dumps(variable_registry, indent=2, ensure_ascii=False))
-    
+
+    # =========================================================================
+    # 阶段3: Prompt 3.0 DSL 编译准备
+    # =========================================================================
+    info("\n>>> 准备 Prompt 2.0 结果用于 DSL 编译...")
+
+    # 创建 Prompt20Result 对象
+    prompt20_result = create_prompt20_result(
+        source_prompt10_id=prompt10_result.id,
+        original_text=processed_text,
+        template_text=template,
+        variables=variable_metas,
+        processing_time_ms=0  # 实际应该计算，这里先设为0
+    )
+
+    # 转换为 DSL 编译器输入格式
+    dsl_input = convert_prompt20_to_dsl_input(prompt20_result)
+    info(f"✅ Prompt 2.0 结果已准备，包含 {len(prompt20_result.variables)} 个变量")
+
     # =========================================================================
     # 验证与应用示例
     # =========================================================================
@@ -473,7 +505,45 @@ def run_full_pipeline():
     for line in customized.split('\n'):
         info(line)
     info("─" * 60)
-    
+
+    # =========================================================================
+    # 阶段3: Prompt 3.0 DSL 编译
+    # =========================================================================
+    info("\n\n" + "=" * 80)
+    info("【阶段 3: Prompt 3.0 DSL 编译 (prompt_dslcompiler)】")
+    info("=" * 80)
+
+    info("\n>>> 开始 DSL 编译...")
+    start_time = time.time()
+
+    # 创建自我修正循环编译器
+    compiler = SelfCorrectionLoop(max_retries=3, use_mock=USE_MOCK)
+    success, dsl_code, validation_result = compiler.compile_with_retry(dsl_input)
+
+    dsl_compile_time = int((time.time() - start_time) * 1000)
+
+    if success:
+        info(f"\n✅ DSL 编译成功！耗时: {dsl_compile_time}ms")
+        info("\n📄 生成的 DSL 代码:")
+        info("─" * 60)
+        for line in dsl_code.split('\n'):
+            info(line)
+        info("─" * 60)
+        
+        info("\n📊 验证结果:")
+        info(validation_result.get_report())
+    else:
+        warning(f"\n⚠️  DSL 编译失败！耗时: {dsl_compile_time}ms")
+        info("\n📄 生成的 DSL 代码 (有错误):")
+        info("─" * 60)
+        for line in dsl_code.split('\n'):
+            info(line)
+        info("─" * 60)
+        
+        info("\n❌ 验证错误:")
+        for err in validation_result.errors[:5]:
+            error(f"  {err}")
+
     # =========================================================================
     # 总结
     # =========================================================================
@@ -555,9 +625,15 @@ def run_full_pipeline():
         prompt20_extraction_log=[],
         prompt20_time_ms=0,
         
+        # 阶段3结果 (DSL编译)
+        prompt30_id=generate_id(),
+        prompt30_dsl_code=dsl_code if success else "",
+        prompt30_validation_result=validation_result.to_dict() if success else {},
+        prompt30_time_ms=dsl_compile_time,
+        
         # 整体状态
-        overall_status="success",
-        total_time_ms=prompt10_result.processing_time_ms,
+        overall_status="success" if success else "partial",
+        total_time_ms=prompt10_result.processing_time_ms + dsl_compile_time,
         error_message=None
     )
     

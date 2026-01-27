@@ -8,10 +8,11 @@ S.E.D.E (Software Engineering Driven Prompt Engineering)
 import re
 import json
 from typing import List, Dict, Set, Optional, Tuple, Any
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from enum import Enum
 from copy import deepcopy
 from logger import info, warning, error, debug
+from llm_client import create_llm_client
 
 
 # ============================================================
@@ -159,6 +160,15 @@ class Variable:
     
     def __str__(self):
         return f"{{{{name}}}}: {self.var_type.value}"
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """转换为可序列化的字典"""
+        return {
+            'name': self.name,
+            'var_type': self.var_type.value,
+            'initial_value': self.initial_value,
+            'line_number': self.line_number
+        }
 
 
 @dataclass
@@ -170,6 +180,21 @@ class ControlBlock:
     end_line: Optional[int] = None
     parent: Optional['ControlBlock'] = None
     children: List['ControlBlock'] = field(default_factory=list)
+    const_condition: Optional[bool] = None
+    has_else: bool = False
+
+
+@dataclass
+class DSLSchema:
+    """DSL 配置：限制可用语法集合"""
+    allowed_keywords: Set[str] = field(default_factory=lambda: {
+        'DEFINE', 'IF', 'ELSE', 'ENDIF',
+        'FOR', 'ENDFOR',
+        'CALL', 'RETURN'
+    })
+    
+    def is_keyword_allowed(self, keyword: str) -> bool:
+        return keyword in self.allowed_keywords
 
 
 @dataclass
@@ -230,6 +255,18 @@ class ValidationResult:
         report.append(f"  - 最大嵌套深度: {self.max_nesting_depth}")
         
         return "\n".join(report)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """转换为可序列化的字典"""
+        return {
+            'is_valid': self.is_valid,
+            'errors': [asdict(error) for error in self.errors],
+            'warnings': self.warnings,
+            'defined_variables': {name: var.to_dict() for name, var in self.defined_variables.items()},
+            'function_calls': [asdict(fc) for fc in self.function_calls],
+            'control_blocks': [asdict(cb) for cb in self.control_blocks],
+            'max_nesting_depth': self.max_nesting_depth
+        }
 
 
 # ============================================================
@@ -239,8 +276,15 @@ class ValidationResult:
 class DSLTranspiler:
     """将结构化的 Prompt 2.0 转换为 DSL 伪代码"""
     
-    def __init__(self):
+    def __init__(self, llm_client=None):
+        """
+        初始化 DSL 转译器
+        
+        Args:
+            llm_client: LLM 客户端实例，如果为 None 则使用真实客户端
+        """
         self.system_prompt = self._build_system_prompt()
+        self.llm_client = llm_client or create_llm_client(use_mock=False)
     
     def _build_system_prompt(self) -> str:
         """构建系统提示词"""
@@ -279,39 +323,90 @@ class DSLTranspiler:
         Returns:
             DSL 伪代码字符串
         """
-        # 实际应用中这里调用 LLM API
-        # 这里提供模拟实现
+        # 构建用户输入：将变量定义和逻辑描述组合
+        user_content = self._build_user_content(prompt_2_0)
         
-        dsl_code = []
+        # 调用 LLM 进行转译
+        info(f"[DSL转译] 调用 LLM 进行逻辑重构...")
+        response = self.llm_client.call(self.system_prompt, user_content)
+        dsl_code = response.content.strip()
         
-        # 1. 生成变量定义区
-        dsl_code.append("# ===== 变量定义区 =====")
-        for var in prompt_2_0.get('variables', []):
-            var_def = f"DEFINE {{{{{var['name']}}}}}: {var['type']}"
-            if 'default' in var:
-                var_def += f" = {var['default']}"
-            dsl_code.append(var_def)
+        # 验证响应格式：确保是纯代码，没有额外解释
+        dsl_code = self._clean_llm_response(dsl_code)
         
-        dsl_code.append("")
-        dsl_code.append("# ===== 逻辑控制区 =====")
+        info(f"[DSL转译] 生成代码长度: {len(dsl_code)} 字符")
+        debug(f"[DSL转译] 生成代码:\n{dsl_code}")
         
-        # 2. 转译逻辑（这里是示例，实际需要 LLM）
-        logic = prompt_2_0.get('logic', '')
+        return dsl_code
+    
+    def _build_user_content(self, prompt_2_0: Dict[str, Any]) -> str:
+        """构建发送给 LLM 的用户输入"""
+        parts = []
         
-        # 简单的规则转换示例
-        if '如果' in logic and 'VIP' in logic:
-            dsl_code.append("IF {{user_type}} == \"VIP\"")
-            dsl_code.append("    {{discount}} = 0.8")
-            dsl_code.append("    {{email_body}} = CALL generate_discount_email({{user_name}}, {{discount}})")
-            dsl_code.append("ELSE")
-            dsl_code.append("    {{email_body}} = CALL generate_normal_email({{user_name}})")
-            dsl_code.append("ENDIF")
+        # 1. 变量定义部分
+        if prompt_2_0.get('variables'):
+            parts.append("【变量定义】")
+            for var in prompt_2_0['variables']:
+                var_def = f"- {var['name']}: {var['type']}"
+                if 'default' in var:
+                    var_def += f" = {var['default']}"
+                parts.append(var_def)
         
-        dsl_code.append("")
-        dsl_code.append("# ===== 输出区 =====")
-        dsl_code.append("RETURN {{email_body}}")
+        # 2. 逻辑描述部分
+        if prompt_2_0.get('logic'):
+            parts.append("")
+            parts.append("【逻辑描述】")
+            parts.append(prompt_2_0['logic'])
         
-        return "\n".join(dsl_code)
+        # 3. 上下文部分（如果有）
+        if prompt_2_0.get('context'):
+            parts.append("")
+            parts.append("【上下文】")
+            parts.append(prompt_2_0['context'])
+        
+        # 4. 错误反馈部分（如果有，用于自我修正循环）
+        if prompt_2_0.get('error_feedback'):
+            parts.append("")
+            parts.append("【错误反馈】")
+            parts.append(prompt_2_0['error_feedback'])
+            parts.append("请根据上述错误反馈修正你的 DSL 代码。")
+        
+        return "\n".join(parts)
+    
+    def _clean_llm_response(self, response: str) -> str:
+        """清理 LLM 响应，移除代码块标记和额外解释"""
+        # 移除常见的代码块标记
+        code_blocks = [
+            ("```dsl", "```"),
+            ("```python", "```"),
+            ("```", "```"),
+        ]
+        
+        cleaned = response
+        
+        # 尝试提取代码块内容
+        for start_marker, end_marker in code_blocks:
+            if start_marker in cleaned:
+                # 提取第一个代码块的内容
+                start_idx = cleaned.find(start_marker) + len(start_marker)
+                end_idx = cleaned.find(end_marker, start_idx)
+                if end_idx != -1:
+                    cleaned = cleaned[start_idx:end_idx].strip()
+                    break
+        
+        # 移除可能的额外解释行（以 # 开头但不在代码块中）
+        lines = cleaned.split('\n')
+        code_lines = []
+        in_code = True
+        
+        for line in lines:
+            stripped = line.strip()
+            # 跳过空行和纯注释行（除非是代码的一部分）
+            if not stripped or (stripped.startswith('#') and not stripped.startswith('# =====')):
+                continue
+            code_lines.append(line)
+        
+        return '\n'.join(code_lines)
 
 
 # ============================================================
@@ -321,7 +416,7 @@ class DSLTranspiler:
 class DSLValidator:
     """DSL 静态代码分析器 - 核心防线"""
     
-    def __init__(self):
+    def __init__(self, schema: Optional[DSLSchema] = None):
         self.defined_vars: Dict[str, Variable] = {}
         self.control_stack: List[ControlBlock] = []
         self.function_calls: List[FunctionCall] = []
@@ -329,6 +424,7 @@ class DSLValidator:
         self.warnings: List[str] = []
         self.current_nesting = 0
         self.max_nesting = 0
+        self.schema = schema or DSLSchema()
     
     def validate(self, dsl_code: str) -> ValidationResult:
         """执行完整的静态分析"""
@@ -383,6 +479,19 @@ class DSLValidator:
         # 跳过空行和注释
         if not line or line.startswith('#'):
             return
+        
+        # 0. 语法关键字白名单检查
+        keyword_match = re.match(r'^([A-Z]+)\b', line)
+        if keyword_match:
+            keyword = keyword_match.group(1)
+            if not self.schema.is_keyword_allowed(keyword):
+                self.errors.append(ValidationError(
+                    line_number=line_num,
+                    error_type="语法禁用",
+                    message=f"关键字 {keyword} 不在允许的 DSL 语法集合中",
+                    suggestion=f"允许关键字: {', '.join(sorted(self.schema.allowed_keywords))}"
+                ))
+                return
         
         # 1. 检查 DEFINE 语句
         if line.startswith('DEFINE'):
@@ -490,6 +599,7 @@ class DSLValidator:
         
         condition = match.group(1)
         self._check_condition_variables(line_num, condition)
+        self._check_condition_types(line_num, condition)
         
         # 入栈
         block = ControlBlock(
@@ -497,6 +607,7 @@ class DSLValidator:
             condition=condition,
             start_line=line_num
         )
+        block.const_condition = self._detect_constant_condition(condition)
         self.control_stack.append(block)
         self.current_nesting += 1
         self.max_nesting = max(self.max_nesting, self.current_nesting)
@@ -520,6 +631,12 @@ class DSLValidator:
                 message="ELSE 没有匹配的 IF",
                 suggestion="ELSE 必须在 IF 语句块内"
             ))
+        else:
+            self.control_stack[-1].has_else = True
+            if self.control_stack[-1].const_condition is True:
+                self.warnings.append("检测到 IF 条件恒为 True，ELSE 分支为死代码")
+            if self.control_stack[-1].const_condition is False:
+                self.warnings.append("检测到 IF 条件恒为 False，IF 分支为死代码")
     
     def _parse_endif(self, line_num: int, line: str):
         """解析 ENDIF 语句"""
@@ -534,6 +651,8 @@ class DSLValidator:
             block = self.control_stack.pop()
             block.end_line = line_num
             self.current_nesting -= 1
+            if block.const_condition is False and not block.has_else:
+                self.warnings.append("检测到 IF 条件恒为 False，且无 ELSE，整个分支为死代码")
     
     def _parse_for(self, line_num: int, line: str):
         """解析 FOR 语句"""
@@ -548,7 +667,8 @@ class DSLValidator:
             return
         
         item_var, collection = match.groups()
-        self._check_variables_exist(line_num, [collection])
+        vars_in_collection = re.findall(r'\{\{(\w+)\}\}', collection)
+        self._check_variables_exist(line_num, vars_in_collection)
         
         block = ControlBlock(
             block_type='FOR',
@@ -586,6 +706,7 @@ class DSLValidator:
         
         condition = match.group(1)
         self._check_condition_variables(line_num, condition)
+        self._check_condition_types(line_num, condition)
         
         block = ControlBlock(
             block_type='WHILE',
@@ -646,6 +767,9 @@ class DSLValidator:
                     message=f"变量 {{{{{var_name}}}}} 在使用前未定义",
                     suggestion=f"在代码开头添加: DEFINE {{{{{var_name}}}}}: Type"
                 ))
+            rhs = assign_match.group(2)
+            rhs_vars = re.findall(r'\{\{(\w+)\}\}', rhs)
+            self._check_variables_exist(line_num, rhs_vars)
     
     def _parse_return(self, line_num: int, line: str):
         """解析 RETURN 语句"""
@@ -659,6 +783,77 @@ class DSLValidator:
         """检查条件中的变量"""
         vars_in_condition = re.findall(r'\{\{(\w+)\}\}', condition)
         self._check_variables_exist(line_num, vars_in_condition)
+    
+    def _check_condition_types(self, line_num: int, condition: str):
+        """检查条件中的类型安全"""
+        comparison_pattern = r'(.+?)\s*(==|!=|>=|<=|>|<|IN)\s*(.+)'
+        match = re.match(comparison_pattern, condition.strip())
+        if not match:
+            return
+        
+        left, op, right = match.groups()
+        left_type = self._infer_expr_type(left.strip())
+        right_type = self._infer_expr_type(right.strip())
+        
+        if op in ('>', '<', '>=', '<='):
+            if left_type not in (VarType.INTEGER, VarType.FLOAT, VarType.ANY) or \
+               right_type not in (VarType.INTEGER, VarType.FLOAT, VarType.ANY):
+                self.errors.append(ValidationError(
+                    line_number=line_num,
+                    error_type="类型错误",
+                    message=f"比较运算 {op} 仅支持数字类型，当前为 {left_type.value} 与 {right_type.value}",
+                    suggestion="将变量类型改为 Integer/Float，或改用 == / !="
+                ))
+        
+        if op == 'IN':
+            if right_type not in (VarType.LIST, VarType.DICT, VarType.ANY):
+                self.errors.append(ValidationError(
+                    line_number=line_num,
+                    error_type="类型错误",
+                    message=f"IN 运算右侧必须为 List/Dict，当前为 {right_type.value}",
+                    suggestion="确保集合类型变量为 List 或 Dict"
+                ))
+    
+    def _infer_expr_type(self, expr: str) -> VarType:
+        """推断表达式类型"""
+        var_match = re.fullmatch(r'\{\{(\w+)\}\}', expr)
+        if var_match:
+            var_name = var_match.group(1)
+            if var_name in self.defined_vars:
+                return self.defined_vars[var_name].var_type
+            return VarType.ANY
+        
+        literal_type = self._infer_literal_type(expr)
+        return literal_type
+    
+    def _infer_literal_type(self, value: str) -> VarType:
+        """推断字面量类型"""
+        value = value.strip()
+        if re.fullmatch(r'".*"', value) or re.fullmatch(r"'.*'", value):
+            return VarType.STRING
+        if value.lower() in ('true', 'false'):
+            return VarType.BOOLEAN
+        if re.fullmatch(r'\d+', value):
+            return VarType.INTEGER
+        if re.fullmatch(r'\d+\.\d+', value):
+            return VarType.FLOAT
+        if value.startswith('[') and value.endswith(']'):
+            return VarType.LIST
+        if value.startswith('{') and value.endswith('}'):
+            return VarType.DICT
+        return VarType.ANY
+    
+    def _detect_constant_condition(self, condition: str) -> Optional[bool]:
+        """检测恒真/恒假条件"""
+        cond = condition.strip().lower()
+        if cond == 'true':
+            return True
+        if cond == 'false':
+            return False
+        simple_eq = re.fullmatch(r'(\d+)\s*==\s*(\d+)', cond)
+        if simple_eq:
+            return int(simple_eq.group(1)) == int(simple_eq.group(2))
+        return None
     
     def _check_variables_in_args(self, line_num: int, args: List[str]):
         """检查函数参数中的变量"""
@@ -685,9 +880,17 @@ class DSLValidator:
 class SelfCorrectionLoop:
     """自我修正循环 - 当验证失败时自动修复"""
     
-    def __init__(self, max_retries: int = 3):
+    def __init__(self, max_retries: int = 3, use_mock: bool = False):
+        """
+        初始化自我修正循环
+        
+        Args:
+            max_retries: 最大重试次数
+            use_mock: 是否使用模拟 LLM 客户端
+        """
         self.max_retries = max_retries
-        self.transpiler = DSLTranspiler()
+        self.llm_client = create_llm_client(use_mock=use_mock)
+        self.transpiler = DSLTranspiler(llm_client=self.llm_client)
         self.validator = DSLValidator()
     
     def compile_with_retry(self, prompt_2_0: Dict[str, Any]) -> Tuple[bool, str, ValidationResult]:
@@ -777,4 +980,7 @@ def main():
         error("\n❌ 编译失败，需要人工介入")
         info("DSL 代码:")
         info(dsl_code)
+
         
+if __name__ == "__main__":
+    main()

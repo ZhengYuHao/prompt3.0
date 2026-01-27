@@ -79,6 +79,12 @@ class PipelineHistory:
     prompt20_extraction_log: List[str] = field(default_factory=list)
     prompt20_time_ms: int = 0
     
+    # 阶段3结果 (DSL编译)
+    prompt30_id: str = ""
+    prompt30_dsl_code: str = ""
+    prompt30_validation_result: Dict[str, Any] = field(default_factory=dict)
+    prompt30_time_ms: int = 0
+    
     # 整体状态
     overall_status: str = ""
     total_time_ms: int = 0
@@ -711,7 +717,41 @@ class HistoryManager:
         lines.append("")
         lines.append(f"处理耗时: {history.prompt20_time_ms}ms")
         lines.append("")
+
+        # ===== 阶段 3: Prompt 3.0 DSL 编译 =====
+        lines.append("=" * 80)
+        lines.append("【阶段 3: Prompt 3.0 DSL 编译】")
+        lines.append("=" * 80)
+        lines.append("")
         
+        if history.prompt30_dsl_code:
+            lines.append("┌─ 生成的 DSL 代码 (Prompt 3.0) ───────────────────────────────────────────────┐")
+            dsl_lines = history.prompt30_dsl_code.split('\n')
+            for line in dsl_lines[:20]:  # 最多显示20行
+                lines.append(f"│ {line}")
+            if len(dsl_lines) > 20:
+                lines.append(f"│ ... 还有 {len(dsl_lines) - 20} 行")
+            lines.append("└────────────────────────────────────────────────────────────────────────────┘")
+            lines.append("")
+            
+            # 验证结果
+            if history.prompt30_validation_result:
+                valid = history.prompt30_validation_result.get('is_valid', False)
+                errors = history.prompt30_validation_result.get('errors', [])
+                warnings = history.prompt30_validation_result.get('warnings', [])
+                
+                lines.append(f"验证状态: {'✅ 通过' if valid else '❌ 失败'}")
+                if errors:
+                    lines.append(f"错误数量: {len(errors)} 个")
+                if warnings:
+                    lines.append(f"警告数量: {len(warnings)} 个")
+        else:
+            lines.append("  未进行 DSL 编译")
+        
+        lines.append("")
+        lines.append(f"处理耗时: {history.prompt30_time_ms}ms")
+        lines.append("")
+
         # ===== 总结 =====
         lines.append("=" * 80)
         lines.append("【处理总结】")
@@ -719,6 +759,7 @@ class HistoryManager:
         lines.append(f"  原始输入长度: {len(history.raw_input)} 字符")
         lines.append(f"  标准化后长度: {len(history.prompt10_processed)} 字符")
         lines.append(f"  识别变量数量: {history.prompt20_variable_count} 个")
+        lines.append(f"  DSL 编译状态: {'✅ 成功' if history.prompt30_dsl_code else '❌ 未执行'}")
         lines.append(f"  总处理耗时: {history.total_time_ms}ms")
         lines.append("█" * 80)
         
@@ -765,6 +806,36 @@ class HistoryManager:
                 terminology_html += f'<div class="term-item"><span class="old">{old}</span> → <span class="new">{new}</span></div>'
             else:
                 terminology_html += f'<div class="term-item"><span class="old">{old}</span> → <span class="deleted">(删除)</span></div>'
+        
+        # DSL 代码 HTML
+        dsl_code_html = ""
+        if history.prompt30_dsl_code:
+            # 转义HTML特殊字符
+            escaped_dsl = history.prompt30_dsl_code.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+            dsl_code_html = f"""
+                <div class="text-box dsl-code">
+                    <pre>{escaped_dsl}</pre>
+                </div>
+            """
+        else:
+            dsl_code_html = '<p style="color:#999; font-style:italic;">未生成 DSL 代码</p>'
+        
+        # 验证结果 HTML
+        validation_html = ""
+        if history.prompt30_validation_result:
+            valid = history.prompt30_validation_result.get('is_valid', False)
+            errors = history.prompt30_validation_result.get('errors', [])
+            warnings = history.prompt30_validation_result.get('warnings', [])
+            
+            validation_html = f"""
+                <div class="validation-result">
+                    <p><strong>验证状态:</strong> {'✅ 通过' if valid else '❌ 失败'}</p>
+                    <p><strong>错误数量:</strong> {len(errors)} 个</p>
+                    <p><strong>警告数量:</strong> {len(warnings)} 个</p>
+                </div>
+            """
+        else:
+            validation_html = '<p style="color:#999; font-style:italic;">无验证结果</p>'
         
         html = f"""
 <!DOCTYPE html>
@@ -832,6 +903,7 @@ class HistoryManager:
         }}
         .stage-1 .stage-header {{ background: linear-gradient(90deg, #667eea, #764ba2); }}
         .stage-2 .stage-header {{ background: linear-gradient(90deg, #11998e, #38ef7d); }}
+        .stage-3 .stage-header {{ background: linear-gradient(90deg, #ff7e5f, #feb47b); }}
         .stage-content {{
             padding: 20px;
         }}
@@ -974,6 +1046,18 @@ class HistoryManager:
                         {variables_html}
                     </tbody>
                 </table>
+            </div>
+        </div>
+        
+        <!-- 阶段 3 -->
+        <div class="stage stage-3">
+            <div class="stage-header">⚙️ 阶段 3: Prompt 3.0 DSL 编译 (耗时 {history.prompt30_time_ms}ms)</div>
+            <div class="stage-content">
+                <h4>生成的 DSL 代码</h4>
+                {dsl_code_html}
+                
+                <h4>验证结果</h4>
+                {validation_html}
             </div>
         </div>
         

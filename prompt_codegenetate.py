@@ -27,6 +27,8 @@ class BlockType(Enum):
     IF = "IF"                  # 条件判断
     ELSE = "ELSE"              # 否则分支
     ENDIF = "ENDIF"            # 条件结束
+    FOR = "FOR"                # FOR循环
+    ENDFOR = "ENDFOR"          # FOR循环结束
     WHILE = "WHILE"            # 循环（扩展）
     ENDWHILE = "ENDWHILE"      # 循环结束
 
@@ -89,6 +91,10 @@ class PseudoCodeParser:
             return BlockType.ELSE
         elif line_upper == "ENDIF":
             return BlockType.ENDIF
+        elif line_upper.startswith("FOR "):
+            return BlockType.FOR
+        elif line_upper == "ENDFOR":
+            return BlockType.ENDFOR
         elif line_upper.startswith("WHILE "):
             return BlockType.WHILE
         elif line_upper == "ENDWHILE":
@@ -124,6 +130,7 @@ class PseudoCodeParser:
             
             # 控制流语句
             if block_type in [BlockType.IF, BlockType.ELSE, BlockType.ENDIF, 
+                             BlockType.FOR, BlockType.ENDFOR,
                              BlockType.WHILE, BlockType.ENDWHILE]:
                 blocks.append(CodeBlock(
                     id=f"CTRL_{block_counter}",
@@ -253,13 +260,13 @@ class DependencyAnalyzer:
             
             elif strategy == "control_flow":
                 # 控制流边界切分
-                should_split = node_data.type in [BlockType.ENDIF, BlockType.ENDWHILE]
+                should_split = node_data.type in [BlockType.ENDIF, BlockType.ENDFOR, BlockType.ENDWHILE]
             
             elif strategy == "hybrid":
                 # CALL 或控制流结束时切分
                 should_split = (
                     node_data.type == BlockType.CALL or 
-                    node_data.type in [BlockType.ENDIF, BlockType.ENDWHILE]
+                    node_data.type in [BlockType.ENDIF, BlockType.ENDFOR, BlockType.ENDWHILE]
                 )
             
             if should_split and current_module:
@@ -353,6 +360,8 @@ class ModuleSynthesizer:
         cleaned = re.sub(r'^IF\s+', 'if ', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'^ELSE$', 'else:', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'^ENDIF$', '', cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r'^FOR\s+\{\{(\w+)\}\}\s+IN\s+\{\{(\w+)\}\}', r'for \1 in \2:', cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r'^ENDFOR$', '', cleaned, flags=re.IGNORECASE)
         
         # 处理 CALL
         if "CALL" in line:

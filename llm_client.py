@@ -336,14 +336,14 @@ class MockLLMClient(UnifiedLLMClient):
         debug(f"[User] {user_content[:50]}...")
         
         # 根据系统提示词类型返回不同的模拟响应
-        if "实体抽取" in system_prompt or "变量" in system_prompt:
+        if "DSL" in system_prompt or "逻辑重构" in system_prompt:
+            content = self._mock_dsl_transpilation(user_content)
+        elif "实体抽取" in system_prompt or "变量" in system_prompt:
             content = self._mock_entity_extraction(user_content)
         elif "歧义" in system_prompt:
             content = self._mock_ambiguity_detection(user_content)
         elif "标准化" in system_prompt or "书面语" in system_prompt:
             content = self._mock_standardization(user_content)
-        elif "DSL" in system_prompt or "逻辑重构" in system_prompt:
-            content = self._mock_dsl_transpilation(user_content)
         else:
             content = f"[模拟响应] {user_content[:50]}..."
         
@@ -464,6 +464,11 @@ class MockLLMClient(UnifiedLLMClient):
             else:
                 dsl_lines.append(f"DEFINE {{{{{var['name']}}}}}: {var['type']}")
         
+        # 确保 result 变量被定义（如果尚未定义）
+        result_var_defined = any(var['name'] == 'result' for var in variables)
+        if not result_var_defined:
+            dsl_lines.append("DEFINE {{result}}: String")
+        
         # 2. 根据逻辑描述生成控制流
         if '如果' in logic or '若' in logic:
             # 简单条件语句
@@ -484,10 +489,10 @@ class MockLLMClient(UnifiedLLMClient):
             dsl_lines.append("ENDFOR")
         
         # 如果没有生成任何控制流，添加一个默认的CALL
-        if len(dsl_lines) <= len(variables):
+        if len(dsl_lines) <= len(variables) + (1 if not result_var_defined else 0):
             dsl_lines.append("")
             dsl_lines.append("# 默认处理")
-            dsl_lines.append("{{output}} = CALL generate_output()")
+            dsl_lines.append("{{result}} = CALL generate_output()")
         
         # 3. 添加返回语句
         dsl_lines.append("")

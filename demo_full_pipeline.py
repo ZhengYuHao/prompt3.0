@@ -34,6 +34,9 @@ from prompt_structurizer import (
 # 导入 DSL 编译器模块（原 prompt_dslcompiler.py）
 from prompt_dslcompiler import SelfCorrectionLoop, ValidationResult
 
+# 导入代码生成器模块（原 prompt_codegenetate.py）
+from prompt_codegenetate import WaActCompiler
+
 # 导入历史记录管理
 from history_manager import HistoryManager, PipelineHistory
 
@@ -42,7 +45,7 @@ from history_manager import HistoryManager, PipelineHistory
 # 配置
 # ============================================================================
 # 是否使用模拟 LLM 客户端（设为 True 可避免真实 API 调用）
-USE_MOCK = False  # 默认使用模拟客户端，避免意外 API 调用
+USE_MOCK = True  # 默认使用模拟客户端，避免意外 API 调用
 # 如果要使用真实 LLM，请设置为 False 并确保配置了有效的 API 密钥
 # USE_MOCK = False
 
@@ -532,6 +535,44 @@ def run_full_pipeline():
         
         info("\n📊 验证结果:")
         info(validation_result.get_report())
+
+        # =========================================================================
+        # 阶段 4: Prompt 4.0 代码生成
+        # =========================================================================
+        info("\n\n" + "=" * 80)
+        info("【阶段 4: Prompt 4.0 代码生成 (prompt_codegenetate)】")
+        info("=" * 80)
+
+        info("\n>>> 开始代码生成...")
+        start_time_codegen = time.time()
+
+        # 创建代码编译器
+        code_compiler = WaActCompiler()
+        modules, main_code = code_compiler.compile(
+            dsl_code,
+            clustering_strategy="hybrid",
+            visualize=False
+        )
+
+        codegen_time = int((time.time() - start_time_codegen) * 1000)
+        info(f"\n✅ 代码生成成功！耗时: {codegen_time}ms")
+
+        # 显示生成的模块
+        info("\n📦 生成的模块:")
+        for i, module in enumerate(modules, 1):
+            info(f"  {i}. {module.name} ({'async' if module.is_async else 'sync'})")
+
+        # 显示主工作流代码
+        info("\n📄 主工作流代码:")
+        info("─" * 60)
+        for line in main_code.split('\n'):
+            info(line)
+        info("─" * 60)
+
+        # 导出到文件
+        output_file = "generated_workflow.py"
+        code_compiler.export_to_file(modules, main_code, output_file)
+        info(f"\n💾 代码已导出到: {output_file}")
     else:
         warning(f"\n⚠️  DSL 编译失败！耗时: {dsl_compile_time}ms")
         info("\n📄 生成的 DSL 代码 (有错误):")

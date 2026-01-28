@@ -188,11 +188,11 @@ class ControlBlock:
 class DSLSchema:
     """DSL 配置：限制可用语法集合"""
     allowed_keywords: Set[str] = field(default_factory=lambda: {
-        'DEFINE', 'IF', 'ELSE', 'ENDIF',
-        'FOR', 'ENDFOR',
-        'CALL', 'RETURN'
+        'DEFINE', 'IF', 'ELSE', 'ELIF', 'ENDIF',
+        'FOR', 'ENDFOR', 'WHILE', 'ENDWHILE',
+        'CALL', 'RETURN', 'BREAK', 'CONTINUE'
     })
-    
+
     def is_keyword_allowed(self, keyword: str) -> bool:
         return keyword in self.allowed_keywords
 
@@ -213,10 +213,16 @@ class ValidationError:
     error_type: str
     message: str
     suggestion: Optional[str] = None
-    
+    severity: str = "P2"  # P0:致命, P1:严重, P2:警告
+
     def __str__(self):
         suggestion_text = f"\n  建议: {self.suggestion}" if self.suggestion else ""
-        return f"[第{self.line_number}行] {self.error_type}: {self.message}{suggestion_text}"
+        severity_icon = {"P0": "🔴", "P1": "🟡", "P2": "⚪"}.get(self.severity, "")
+        return f"{severity_icon}[第{self.line_number}行] {self.error_type}: {self.message}{suggestion_text}"
+
+    def to_dict(self) -> Dict[str, Any]:
+        """转换为字典"""
+        return asdict(self)
 
 
 @dataclass
@@ -302,11 +308,34 @@ class DSLTranspiler:
 5. 严格使用 {{{{variable}}}} 包裹所有变量
 6. 确保所有变量在使用前都已 DEFINE
 
+**重要约束：**
+- 只使用【变量定义】中列出的变量名称
+- 绝对不要创造新的变量名称（如 user_input, query_type 等）
+- 如果逻辑描述中提到但变量列表中没有，请使用变量定义中已有的最接近的变量名
+- 每个变量在使用前必须先用 DEFINE 声明，类型必须匹配给定的类型
+
 **输入格式：**
 你会收到包含变量定义和逻辑描述的结构化文本。
 
 **输出格式：**
 只输出符合 DSL 规范的伪代码，不要包含任何解释或额外文字。
+
+**代码结构模板：**
+```
+# 变量定义（必须先定义所有变量）
+DEFINE {{variable1}}: Type1 [= value1]
+DEFINE {{variable2}}: Type2 [= value2]
+...
+
+# 逻辑实现
+IF {{condition1}}
+    ...
+ENDIF
+
+FOR {{item}} IN {{collection}}
+    ...
+ENDFOR
+```
 """
     
     def transpile(self, prompt_2_0: Dict[str, Any]) -> str:
@@ -443,11 +472,12 @@ class DSLValidator:
                 line_number=len(lines),
                 error_type="控制流未闭合",
                 message=f"存在未闭合的控制结构: {unclosed}",
-                suggestion="检查每个 IF/FOR/WHILE 是否有对应的 ENDIF/ENDFOR/ENDWHILE"
+                suggestion="检查每个 IF/FOR/WHILE 是否有对应的 ENDIF/ENDFOR/ENDWHILE",
+                severity="P0"
             ))
         
         # 检查嵌套深度
-        if self.max_nesting > 3:
+        if self.max_nesting > 5:
             self.warnings.append(f"嵌套深度过深({self.max_nesting}层)，建议重构为函数调用")
         
         # 构建结果
@@ -878,67 +908,243 @@ class DSLValidator:
 # ============================================================
 
 class SelfCorrectionLoop:
-    """自我修正循环 - 当验证失败时自动修复"""
-    
-    def __init__(self, max_retries: int = 3, use_mock: bool = False):
+    """自我修正循环 - 策略 D：混合错误处理"""
+
+    def __init__(self, max_retries: int = 3, use_mock: bool = False, auto_fix_threshold: int = 3):
         """
         初始化自我修正循环
-        
+
         Args:
             max_retries: 最大重试次数
             use_mock: 是否使用模拟 LLM 客户端
+            auto_fix_threshold: 自动修复阈值，错误数小于等于此值时尝试自动修复
         """
         self.max_retries = max_retries
         self.llm_client = create_llm_client(use_mock=use_mock)
         self.transpiler = DSLTranspiler(llm_client=self.llm_client)
         self.validator = DSLValidator()
-    
-    def compile_with_retry(self, prompt_2_0: Dict[str, Any]) -> Tuple[bool, str, ValidationResult]:
+        self.auto_fix_threshold = auto_fix_threshold
+
+    def compile_with_retry(self, prompt_2_0: Dict[str, Any]) -> Tuple[bool, str, ValidationResult, Dict[str, Any]]:
         """
-        带重试机制的编译
-        
+        带重试机制的编译（策略 D 实现）
+
         Returns:
-            (成功标志, DSL代码, 验证结果)
+            (成功标志, DSL代码, 验证结果, 诊断信息)
         """
         dsl_code = None
         result = None
-        
+        history = {
+            'attempts': [],
+            'final_decision': '',
+            'error_summary': {}
+        }
+
         for attempt in range(self.max_retries):
             info(f"\n🔄 第 {attempt + 1} 次编译尝试...")
-            
+
             # 转译
             dsl_code = self.transpiler.transpile(prompt_2_0)
-            
+
             # 验证
             result = self.validator.validate(dsl_code)
-            
+
+            # 错误分级
+            error_analysis = self._analyze_errors(result.errors)
+
+            # 记录本次尝试
+            history['attempts'].append({
+                'attempt': attempt + 1,
+                'total_errors': len(result.errors),
+                'error_analysis': error_analysis
+            })
+
             if result.is_valid:
                 info(f"✅ 编译成功！")
-                return True, dsl_code, result
+                history['final_decision'] = 'success'
+                return True, dsl_code, result, history
             else:
                 error(f"❌ 编译失败，发现 {len(result.errors)} 个错误")
-                for err in result.errors[:3]:  # 只显示前3个错误
+                for err in result.errors[:5]:  # 显示前5个错误
                     error(f"  {err}")
-                
+
+                # 策略 D：根据错误数量决定处理方式
                 if attempt < self.max_retries - 1:
+                    if error_analysis['p0_count'] + error_analysis['p1_count'] <= self.auto_fix_threshold:
+                        # 尝试自动修复 + LLM 重试
+                        fixed_dsl, fix_count = self._auto_fix_syntax_errors(dsl_code, result.errors)
+                        if fix_count > 0:
+                            info(f"  🔧 自动修复了 {fix_count} 个语法错误")
+                            # 验证修复后的代码
+                            temp_result = self.validator.validate(fixed_dsl)
+                            if temp_result.is_valid:
+                                info(f"  ✅ 自动修复成功！")
+                                history['final_decision'] = 'auto_fixed'
+                                return True, fixed_dsl, temp_result, history
+                            else:
+                                info(f"  ⚠️  自动修复不完整，继续 LLM 重试...")
+                                dsl_code = fixed_dsl
+                                result = temp_result
+
                     # 准备错误反馈给 LLM
-                    error_feedback = self._generate_error_feedback(dsl_code, result)
+                    error_feedback = self._generate_error_feedback(dsl_code, result, error_analysis)
                     prompt_2_0['error_feedback'] = error_feedback
                     info(f"  正在准备修正...")
-        
-        error(f"\n❌ 经过 {self.max_retries} 次尝试仍未通过验证，需要人工介入")
-        return False, dsl_code, result
-    
-    def _generate_error_feedback(self, dsl_code: str, result: ValidationResult) -> str:
-        """生成错误反馈给 LLM"""
-        feedback = ["你生成的伪代码存在以下问题：\n"]
-        
-        for error in result.errors:
-            feedback.append(f"- {error}")
-        
-        feedback.append("\n请修正代码并重新输出完整的 DSL 代码。")
-        
+
+        # 所有尝试都失败，生成诊断报告
+        error(f"\n❌ 经过 {self.max_retries} 次尝试仍未通过验证")
+        self._generate_diagnostic_report(result, history)
+        history['final_decision'] = 'failed'
+        history['error_summary'] = self._analyze_errors(result.errors)
+        return False, dsl_code, result, history
+
+    def _analyze_errors(self, errors: List[ValidationError]) -> Dict[str, int]:
+        """分析错误严重程度"""
+        analysis = {'p0_count': 0, 'p1_count': 0, 'p2_count': 0, 'total': len(errors)}
+
+        for error in errors:
+            severity = getattr(error, 'severity', 'P2')
+            if severity == 'P0':
+                analysis['p0_count'] += 1
+            elif severity == 'P1':
+                analysis['p1_count'] += 1
+            else:
+                analysis['p2_count'] += 1
+
+        return analysis
+
+    def _auto_fix_syntax_errors(self, dsl_code: str, errors: List[ValidationError]) -> Tuple[str, int]:
+        """
+        自动修复简单语法错误
+
+        支持的修复类型：
+        - IF 缺少条件 → IF True
+        - 未闭合的控制流 → 自动添加 ENDIF/ENDFOR
+        - 多余的空行 → 删除
+        """
+        lines = dsl_code.split('\n')
+        fixed_lines = []
+        fix_count = 0
+        control_stack = []
+
+        for line in lines:
+            stripped = line.strip()
+
+            # 修复 IF 缺少条件
+            if stripped == 'IF' or stripped.startswith('IF ') and len(stripped) == 2:
+                fixed_lines.append(line.replace('IF', 'IF True'))
+                fix_count += 1
+                continue
+
+            # 跟踪控制流
+            if stripped in ['IF', 'FOR', 'WHILE']:
+                control_stack.append(stripped)
+            elif stripped in ['ENDIF', 'ENDFOR', 'ENDWHILE']:
+                if control_stack:
+                    control_stack.pop()
+            elif stripped.startswith('IF'):
+                control_stack.append('IF')
+            elif stripped.startswith('FOR'):
+                control_stack.append('FOR')
+            elif stripped.startswith('WHILE'):
+                control_stack.append('WHILE')
+
+            fixed_lines.append(line)
+
+        # 修复未闭合的控制流
+        while control_stack:
+            block_type = control_stack.pop()
+            if block_type == 'IF':
+                fixed_lines.append('ENDIF')
+            elif block_type == 'FOR':
+                fixed_lines.append('ENDFOR')
+            elif block_type == 'WHILE':
+                fixed_lines.append('ENDWHILE')
+            fix_count += 1
+
+        return '\n'.join(fixed_lines), fix_count
+
+    def _generate_error_feedback(self, dsl_code: str, result: ValidationResult, error_analysis: Dict[str, int]) -> str:
+        """生成详细的错误反馈给 LLM"""
+        feedback = [f"你生成的伪代码存在以下问题：\n"]
+        feedback.append(f"总错误数: {len(result.errors)}")
+        feedback.append(f"  - P0 致命错误: {error_analysis['p0_count']}")
+        feedback.append(f"  - P1 严重错误: {error_analysis['p1_count']}")
+        feedback.append(f"  - P2 警告: {error_analysis['p2_count']}\n")
+
+        # 按严重程度分组显示错误
+        p0_errors = [e for e in result.errors if getattr(e, 'severity', 'P2') == 'P0']
+        p1_errors = [e for e in result.errors if getattr(e, 'severity', 'P2') == 'P1']
+
+        if p0_errors:
+            feedback.append("【致命错误（必须修复）】")
+            for error in p0_errors[:5]:  # 只显示前5个
+                feedback.append(f"  - {error}")
+            feedback.append("")
+
+        if p1_errors:
+            feedback.append("【严重错误（建议修复）】")
+            for error in p1_errors[:5]:
+                feedback.append(f"  - {error}")
+            feedback.append("")
+
+        # 提供修正建议
+        feedback.append("【修正要求】")
+        feedback.append("1. 必须修复所有 P0 致命错误")
+        feedback.append("2. 优先修复 P1 严重错误")
+        feedback.append("3. 确保所有 IF/FOR/WHILE 都有对应的 ENDIF/ENDFOR/ENDWHILE")
+        feedback.append("4. 所有变量使用前必须先 DEFINE 声明")
+        feedback.append("5. 重新输出完整的 DSL 代码，不要只输出修改的部分\n")
+
         return "\n".join(feedback)
+
+    def _generate_diagnostic_report(self, result: ValidationResult, history: Dict[str, Any]):
+        """生成诊断报告"""
+        # 如果没有 error_summary，则实时分析
+        if 'error_summary' not in history:
+            error_analysis = self._analyze_errors(result.errors)
+            history['error_summary'] = error_analysis
+        else:
+            error_analysis = history['error_summary']
+
+        info("\n" + "=" * 80)
+        info("DSL 编译失败诊断报告")
+        info("=" * 80)
+        info(f"\n尝试次数: {len(history['attempts'])}/{self.max_retries}")
+        info(f"最终结果: 失败")
+        info(f"\n错误统计:")
+        info(f"  P0 致命错误: {error_analysis.get('p0_count', 0)}")
+        info(f"  P1 严重错误: {error_analysis.get('p1_count', 0)}")
+        info(f"  P2 警告: {error_analysis.get('p2_count', 0)}")
+        info(f"  总错误数: {error_analysis.get('total', len(result.errors))}")
+
+        info(f"\n关键错误（前10个）:")
+        for i, err in enumerate(result.errors[:10], 1):
+            info(f"  {i}. {err}")
+
+        p0_count = error_analysis.get('p0_count', 0)
+        p1_count = error_analysis.get('p1_count', 0)
+
+        info(f"\n【处理建议】")
+        if p0_count + p1_count <= 3:
+            info(f"✓ 建议：自动修复 P0 错误 + 继续执行")
+        elif p0_count + p1_count <= 10:
+            info(f"✓ 建议：")
+            info(f"  1. 人工修正 DSL 代码")
+            info(f"  2. 重新生成（增强 Prompt）")
+            info(f"  3. 调整原始需求 → 回到 Prompt 2.0")
+        else:
+            info(f"✗ 建议：强制人工介入")
+            info(f"  - 检查原始需求是否过于复杂")
+            info(f"  - 考虑拆分为多个子任务")
+            info(f"  - 审查 Prompt 2.0 的变量提取是否准确")
+
+        info(f"\n【选项】")
+        info(f"选项1: 修改原始需求并重新运行")
+        info(f"选项2: 人工编辑 DSL 代码并手动验证")
+        info(f"选项3: 查看 debug 日志获取更多信息")
+
+        info("=" * 80)
 
 
 # ============================================================

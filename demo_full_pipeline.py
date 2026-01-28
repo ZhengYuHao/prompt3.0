@@ -538,9 +538,9 @@ def run_full_pipeline():
     info("\n>>> 开始 DSL 编译...")
     start_time = time.time()
 
-    # 创建自我修正循环编译器
-    compiler = SelfCorrectionLoop(max_retries=3, use_mock=USE_MOCK)
-    success, dsl_code, validation_result = compiler.compile_with_retry(dsl_input)
+    # 创建自我修正循环编译器（策略 D）
+    compiler = SelfCorrectionLoop(max_retries=3, use_mock=USE_MOCK, auto_fix_threshold=3)
+    success, dsl_code, validation_result, compile_history = compiler.compile_with_retry(dsl_input)
 
     dsl_compile_time = int((time.time() - start_time) * 1000)
 
@@ -735,6 +735,8 @@ def run_full_pipeline():
         prompt30_dsl_code=dsl_code if success else "",
         prompt30_validation_result=validation_result.to_dict() if success else {},
         prompt30_time_ms=dsl_compile_time,
+        prompt30_compile_history=compile_history,  # 新增：编译历史（策略 D）
+        prompt30_success=success,  # 新增：编译成功标志
 
         # 阶段4结果 (代码生成)
         prompt40_id=generate_id(),

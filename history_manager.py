@@ -84,6 +84,8 @@ class PipelineHistory:
     prompt30_dsl_code: str = ""
     prompt30_validation_result: Dict[str, Any] = field(default_factory=dict)
     prompt30_time_ms: int = 0
+    prompt30_compile_history: Dict[str, Any] = field(default_factory=dict)  # 策略 D：编译历史
+    prompt30_success: bool = True  # 策略 D：编译成功标志
     
     # 阶段4结果 (代码生成)
     prompt40_id: str = ""

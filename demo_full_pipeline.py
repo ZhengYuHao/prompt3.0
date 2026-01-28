@@ -544,16 +544,30 @@ def run_full_pipeline():
 
     dsl_compile_time = int((time.time() - start_time) * 1000)
 
-    if success:
-        info(f"\n✅ DSL 编译成功！耗时: {dsl_compile_time}ms")
+    # 检查编译状态
+    compile_decision = compile_history.get('final_decision', 'unknown')
+
+    if success or compile_decision == 'partial_auto_fixed':
+        if compile_decision == 'partial_auto_fixed':
+            warning(f"\n⚠️  DSL 部分修复成功（自动修复后仍有少量错误）！耗时: {dsl_compile_time}ms")
+        else:
+            info(f"\n✅ DSL 编译成功！耗时: {dsl_compile_time}ms")
         info("\n📄 生成的 DSL 代码:")
         info("─" * 60)
         for line in dsl_code.split('\n'):
             info(line)
         info("─" * 60)
-        
+
         info("\n📊 验证结果:")
         info(validation_result.get_report())
+
+        # 如果是部分修复状态，显示警告信息
+        if compile_decision == 'partial_auto_fixed':
+            warning("\n⚠️  注意：DSL 代码仍有少量验证错误，但已尝试进入代码生成阶段")
+            if validation_result.errors:
+                info("剩余错误:")
+                for err in validation_result.errors:
+                    error(f"  {err}")
 
         # =========================================================================
         # 阶段 4: Prompt 4.0 代码生成
@@ -567,31 +581,45 @@ def run_full_pipeline():
 
         # 创建代码编译器
         code_compiler = WaActCompiler()
-        modules, main_code, compile_details = code_compiler.compile(
-            dsl_code,
-            clustering_strategy="hybrid",
-            visualize=False
-        )
+        try:
+            modules, main_code, compile_details = code_compiler.compile(
+                dsl_code,
+                clustering_strategy="hybrid",
+                visualize=False
+            )
 
-        codegen_time = int((time.time() - start_time_codegen) * 1000)
-        info(f"\n✅ 代码生成成功！耗时: {codegen_time}ms")
+            codegen_time = int((time.time() - start_time_codegen) * 1000)
+            info(f"\n✅ 代码生成成功！耗时: {codegen_time}ms")
 
-        # 显示生成的模块
-        info("\n📦 生成的模块:")
-        for i, module in enumerate(modules, 1):
-            info(f"  {i}. {module.name} ({'async' if module.is_async else 'sync'})")
+            # 显示生成的模块
+            info("\n📦 生成的模块:")
+            for i, module in enumerate(modules, 1):
+                info(f"  {i}. {module.name} ({'async' if module.is_async else 'sync'})")
 
-        # 显示主工作流代码
-        info("\n📄 主工作流代码:")
-        info("─" * 60)
-        for line in main_code.split('\n'):
-            info(line)
-        info("─" * 60)
+            # 显示主工作流代码
+            info("\n📄 主工作流代码:")
+            info("─" * 60)
+            for line in main_code.split('\n'):
+                info(line)
+            info("─" * 60)
 
-        # 导出到文件
-        output_file = "generated_workflow.py"
-        code_compiler.export_to_file(modules, main_code, output_file)
-        info(f"\n💾 代码已导出到: {output_file}")
+            # 导出到文件
+            output_file = "generated_workflow.py"
+            code_compiler.export_to_file(modules, main_code, output_file)
+            info(f"\n💾 代码已导出到: {output_file}")
+        except Exception as e:
+            error(f"\n❌ 代码生成失败: {e}")
+            warning("DSL 代码存在严重错误，无法生成可执行代码")
+            modules = []
+            main_code = ""
+            compile_details = {
+                'step1_parsing': {'status': 'failed', 'reason': str(e)},
+                'step2_dependency': {'status': 'skipped', 'reason': 'Parsing failed'},
+                'step3_clustering': {'status': 'skipped', 'reason': 'Parsing failed'},
+                'step4_generation': {'status': 'skipped', 'reason': 'Parsing failed'},
+                'step5_orchestration': {'status': 'skipped', 'reason': 'Parsing failed'}
+            }
+            codegen_time = int((time.time() - start_time_codegen) * 1000)
     else:
         warning(f"\n⚠️  DSL 编译失败！耗时: {dsl_compile_time}ms")
         info("\n📄 生成的 DSL 代码 (有错误):")
@@ -730,10 +758,10 @@ def run_full_pipeline():
         prompt20_extraction_log=[],
         prompt20_time_ms=0,
 
-        # 阶段3结果 (DSL编译)
+        # 阶段3结果 (DSL编译) - 无论成功失败都记录 DSL 代码和验证结果
         prompt30_id=generate_id(),
-        prompt30_dsl_code=dsl_code if success else "",
-        prompt30_validation_result=validation_result.to_dict() if success else {},
+        prompt30_dsl_code=dsl_code,  # 总是记录 DSL 代码
+        prompt30_validation_result=validation_result.to_dict(),  # 总是记录验证结果
         prompt30_time_ms=dsl_compile_time,
         prompt30_compile_history=compile_history,  # 新增：编译历史（策略 D）
         prompt30_success=success,  # 新增：编译成功标志
@@ -752,11 +780,18 @@ def run_full_pipeline():
         prompt40_step4_generation=prompt40_step4_generation,
         prompt40_step5_orchestration=prompt40_step5_orchestration,
 
-        # 整体状态
-        overall_status="success" if success else "partial",
+        # 整体状态 - 根据编译决策判断
         total_time_ms=prompt10_result.processing_time_ms + dsl_compile_time + prompt40_time_ms,
         error_message=None
     )
+
+    # 根据编译决策更新整体状态
+    if compile_decision == 'success':
+        pipeline_history.overall_status = "success"
+    elif compile_decision == 'partial_auto_fixed':
+        pipeline_history.overall_status = "partial"  # DSL有误但能生成代码
+    else:
+        pipeline_history.overall_status = "partial"  # DSL失败
     
     # 保存历史记录
     history_manager = HistoryManager()

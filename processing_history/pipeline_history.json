@@ -2534,5 +2534,1579 @@
     "overall_status": "partial",
     "total_time_ms": 38171,
     "error_message": null
+  },
+  "2df6aae3": {
+    "pipeline_id": "2df6aae3",
+    "timestamp": "2026-01-28 17:30:33",
+    "raw_input": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+    "prompt10_id": "47fc4486",
+    "prompt10_original": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+    "prompt10_processed": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n在向量检索模式下，如果相似度超过0.85，直接返回前3个结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n在图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码。如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n在用户反馈环节，如果用户对结果不满意，点击“重新生成”时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500毫秒内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果每秒查询率低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+    "prompt10_mode": "dictionary",
+    "prompt10_steps": [
+      {
+        "step_name": "术语对齐",
+        "step_index": 1,
+        "input_text": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "changes": {
+          "帮我": "请",
+          "top-3": "前3个结果",
+          "top-5": "前5个结果",
+          "知识图谱": "知识图谱(KG)",
+          "向量索引": "向量索引(VI)",
+          "QPS": "每秒查询率(QPS)",
+          "缓存命中率": "缓存命中率(CRH)"
+        },
+        "duration_ms": 0,
+        "notes": [
+          "替换 8 处"
+        ]
+      },
+      {
+        "step_name": "术语对齐",
+        "step_index": 2,
+        "input_text": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "changes": {
+          "帮我": "请",
+          "top-3": "前3个结果",
+          "top-5": "前5个结果",
+          "知识图谱": "知识图谱(KG)",
+          "向量索引": "向量索引(VI)",
+          "QPS": "每秒查询率(QPS)",
+          "缓存命中率": "缓存命中率(CRH)"
+        },
+        "duration_ms": 0,
+        "notes": []
+      },
+      {
+        "step_name": "LLM语义重构",
+        "step_index": 3,
+        "input_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n在向量检索模式下，如果相似度超过0.85，直接返回前3个结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n在图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码。如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n在用户反馈环节，如果用户对结果不满意，点击“重新生成”时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500毫秒内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果每秒查询率低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "changes": {
+          "标准化": "840字 → 818字"
+        },
+        "duration_ms": 12213,
+        "notes": []
+      }
+    ],
+    "prompt10_terminology_changes": {
+      "帮我": "请",
+      "top-3": "前3个结果",
+      "top-5": "前5个结果",
+      "知识图谱": "知识图谱(KG)",
+      "向量索引": "向量索引(VI)",
+      "QPS": "每秒查询率(QPS)",
+      "缓存命中率": "缓存命中率(CRH)"
+    },
+    "prompt10_ambiguity_detected": false,
+    "prompt10_status": "success",
+    "prompt10_time_ms": 12214,
+    "prompt20_id": "3e1d8180",
+    "prompt20_template": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n在向量检索模式下，如果相似度超过{{vector_similarity_threshold}}，直接返回{{top_n_vector_results}}；否则结合重排序模型重新评分，再返回{{reordered_top_n_results}}。检索失败时自动切换到混合检索模式。\n\n在图数据库检索时，需要沿着知识图谱进行{{graph_exploration_steps}}，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期{{cache_expiration_time}}。\n\n代码分析引擎支持Python和Java代码。如果代码行数超过{{max_code_lines_static_analysis}}，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n在用户反馈环节，如果用户对结果不满意，点击“重新生成”时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含{{knowledge_base_A_documents}}，知识库B包含{{knowledge_base_B_documents}}，知识库C包含{{knowledge_base_C_documents}}。每个知识库都有独立的向量索引，向量维度统一为{{vector_dimension}}。\n\n并发控制：系统支持最大{{max_concurrent_requests}}，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为{{query_rate_threshold}}。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在{{response_time_vector_retrieval}}内完成，图数据库检索在{{response_time_graph_retrieval}}内完成，代码分析在{{response_time_code_analysis}}内完成。总响应时间不超过{{total_response_time_limit}}，否则降级服务。\n\n日志级别：错误日志保留{{error_log_retention_days}}，访问日志保留{{access_log_retention_days}}，调试日志保留{{debug_log_retention_days}}。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果每秒查询率低于10持续{{alert_duration_minutes}}，触发告警；如果95分位响应时间超过3秒持续{{alert_duration_response_time_minutes}}，触发扩容。",
+    "prompt20_variables": [
+      {
+        "variable": "vector_similarity_threshold",
+        "original_text": "0.85",
+        "value": "0.85",
+        "type": "String"
+      },
+      {
+        "variable": "top_n_vector_results",
+        "original_text": "前3个结果",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "reordered_top_n_results",
+        "original_text": "前5个结果",
+        "value": 5,
+        "type": "Integer"
+      },
+      {
+        "variable": "graph_exploration_steps",
+        "original_text": "2跳邻居探索",
+        "value": 2,
+        "type": "Integer"
+      },
+      {
+        "variable": "cache_expiration_time",
+        "original_text": "30分钟",
+        "value": 30,
+        "type": "Integer"
+      },
+      {
+        "variable": "max_code_lines_static_analysis",
+        "original_text": "500行",
+        "value": 500,
+        "type": "Integer"
+      },
+      {
+        "variable": "knowledge_base_A_documents",
+        "original_text": "2000个医学文档",
+        "value": 2000,
+        "type": "Integer"
+      },
+      {
+        "variable": "knowledge_base_B_documents",
+        "original_text": "3000个技术文档",
+        "value": 3000,
+        "type": "Integer"
+      },
+      {
+        "variable": "knowledge_base_C_documents",
+        "original_text": "1500个法律文档",
+        "value": 1500,
+        "type": "Integer"
+      },
+      {
+        "variable": "vector_dimension",
+        "original_text": "1536",
+        "value": 1536,
+        "type": "Integer"
+      },
+      {
+        "variable": "max_concurrent_requests",
+        "original_text": "50个并发请求",
+        "value": 50,
+        "type": "Integer"
+      },
+      {
+        "variable": "query_rate_threshold",
+        "original_text": "10",
+        "value": 10,
+        "type": "Integer"
+      },
+      {
+        "variable": "response_time_vector_retrieval",
+        "original_text": "500毫秒",
+        "value": 500,
+        "type": "Integer"
+      },
+      {
+        "variable": "response_time_graph_retrieval",
+        "original_text": "1秒",
+        "value": 1,
+        "type": "Integer"
+      },
+      {
+        "variable": "response_time_code_analysis",
+        "original_text": "2秒",
+        "value": 2,
+        "type": "Integer"
+      },
+      {
+        "variable": "total_response_time_limit",
+        "original_text": "3秒",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "error_log_retention_days",
+        "original_text": "90天",
+        "value": 90,
+        "type": "Integer"
+      },
+      {
+        "variable": "access_log_retention_days",
+        "original_text": "30天",
+        "value": 30,
+        "type": "Integer"
+      },
+      {
+        "variable": "debug_log_retention_days",
+        "original_text": "7天",
+        "value": 7,
+        "type": "Integer"
+      },
+      {
+        "variable": "alert_duration_minutes",
+        "original_text": "10分钟",
+        "value": 10,
+        "type": "Integer"
+      },
+      {
+        "variable": "alert_duration_response_time_minutes",
+        "original_text": "5分钟",
+        "value": 5,
+        "type": "Integer"
+      }
+    ],
+    "prompt20_variable_count": 21,
+    "prompt20_type_stats": {
+      "String": 1,
+      "Integer": 20
+    },
+    "prompt20_extraction_log": [],
+    "prompt20_time_ms": 0,
+    "prompt30_id": "38c0ddff",
+    "prompt30_dsl_code": "DEFINE {{vector_similarity_threshold}}: String = \"0.85\"\nDEFINE {{top_n_vector_results}}: Integer = 3\nDEFINE {{reordered_top_n_results}}: Integer = 5\nDEFINE {{graph_exploration_steps}}: Integer = 2\nDEFINE {{cache_expiration_time}}: Integer = 30\nDEFINE {{max_code_lines_static_analysis}}: Integer = 500\nDEFINE {{knowledge_base_A_documents}}: Integer = 2000\nDEFINE {{knowledge_base_B_documents}}: Integer = 3000\nDEFINE {{knowledge_base_C_documents}}: Integer = 1500\nDEFINE {{vector_dimension}}: Integer = 1536\nDEFINE {{max_concurrent_requests}}: Integer = 50\nDEFINE {{query_rate_threshold}}: Integer = 10\nDEFINE {{response_time_vector_retrieval}}: Integer = 500\nDEFINE {{response_time_graph_retrieval}}: Integer = 1\nDEFINE {{response_time_code_analysis}}: Integer = 2\nDEFINE {{total_response_time_limit}}: Integer = 3\nDEFINE {{error_log_retention_days}}: Integer = 90\nDEFINE {{access_log_retention_days}}: Integer = 30\nDEFINE {{debug_log_retention_days}}: Integer = 7\nDEFINE {{alert_duration_minutes}}: Integer = 10\nDEFINE {{alert_duration_response_time_minutes}}: Integer = 5\nIF {{query_type}} == \"simple_fact\"\n    {{similarity}} = CALL vector_retrieval({{user_query}})\n    IF {{similarity}} >= {{vector_similarity_threshold}}\n        {{results}} = CALL return_top_n_results({{top_n_vector_results}})\n    ELSE\n        {{results}} = CALL reorder_results({{reordered_top_n_results}})\n    ENDIF\nELIF {{query_type}} == \"complex_reasoning\"\n    {{intent}} = CALL intent_decomposition({{user_query}})\n    {{results}} = CALL graph_database_retrieval({{intent}}, {{graph_exploration_steps}})\n    IF {{results}} == \"no_match\"\n        {{results}} = CALL full_search()\n    ENDIF\nELIF {{query_type}} == \"code_related\"\n    IF {{code_lines}} > {{max_code_lines_static_analysis}}\n        {{results}} = CALL static_analysis({{user_code}})\n    ELSE\n        {{results}} = CALL semantic_analysis({{user_code}})\n    ENDIF\nENDIF\n{{cache}} = CALL cache_results({{results}}, {{cache_expiration_time}})\nIF {{user_feedback}} == \"unsatisfied\"\n    {{retry}} = CALL enable_stronger_model()\n    IF {{retry_count}} >= 3\n        {{results}} = CALL escalate_to_human_review()\n    ENDIF\nENDIF\nIF {{query_source}} == \"financial\"\n    {{confirmation}} = CALL confirm_user_identity()\nENDIF\nIF {{response_time}} > {{total_response_time_limit}}\n    {{results}} = CALL degrade_service()\nENDIF\n{{log}} = CALL upload_logs({{error_log_retention_days}}, {{access_log_retention_days}}, {{debug_log_retention_days}})\nIF {{query_rate}} < {{query_rate_threshold}} AND {{duration}} >= 10\n    CALL trigger_alert()\nENDIF\nIF {{95th_percentile_response_time}} > {{total_response_time_limit}} AND {{duration}} >= 5\n    CALL trigger_scaling()\nENDIF",
+    "prompt30_validation_result": {
+      "is_valid": false,
+      "errors": [
+        {
+          "line_number": 22,
+          "error_type": "未定义变量",
+          "message": "变量 {{query_type}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{query_type}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 23,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_query}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_query}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 23,
+          "error_type": "未定义变量",
+          "message": "变量 {{similarity}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{similarity}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 23,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_query}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_query}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 24,
+          "error_type": "未定义变量",
+          "message": "变量 {{similarity}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{similarity}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 24,
+          "error_type": "类型错误",
+          "message": "比较运算 >= 仅支持数字类型，当前为 Any 与 String",
+          "suggestion": "将变量类型改为 Integer/Float，或改用 == / !=",
+          "severity": "P2"
+        },
+        {
+          "line_number": 25,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 27,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 30,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_query}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_query}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 30,
+          "error_type": "未定义变量",
+          "message": "变量 {{intent}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{intent}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 30,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_query}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_query}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 31,
+          "error_type": "未定义变量",
+          "message": "变量 {{intent}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{intent}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 31,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 31,
+          "error_type": "未定义变量",
+          "message": "变量 {{intent}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{intent}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 32,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 33,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 36,
+          "error_type": "未定义变量",
+          "message": "变量 {{code_lines}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{code_lines}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 37,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_code}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_code}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 37,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 37,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_code}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_code}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 39,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_code}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_code}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 39,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 39,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_code}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_code}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 42,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 42,
+          "error_type": "未定义变量",
+          "message": "变量 {{cache}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{cache}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 42,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 43,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_feedback}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_feedback}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 44,
+          "error_type": "未定义变量",
+          "message": "变量 {{retry}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{retry}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 45,
+          "error_type": "未定义变量",
+          "message": "变量 {{retry_count}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{retry_count}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 46,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 49,
+          "error_type": "未定义变量",
+          "message": "变量 {{query_source}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{query_source}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 50,
+          "error_type": "未定义变量",
+          "message": "变量 {{confirmation}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{confirmation}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 52,
+          "error_type": "未定义变量",
+          "message": "变量 {{response_time}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{response_time}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 53,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 55,
+          "error_type": "未定义变量",
+          "message": "变量 {{log}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{log}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 56,
+          "error_type": "未定义变量",
+          "message": "变量 {{query_rate}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{query_rate}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 56,
+          "error_type": "未定义变量",
+          "message": "变量 {{duration}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{duration}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 59,
+          "error_type": "未定义变量",
+          "message": "变量 {{95th_percentile_response_time}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{95th_percentile_response_time}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 59,
+          "error_type": "未定义变量",
+          "message": "变量 {{duration}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{duration}}: Type",
+          "severity": "P2"
+        }
+      ],
+      "warnings": [],
+      "defined_variables": {
+        "vector_similarity_threshold": {
+          "name": "vector_similarity_threshold",
+          "var_type": "String",
+          "initial_value": "\"0.85\"",
+          "line_number": 1
+        },
+        "top_n_vector_results": {
+          "name": "top_n_vector_results",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 2
+        },
+        "reordered_top_n_results": {
+          "name": "reordered_top_n_results",
+          "var_type": "Integer",
+          "initial_value": "5",
+          "line_number": 3
+        },
+        "graph_exploration_steps": {
+          "name": "graph_exploration_steps",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 4
+        },
+        "cache_expiration_time": {
+          "name": "cache_expiration_time",
+          "var_type": "Integer",
+          "initial_value": "30",
+          "line_number": 5
+        },
+        "max_code_lines_static_analysis": {
+          "name": "max_code_lines_static_analysis",
+          "var_type": "Integer",
+          "initial_value": "500",
+          "line_number": 6
+        },
+        "knowledge_base_A_documents": {
+          "name": "knowledge_base_A_documents",
+          "var_type": "Integer",
+          "initial_value": "2000",
+          "line_number": 7
+        },
+        "knowledge_base_B_documents": {
+          "name": "knowledge_base_B_documents",
+          "var_type": "Integer",
+          "initial_value": "3000",
+          "line_number": 8
+        },
+        "knowledge_base_C_documents": {
+          "name": "knowledge_base_C_documents",
+          "var_type": "Integer",
+          "initial_value": "1500",
+          "line_number": 9
+        },
+        "vector_dimension": {
+          "name": "vector_dimension",
+          "var_type": "Integer",
+          "initial_value": "1536",
+          "line_number": 10
+        },
+        "max_concurrent_requests": {
+          "name": "max_concurrent_requests",
+          "var_type": "Integer",
+          "initial_value": "50",
+          "line_number": 11
+        },
+        "query_rate_threshold": {
+          "name": "query_rate_threshold",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 12
+        },
+        "response_time_vector_retrieval": {
+          "name": "response_time_vector_retrieval",
+          "var_type": "Integer",
+          "initial_value": "500",
+          "line_number": 13
+        },
+        "response_time_graph_retrieval": {
+          "name": "response_time_graph_retrieval",
+          "var_type": "Integer",
+          "initial_value": "1",
+          "line_number": 14
+        },
+        "response_time_code_analysis": {
+          "name": "response_time_code_analysis",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 15
+        },
+        "total_response_time_limit": {
+          "name": "total_response_time_limit",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 16
+        },
+        "error_log_retention_days": {
+          "name": "error_log_retention_days",
+          "var_type": "Integer",
+          "initial_value": "90",
+          "line_number": 17
+        },
+        "access_log_retention_days": {
+          "name": "access_log_retention_days",
+          "var_type": "Integer",
+          "initial_value": "30",
+          "line_number": 18
+        },
+        "debug_log_retention_days": {
+          "name": "debug_log_retention_days",
+          "var_type": "Integer",
+          "initial_value": "7",
+          "line_number": 19
+        },
+        "alert_duration_minutes": {
+          "name": "alert_duration_minutes",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 20
+        },
+        "alert_duration_response_time_minutes": {
+          "name": "alert_duration_response_time_minutes",
+          "var_type": "Integer",
+          "initial_value": "5",
+          "line_number": 21
+        }
+      },
+      "function_calls": [
+        {
+          "function_name": "vector_retrieval",
+          "arguments": [
+            "{{user_query}}"
+          ],
+          "result_var": "similarity",
+          "line_number": 23
+        },
+        {
+          "function_name": "return_top_n_results",
+          "arguments": [
+            "{{top_n_vector_results}}"
+          ],
+          "result_var": "results",
+          "line_number": 25
+        },
+        {
+          "function_name": "reorder_results",
+          "arguments": [
+            "{{reordered_top_n_results}}"
+          ],
+          "result_var": "results",
+          "line_number": 27
+        },
+        {
+          "function_name": "intent_decomposition",
+          "arguments": [
+            "{{user_query}}"
+          ],
+          "result_var": "intent",
+          "line_number": 30
+        },
+        {
+          "function_name": "graph_database_retrieval",
+          "arguments": [
+            "{{intent}}",
+            "{{graph_exploration_steps}}"
+          ],
+          "result_var": "results",
+          "line_number": 31
+        },
+        {
+          "function_name": "full_search",
+          "arguments": [],
+          "result_var": "results",
+          "line_number": 33
+        },
+        {
+          "function_name": "static_analysis",
+          "arguments": [
+            "{{user_code}}"
+          ],
+          "result_var": "results",
+          "line_number": 37
+        },
+        {
+          "function_name": "semantic_analysis",
+          "arguments": [
+            "{{user_code}}"
+          ],
+          "result_var": "results",
+          "line_number": 39
+        },
+        {
+          "function_name": "cache_results",
+          "arguments": [
+            "{{results}}",
+            "{{cache_expiration_time}}"
+          ],
+          "result_var": "cache",
+          "line_number": 42
+        },
+        {
+          "function_name": "enable_stronger_model",
+          "arguments": [],
+          "result_var": "retry",
+          "line_number": 44
+        },
+        {
+          "function_name": "escalate_to_human_review",
+          "arguments": [],
+          "result_var": "results",
+          "line_number": 46
+        },
+        {
+          "function_name": "confirm_user_identity",
+          "arguments": [],
+          "result_var": "confirmation",
+          "line_number": 50
+        },
+        {
+          "function_name": "degrade_service",
+          "arguments": [],
+          "result_var": "results",
+          "line_number": 53
+        },
+        {
+          "function_name": "upload_logs",
+          "arguments": [
+            "{{error_log_retention_days}}",
+            "{{access_log_retention_days}}",
+            "{{debug_log_retention_days}}"
+          ],
+          "result_var": "log",
+          "line_number": 55
+        }
+      ],
+      "control_blocks": [],
+      "max_nesting_depth": 2
+    },
+    "prompt30_time_ms": 39143,
+    "prompt30_compile_history": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "dsl_code": "DEFINE {{vector_similarity_threshold}}: String = 0.85\nDEFINE {{top_n_vector_results}}: Integer = 3\nDEFINE {{reordered_top_n_results}}: Integer = 5\nDEFINE {{graph_exploration_steps}}: Integer = 2\nDEFINE {{cache_expiration_time}}: Integer = 30\nDEFINE {{max_code_lines_static_analysis}}: Integer = 500\nDEFINE {{knowledge_base_A_documents}}: Integer = 2000\nDEFINE {{knowledge_base_B_documents}}: Integer = 3000\nDEFINE {{knowledge_base_C_documents}}: Integer = 1500\nDEFINE {{vector_dimension}}: Integer = 1536\nDEFINE {{max_concurrent_requests}}: Integer = 50\nDEFINE {{query_rate_threshold}}: Integer = 10\nDEFINE {{response_time_vector_retrieval}}: Integer = 500\nDEFINE {{response_time_graph_retrieval}}: Integer = 1\nDEFINE {{response_time_code_analysis}}: Integer = 2\nDEFINE {{total_response_time_limit}}: Integer = 3\nDEFINE {{error_log_retention_days}}: Integer = 90\nDEFINE {{access_log_retention_days}}: Integer = 30\nDEFINE {{debug_log_retention_days}}: Integer = 7\nDEFINE {{alert_duration_minutes}}: Integer = 10\nDEFINE {{alert_duration_response_time_minutes}}: Integer = 5\nIF {{query_type}} == \"simple_fact\"\n    {{similarity}} = CALL vector_retrieval({{user_query}})\n    IF {{similarity}} > {{vector_similarity_threshold}}\n        {{results}} = CALL return_top_n_results({{top_n_vector_results}})\n    ELSE\n        {{results}} = CALL reorder_and_return_results({{reordered_top_n_results}})\n    ENDIF\nELIF {{query_type}} == \"complex_reasoning\"\n    {{intent}} = CALL decompose_intent({{user_query}})\n    {{results}} = CALL graph_database_retrieval({{intent}}, {{graph_exploration_steps}})\n    IF {{results}} == \"no_match\"\n        {{results}} = CALL full_search()\n    ENDIF\nELIF {{query_type}} == \"code_related\"\n    IF {{code_lines}} > {{max_code_lines_static_analysis}}\n        {{results}} = CALL static_analysis({{user_code}})\n    ELSE\n        {{results}} = CALL semantic_analysis({{user_code}})\n    ENDIF\nENDIF\n{{cache}} = CALL cache_results({{results}}, {{cache_expiration_time}})\nIF {{user_feedback}} == \"unsatisfied\"\n    {{retry}} = CALL enable_stronger_reasoning_model()\n    IF {{retry_count}} >= 3\n        {{queue}} = CALL escalate_to_human_review()\n    ENDIF\nENDIF\n{{data_sources}} = CALL configure_data_sources({{knowledge_base_A_documents}}, {{knowledge_base_B_documents}}, {{knowledge_base_C_documents}}, {{vector_dimension}})\nIF {{current_requests}} > {{max_concurrent_requests}}\n    {{queue}} = CALL queue_requests()\nENDIF\n{{filtered_query}} = CALL filter_sensitive_content({{user_query}})\nIF {{filtered_query}} == \"contains_sensitive_content\"\n    CALL reject_service()\n    CALL log_violation()\nENDIF\nIF {{financial_query}} == true\n    {{confirmation}} = CALL confirm_user_identity()\nENDIF\nIF {{response_time_vector_retrieval}} > {{response_time_vector_retrieval}} OR {{response_time_graph_retrieval}} > {{response_time_graph_retrieval}} OR {{response_time_code_analysis}} > {{response_time_code_analysis}} OR {{total_response_time}} > {{total_response_time_limit}}\n    CALL degrade_service()\nENDIF\nCALL upload_logs({{error_log_retention_days}}, {{access_log_retention_days}}, {{debug_log_retention_days}})\nIF {{query_rate}} < {{query_rate_threshold}} AND {{duration}} >= 10\n    CALL trigger_alert()\nENDIF\nIF {{95th_percentile_response_time}} > {{total_response_time_limit}} AND {{duration}} >= 5\n    CALL trigger_scaling()\nENDIF",
+          "total_errors": 45,
+          "error_analysis": {
+            "p0_count": 0,
+            "p1_count": 0,
+            "p2_count": 45,
+            "total": 45
+          }
+        },
+        {
+          "attempt": 2,
+          "dsl_code": "DEFINE {{vector_similarity_threshold}}: String = \"0.85\"\nDEFINE {{top_n_vector_results}}: Integer = 3\nDEFINE {{reordered_top_n_results}}: Integer = 5\nDEFINE {{graph_exploration_steps}}: Integer = 2\nDEFINE {{cache_expiration_time}}: Integer = 30\nDEFINE {{max_code_lines_static_analysis}}: Integer = 500\nDEFINE {{knowledge_base_A_documents}}: Integer = 2000\nDEFINE {{knowledge_base_B_documents}}: Integer = 3000\nDEFINE {{knowledge_base_C_documents}}: Integer = 1500\nDEFINE {{vector_dimension}}: Integer = 1536\nDEFINE {{max_concurrent_requests}}: Integer = 50\nDEFINE {{query_rate_threshold}}: Integer = 10\nDEFINE {{response_time_vector_retrieval}}: Integer = 500\nDEFINE {{response_time_graph_retrieval}}: Integer = 1\nDEFINE {{response_time_code_analysis}}: Integer = 2\nDEFINE {{total_response_time_limit}}: Integer = 3\nDEFINE {{error_log_retention_days}}: Integer = 90\nDEFINE {{access_log_retention_days}}: Integer = 30\nDEFINE {{debug_log_retention_days}}: Integer = 7\nDEFINE {{alert_duration_minutes}}: Integer = 10\nDEFINE {{alert_duration_response_time_minutes}}: Integer = 5\nIF {{query_type}} == \"simple_fact\"\n    {{similarity}} = CALL vector_retrieval({{user_query}})\n    IF {{similarity}} > {{vector_similarity_threshold}}\n        {{results}} = CALL return_top_n_results({{top_n_vector_results}})\n    ELSE\n        {{results}} = CALL reorder_results({{reordered_top_n_results}})\n    ENDIF\nELIF {{query_type}} == \"complex_reasoning\"\n    {{intent}} = CALL decompose_intent({{user_query}})\n    {{results}} = CALL graph_database_retrieval({{intent}}, {{graph_exploration_steps}})\n    IF {{results}} == \"no_match\"\n        {{results}} = CALL full_search()\n    ENDIF\nELIF {{query_type}} == \"code_related\"\n    {{code_lines}} = CALL get_code_lines({{user_query}})\n    IF {{code_lines}} > {{max_code_lines_static_analysis}}\n        {{analysis_result}} = CALL static_analysis({{user_query}})\n    ELSE\n        {{analysis_result}} = CALL semantic_analysis({{user_query}})\n    ENDIF\nENDIF\n{{cache}} = CALL cache_results({{results}}, {{cache_expiration_time}})\nIF {{user_feedback}} == \"regenerate\"\n    {{new_results}} = CALL stronger_reasoning_model({{user_query}})\n    IF {{user_feedback_count}} >= 3\n        CALL escalate_to_human_review()\n    ENDIF\nENDIF\n{{knowledge_base_A}} = {{knowledge_base_A_documents}}\n{{knowledge_base_B}} = {{knowledge_base_B_documents}}\n{{knowledge_base_C}} = {{knowledge_base_C_documents}}\nIF {{current_requests}} > {{max_concurrent_requests}}\n    CALL queue_request()\nENDIF\nIF CALL contains_sensitive_words({{user_query}})\n    CALL reject_service()\n    CALL log_violation()\nENDIF\nIF {{response_time}} > {{total_response_time_limit}}\n    CALL degrade_service()\nENDIF\nCALL upload_logs({{error_log_retention_days}}, {{access_log_retention_days}}, {{debug_log_retention_days}})\nIF {{query_rate}} < {{query_rate_threshold}} AND {{duration}} >= 10\n    CALL trigger_alert()\nENDIF\nIF {{95th_percentile_response_time}} > {{total_response_time_limit}} AND {{duration}} >= 5\n    CALL trigger_scaling()\nENDIF",
+          "total_errors": 44,
+          "error_analysis": {
+            "p0_count": 0,
+            "p1_count": 0,
+            "p2_count": 44,
+            "total": 44
+          }
+        },
+        {
+          "attempt": 3,
+          "dsl_code": "DEFINE {{vector_similarity_threshold}}: String = \"0.85\"\nDEFINE {{top_n_vector_results}}: Integer = 3\nDEFINE {{reordered_top_n_results}}: Integer = 5\nDEFINE {{graph_exploration_steps}}: Integer = 2\nDEFINE {{cache_expiration_time}}: Integer = 30\nDEFINE {{max_code_lines_static_analysis}}: Integer = 500\nDEFINE {{knowledge_base_A_documents}}: Integer = 2000\nDEFINE {{knowledge_base_B_documents}}: Integer = 3000\nDEFINE {{knowledge_base_C_documents}}: Integer = 1500\nDEFINE {{vector_dimension}}: Integer = 1536\nDEFINE {{max_concurrent_requests}}: Integer = 50\nDEFINE {{query_rate_threshold}}: Integer = 10\nDEFINE {{response_time_vector_retrieval}}: Integer = 500\nDEFINE {{response_time_graph_retrieval}}: Integer = 1\nDEFINE {{response_time_code_analysis}}: Integer = 2\nDEFINE {{total_response_time_limit}}: Integer = 3\nDEFINE {{error_log_retention_days}}: Integer = 90\nDEFINE {{access_log_retention_days}}: Integer = 30\nDEFINE {{debug_log_retention_days}}: Integer = 7\nDEFINE {{alert_duration_minutes}}: Integer = 10\nDEFINE {{alert_duration_response_time_minutes}}: Integer = 5\nIF {{query_type}} == \"simple_fact\"\n    {{similarity}} = CALL vector_retrieval({{user_query}})\n    IF {{similarity}} >= {{vector_similarity_threshold}}\n        {{results}} = CALL return_top_n_results({{top_n_vector_results}})\n    ELSE\n        {{results}} = CALL reorder_results({{reordered_top_n_results}})\n    ENDIF\nELIF {{query_type}} == \"complex_reasoning\"\n    {{intent}} = CALL intent_decomposition({{user_query}})\n    {{results}} = CALL graph_database_retrieval({{intent}}, {{graph_exploration_steps}})\n    IF {{results}} == \"no_match\"\n        {{results}} = CALL full_search()\n    ENDIF\nELIF {{query_type}} == \"code_related\"\n    IF {{code_lines}} > {{max_code_lines_static_analysis}}\n        {{results}} = CALL static_analysis({{user_code}})\n    ELSE\n        {{results}} = CALL semantic_analysis({{user_code}})\n    ENDIF\nENDIF\n{{cache}} = CALL cache_results({{results}}, {{cache_expiration_time}})\nIF {{user_feedback}} == \"unsatisfied\"\n    {{retry}} = CALL enable_stronger_model()\n    IF {{retry_count}} >= 3\n        {{results}} = CALL escalate_to_human_review()\n    ENDIF\nENDIF\nIF {{query_source}} == \"financial\"\n    {{confirmation}} = CALL confirm_user_identity()\nENDIF\nIF {{response_time}} > {{total_response_time_limit}}\n    {{results}} = CALL degrade_service()\nENDIF\n{{log}} = CALL upload_logs({{error_log_retention_days}}, {{access_log_retention_days}}, {{debug_log_retention_days}})\nIF {{query_rate}} < {{query_rate_threshold}} AND {{duration}} >= 10\n    CALL trigger_alert()\nENDIF\nIF {{95th_percentile_response_time}} > {{total_response_time_limit}} AND {{duration}} >= 5\n    CALL trigger_scaling()\nENDIF",
+          "total_errors": 39,
+          "error_analysis": {
+            "p0_count": 0,
+            "p1_count": 0,
+            "p2_count": 39,
+            "total": 39
+          }
+        }
+      ],
+      "final_decision": "failed",
+      "error_summary": {
+        "p0_count": 0,
+        "p1_count": 0,
+        "p2_count": 39,
+        "total": 39
+      },
+      "auto_fix_applied": true
+    },
+    "prompt30_success": false,
+    "prompt40_id": "3539c2ba",
+    "prompt40_modules": [],
+    "prompt40_module_count": 0,
+    "prompt40_main_code": "",
+    "prompt40_time_ms": 0,
+    "prompt40_step1_parsing": {},
+    "prompt40_step2_dependency": {},
+    "prompt40_step3_clustering": {},
+    "prompt40_step4_generation": {},
+    "prompt40_step5_orchestration": {},
+    "overall_status": "partial",
+    "total_time_ms": 51357,
+    "error_message": null
+  },
+  "a1815b98": {
+    "pipeline_id": "a1815b98",
+    "timestamp": "2026-01-28 19:08:25",
+    "raw_input": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+    "prompt10_id": "5a53cc3f",
+    "prompt10_original": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+    "prompt10_processed": "请设计一个智能问答系统，处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n在向量检索模式下，如果相似度超过0.85，直接返回前3个结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n在图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码。如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n在用户反馈环节，如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500毫秒内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+    "prompt10_mode": "dictionary",
+    "prompt10_steps": [
+      {
+        "step_name": "术语对齐",
+        "step_index": 1,
+        "input_text": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "changes": {
+          "帮我": "请",
+          "top-3": "前3个结果",
+          "top-5": "前5个结果",
+          "知识图谱": "知识图谱(KG)",
+          "向量索引": "向量索引(VI)",
+          "QPS": "每秒查询率(QPS)",
+          "缓存命中率": "缓存命中率(CRH)"
+        },
+        "duration_ms": 0,
+        "notes": [
+          "替换 8 处"
+        ]
+      },
+      {
+        "step_name": "术语对齐",
+        "step_index": 2,
+        "input_text": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "changes": {
+          "帮我": "请",
+          "top-3": "前3个结果",
+          "top-5": "前5个结果",
+          "知识图谱": "知识图谱(KG)",
+          "向量索引": "向量索引(VI)",
+          "QPS": "每秒查询率(QPS)",
+          "缓存命中率": "缓存命中率(CRH)"
+        },
+        "duration_ms": 0,
+        "notes": []
+      },
+      {
+        "step_name": "LLM语义重构",
+        "step_index": 3,
+        "input_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "请设计一个智能问答系统，处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n在向量检索模式下，如果相似度超过0.85，直接返回前3个结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n在图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码。如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n在用户反馈环节，如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500毫秒内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "changes": {
+          "标准化": "840字 → 839字"
+        },
+        "duration_ms": 11774,
+        "notes": []
+      }
+    ],
+    "prompt10_terminology_changes": {
+      "帮我": "请",
+      "top-3": "前3个结果",
+      "top-5": "前5个结果",
+      "知识图谱": "知识图谱(KG)",
+      "向量索引": "向量索引(VI)",
+      "QPS": "每秒查询率(QPS)",
+      "缓存命中率": "缓存命中率(CRH)"
+    },
+    "prompt10_ambiguity_detected": false,
+    "prompt10_status": "success",
+    "prompt10_time_ms": 11775,
+    "prompt20_id": "0830cff6",
+    "prompt20_template": "请设计一个智能问答系统，处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n在向量检索模式下，如果相似度超过{{similarity_threshold}}，直接返回{{top_n_vector_search}}；否则结合重排序模型重新评分，再返回{{top_n_reordered_results}}。检索失败时自动切换到混合检索模式。\n\n在图数据库检索时，需要沿着知识图谱(KG)进行{{knowledge_graph_exploration_steps}}，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期{{cache_expiration_time}}。\n\n代码分析引擎支持Python和Java代码。如果代码行数超过{{max_code_lines_static_analysis}}，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n在用户反馈环节，如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含{{knowledge_base_A_documents}}，知识库B包含{{knowledge_base_B_documents}}，知识库C包含{{knowledge_base_C_documents}}。每个知识库都有独立的向量索引(VI)，向量维度统一为{{vector_index_dimension}}。\n\n并发控制：系统支持最大{{max_concurrent_requests}}，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为{{qps_threshold_alert}}。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在{{response_time_vector_search}}内完成，图数据库检索在{{response_time_graph_database}}内完成，代码分析在{{response_time_code_analysis}}内完成。总响应时间不超过{{total_response_time_limit}}，否则降级服务。\n\n日志级别：错误日志保留{{error_log_retention_days}}，访问日志保留{{access_log_retention_days}}，调试日志保留{{debug_log_retention_days}}。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续{{alert_duration_minutes}}，触发告警；如果95分位响应时间超过3秒持续{{alert_duration_response_time_minutes}}，触发扩容。",
+    "prompt20_variables": [
+      {
+        "variable": "similarity_threshold",
+        "original_text": "0.85",
+        "value": "0.85",
+        "type": "String"
+      },
+      {
+        "variable": "top_n_vector_search",
+        "original_text": "前3个结果",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "top_n_reordered_results",
+        "original_text": "前5个结果",
+        "value": 5,
+        "type": "Integer"
+      },
+      {
+        "variable": "knowledge_graph_exploration_steps",
+        "original_text": "2跳邻居探索",
+        "value": 2,
+        "type": "Integer"
+      },
+      {
+        "variable": "cache_expiration_time",
+        "original_text": "30分钟",
+        "value": 30,
+        "type": "Integer"
+      },
+      {
+        "variable": "max_code_lines_static_analysis",
+        "original_text": "500行",
+        "value": 500,
+        "type": "Integer"
+      },
+      {
+        "variable": "knowledge_base_A_documents",
+        "original_text": "2000个医学文档",
+        "value": 2000,
+        "type": "Integer"
+      },
+      {
+        "variable": "knowledge_base_B_documents",
+        "original_text": "3000个技术文档",
+        "value": 3000,
+        "type": "Integer"
+      },
+      {
+        "variable": "knowledge_base_C_documents",
+        "original_text": "1500个法律文档",
+        "value": 1500,
+        "type": "Integer"
+      },
+      {
+        "variable": "vector_index_dimension",
+        "original_text": "1536",
+        "value": 1536,
+        "type": "Integer"
+      },
+      {
+        "variable": "max_concurrent_requests",
+        "original_text": "50个并发请求",
+        "value": 50,
+        "type": "Integer"
+      },
+      {
+        "variable": "qps_threshold_alert",
+        "original_text": "10",
+        "value": 10,
+        "type": "Integer"
+      },
+      {
+        "variable": "response_time_vector_search",
+        "original_text": "500毫秒",
+        "value": 500,
+        "type": "Integer"
+      },
+      {
+        "variable": "response_time_graph_database",
+        "original_text": "1秒",
+        "value": 1,
+        "type": "Integer"
+      },
+      {
+        "variable": "response_time_code_analysis",
+        "original_text": "2秒",
+        "value": 2,
+        "type": "Integer"
+      },
+      {
+        "variable": "total_response_time_limit",
+        "original_text": "3秒",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "error_log_retention_days",
+        "original_text": "90天",
+        "value": 90,
+        "type": "Integer"
+      },
+      {
+        "variable": "access_log_retention_days",
+        "original_text": "30天",
+        "value": 30,
+        "type": "Integer"
+      },
+      {
+        "variable": "debug_log_retention_days",
+        "original_text": "7天",
+        "value": 7,
+        "type": "Integer"
+      },
+      {
+        "variable": "alert_duration_minutes",
+        "original_text": "10分钟",
+        "value": 10,
+        "type": "Integer"
+      },
+      {
+        "variable": "alert_duration_response_time_minutes",
+        "original_text": "5分钟",
+        "value": 5,
+        "type": "Integer"
+      }
+    ],
+    "prompt20_variable_count": 21,
+    "prompt20_type_stats": {
+      "String": 1,
+      "Integer": 20
+    },
+    "prompt20_extraction_log": [],
+    "prompt20_time_ms": 0,
+    "prompt30_id": "3ca3f55b",
+    "prompt30_dsl_code": "DEFINE {{similarity_threshold}}: String = \"0.85\"\nDEFINE {{top_n_vector_search}}: Integer = 3\nDEFINE {{top_n_reordered_results}}: Integer = 5\nDEFINE {{knowledge_graph_exploration_steps}}: Integer = 2\nDEFINE {{cache_expiration_time}}: Integer = 30\nDEFINE {{max_code_lines_static_analysis}}: Integer = 500\nDEFINE {{knowledge_base_A_documents}}: Integer = 2000\nDEFINE {{knowledge_base_B_documents}}: Integer = 3000\nDEFINE {{knowledge_base_C_documents}}: Integer = 1500\nDEFINE {{vector_index_dimension}}: Integer = 1536\nDEFINE {{max_concurrent_requests}}: Integer = 50\nDEFINE {{qps_threshold_alert}}: Integer = 10\nDEFINE {{response_time_vector_search}}: Integer = 500\nDEFINE {{response_time_graph_database}}: Integer = 1\nDEFINE {{response_time_code_analysis}}: Integer = 2\nDEFINE {{total_response_time_limit}}: Integer = 3\nDEFINE {{error_log_retention_days}}: Integer = 90\nDEFINE {{access_log_retention_days}}: Integer = 30\nDEFINE {{debug_log_retention_days}}: Integer = 7\nDEFINE {{alert_duration_minutes}}: Integer = 10\nDEFINE {{alert_duration_response_time_minutes}}: Integer = 5\nIF {{query_type}} == \"simple_fact\"\n    {{similarity}} = CALL vector_search({{user_query}})\n    IF {{similarity}} >= {{similarity_threshold}}\n        {{results}} = CALL return_top_n_results({{top_n_vector_search}})\n    ELSE\n        {{results}} = CALL reorder_results({{top_n_reordered_results}})\n    ENDIF\nELIF {{query_type}} == \"complex_reasoning\"\n    {{intent}} = CALL decompose_intent({{user_query}})\n    {{results}} = CALL graph_database_search({{intent}}, {{knowledge_graph_exploration_steps}})\n    IF {{results}} == \"no_match\"\n        {{results}} = CALL full_search()\n    ENDIF\nELIF {{query_type}} == \"code_related\"\n    IF {{code_lines}} > {{max_code_lines_static_analysis}}\n        {{results}} = CALL static_analysis({{user_code}})\n    ELSE\n        {{results}} = CALL semantic_analysis({{user_code}})\n    ENDIF\nENDIF\n{{cache}} = CALL cache_results({{results}}, {{cache_expiration_time}})\nIF {{user_feedback}} == \"regenerate\"\n    {{results}} = CALL stronger_reasoning_model({{user_query}})\n    IF {{user_feedback_count}} >= 3\n        CALL escalate_to_human_review()\n    ENDIF\nENDIF\n{{knowledge_base_A}} = {{knowledge_base_A_documents}}\n{{knowledge_base_B}} = {{knowledge_base_B_documents}}\n{{knowledge_base_C}} = {{knowledge_base_C_documents}}\nIF {{current_requests}} > {{max_concurrent_requests}}\n    CALL queue_requests()\nENDIF\nIF {{contains_sensitive_words}} == TRUE\n    CALL reject_service()\n    CALL log_violation()\nENDIF\nIF {{query_type}} == \"financial\"\n    CALL confirm_user_identity()\nENDIF\nIF {{response_time_vector_search}} > {{response_time_vector_search}} OR \n   {{response_time_graph_database}} > {{response_time_graph_database}} OR \n   {{response_time_code_analysis}} > {{response_time_code_analysis}} OR \n   {{total_response_time}} > {{total_response_time_limit}}\n    CALL degrade_service()\nENDIF\nCALL upload_logs({{error_log_retention_days}}, {{access_log_retention_days}}, {{debug_log_retention_days}})\nIF {{qps}} < {{qps_threshold_alert}} AND {{duration}} >= {{alert_duration_minutes}}\n    CALL trigger_alert()\nENDIF\nIF {{95th_percentile_response_time}} > {{total_response_time_limit}} AND {{duration}} >= {{alert_duration_response_time_minutes}}\n    CALL trigger_scaling()\nENDIF",
+    "prompt30_validation_result": {
+      "is_valid": false,
+      "errors": [
+        {
+          "line_number": 22,
+          "error_type": "未定义变量",
+          "message": "变量 {{query_type}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{query_type}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 23,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_query}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_query}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 23,
+          "error_type": "未定义变量",
+          "message": "变量 {{similarity}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{similarity}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 23,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_query}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_query}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 24,
+          "error_type": "未定义变量",
+          "message": "变量 {{similarity}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{similarity}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 24,
+          "error_type": "类型错误",
+          "message": "比较运算 >= 仅支持数字类型，当前为 Any 与 String",
+          "suggestion": "将变量类型改为 Integer/Float，或改用 == / !=",
+          "severity": "P2"
+        },
+        {
+          "line_number": 25,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 27,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 30,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_query}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_query}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 30,
+          "error_type": "未定义变量",
+          "message": "变量 {{intent}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{intent}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 30,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_query}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_query}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 31,
+          "error_type": "未定义变量",
+          "message": "变量 {{intent}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{intent}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 31,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 31,
+          "error_type": "未定义变量",
+          "message": "变量 {{intent}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{intent}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 32,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 33,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 36,
+          "error_type": "未定义变量",
+          "message": "变量 {{code_lines}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{code_lines}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 37,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_code}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_code}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 37,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 37,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_code}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_code}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 39,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_code}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_code}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 39,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 39,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_code}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_code}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 42,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 42,
+          "error_type": "未定义变量",
+          "message": "变量 {{cache}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{cache}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 42,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 43,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_feedback}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_feedback}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 44,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_query}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_query}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 44,
+          "error_type": "未定义变量",
+          "message": "变量 {{results}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{results}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 44,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_query}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_query}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 45,
+          "error_type": "未定义变量",
+          "message": "变量 {{user_feedback_count}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{user_feedback_count}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 49,
+          "error_type": "未定义变量",
+          "message": "变量 {{knowledge_base_A}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{knowledge_base_A}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 50,
+          "error_type": "未定义变量",
+          "message": "变量 {{knowledge_base_B}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{knowledge_base_B}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 51,
+          "error_type": "未定义变量",
+          "message": "变量 {{knowledge_base_C}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{knowledge_base_C}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 52,
+          "error_type": "未定义变量",
+          "message": "变量 {{current_requests}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{current_requests}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 55,
+          "error_type": "未定义变量",
+          "message": "变量 {{contains_sensitive_words}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{contains_sensitive_words}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 59,
+          "error_type": "未定义变量",
+          "message": "变量 {{query_type}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{query_type}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 69,
+          "error_type": "未定义变量",
+          "message": "变量 {{qps}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{qps}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 69,
+          "error_type": "未定义变量",
+          "message": "变量 {{duration}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{duration}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 69,
+          "error_type": "类型错误",
+          "message": "比较运算 < 仅支持数字类型，当前为 Any 与 Dict",
+          "suggestion": "将变量类型改为 Integer/Float，或改用 == / !=",
+          "severity": "P2"
+        },
+        {
+          "line_number": 72,
+          "error_type": "未定义变量",
+          "message": "变量 {{95th_percentile_response_time}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{95th_percentile_response_time}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 72,
+          "error_type": "未定义变量",
+          "message": "变量 {{duration}} 在使用前未定义",
+          "suggestion": "在代码开头添加: DEFINE {{duration}}: Type",
+          "severity": "P2"
+        },
+        {
+          "line_number": 72,
+          "error_type": "类型错误",
+          "message": "比较运算 > 仅支持数字类型，当前为 Any 与 Dict",
+          "suggestion": "将变量类型改为 Integer/Float，或改用 == / !=",
+          "severity": "P2"
+        }
+      ],
+      "warnings": [],
+      "defined_variables": {
+        "similarity_threshold": {
+          "name": "similarity_threshold",
+          "var_type": "String",
+          "initial_value": "\"0.85\"",
+          "line_number": 1
+        },
+        "top_n_vector_search": {
+          "name": "top_n_vector_search",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 2
+        },
+        "top_n_reordered_results": {
+          "name": "top_n_reordered_results",
+          "var_type": "Integer",
+          "initial_value": "5",
+          "line_number": 3
+        },
+        "knowledge_graph_exploration_steps": {
+          "name": "knowledge_graph_exploration_steps",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 4
+        },
+        "cache_expiration_time": {
+          "name": "cache_expiration_time",
+          "var_type": "Integer",
+          "initial_value": "30",
+          "line_number": 5
+        },
+        "max_code_lines_static_analysis": {
+          "name": "max_code_lines_static_analysis",
+          "var_type": "Integer",
+          "initial_value": "500",
+          "line_number": 6
+        },
+        "knowledge_base_A_documents": {
+          "name": "knowledge_base_A_documents",
+          "var_type": "Integer",
+          "initial_value": "2000",
+          "line_number": 7
+        },
+        "knowledge_base_B_documents": {
+          "name": "knowledge_base_B_documents",
+          "var_type": "Integer",
+          "initial_value": "3000",
+          "line_number": 8
+        },
+        "knowledge_base_C_documents": {
+          "name": "knowledge_base_C_documents",
+          "var_type": "Integer",
+          "initial_value": "1500",
+          "line_number": 9
+        },
+        "vector_index_dimension": {
+          "name": "vector_index_dimension",
+          "var_type": "Integer",
+          "initial_value": "1536",
+          "line_number": 10
+        },
+        "max_concurrent_requests": {
+          "name": "max_concurrent_requests",
+          "var_type": "Integer",
+          "initial_value": "50",
+          "line_number": 11
+        },
+        "qps_threshold_alert": {
+          "name": "qps_threshold_alert",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 12
+        },
+        "response_time_vector_search": {
+          "name": "response_time_vector_search",
+          "var_type": "Integer",
+          "initial_value": "500",
+          "line_number": 13
+        },
+        "response_time_graph_database": {
+          "name": "response_time_graph_database",
+          "var_type": "Integer",
+          "initial_value": "1",
+          "line_number": 14
+        },
+        "response_time_code_analysis": {
+          "name": "response_time_code_analysis",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 15
+        },
+        "total_response_time_limit": {
+          "name": "total_response_time_limit",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 16
+        },
+        "error_log_retention_days": {
+          "name": "error_log_retention_days",
+          "var_type": "Integer",
+          "initial_value": "90",
+          "line_number": 17
+        },
+        "access_log_retention_days": {
+          "name": "access_log_retention_days",
+          "var_type": "Integer",
+          "initial_value": "30",
+          "line_number": 18
+        },
+        "debug_log_retention_days": {
+          "name": "debug_log_retention_days",
+          "var_type": "Integer",
+          "initial_value": "7",
+          "line_number": 19
+        },
+        "alert_duration_minutes": {
+          "name": "alert_duration_minutes",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 20
+        },
+        "alert_duration_response_time_minutes": {
+          "name": "alert_duration_response_time_minutes",
+          "var_type": "Integer",
+          "initial_value": "5",
+          "line_number": 21
+        }
+      },
+      "function_calls": [
+        {
+          "function_name": "vector_search",
+          "arguments": [
+            "{{user_query}}"
+          ],
+          "result_var": "similarity",
+          "line_number": 23
+        },
+        {
+          "function_name": "return_top_n_results",
+          "arguments": [
+            "{{top_n_vector_search}}"
+          ],
+          "result_var": "results",
+          "line_number": 25
+        },
+        {
+          "function_name": "reorder_results",
+          "arguments": [
+            "{{top_n_reordered_results}}"
+          ],
+          "result_var": "results",
+          "line_number": 27
+        },
+        {
+          "function_name": "decompose_intent",
+          "arguments": [
+            "{{user_query}}"
+          ],
+          "result_var": "intent",
+          "line_number": 30
+        },
+        {
+          "function_name": "graph_database_search",
+          "arguments": [
+            "{{intent}}",
+            "{{knowledge_graph_exploration_steps}}"
+          ],
+          "result_var": "results",
+          "line_number": 31
+        },
+        {
+          "function_name": "full_search",
+          "arguments": [],
+          "result_var": "results",
+          "line_number": 33
+        },
+        {
+          "function_name": "static_analysis",
+          "arguments": [
+            "{{user_code}}"
+          ],
+          "result_var": "results",
+          "line_number": 37
+        },
+        {
+          "function_name": "semantic_analysis",
+          "arguments": [
+            "{{user_code}}"
+          ],
+          "result_var": "results",
+          "line_number": 39
+        },
+        {
+          "function_name": "cache_results",
+          "arguments": [
+            "{{results}}",
+            "{{cache_expiration_time}}"
+          ],
+          "result_var": "cache",
+          "line_number": 42
+        },
+        {
+          "function_name": "stronger_reasoning_model",
+          "arguments": [
+            "{{user_query}}"
+          ],
+          "result_var": "results",
+          "line_number": 44
+        }
+      ],
+      "control_blocks": [],
+      "max_nesting_depth": 2
+    },
+    "prompt30_time_ms": 35971,
+    "prompt30_compile_history": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "dsl_code": "DEFINE {{similarity_threshold}}: String = 0.85\nDEFINE {{top_n_vector_search}}: Integer = 3\nDEFINE {{top_n_reordered_results}}: Integer = 5\nDEFINE {{knowledge_graph_exploration_steps}}: Integer = 2\nDEFINE {{cache_expiration_time}}: Integer = 30\nDEFINE {{max_code_lines_static_analysis}}: Integer = 500\nDEFINE {{knowledge_base_A_documents}}: Integer = 2000\nDEFINE {{knowledge_base_B_documents}}: Integer = 3000\nDEFINE {{knowledge_base_C_documents}}: Integer = 1500\nDEFINE {{vector_index_dimension}}: Integer = 1536\nDEFINE {{max_concurrent_requests}}: Integer = 50\nDEFINE {{qps_threshold_alert}}: Integer = 10\nDEFINE {{response_time_vector_search}}: Integer = 500\nDEFINE {{response_time_graph_database}}: Integer = 1\nDEFINE {{response_time_code_analysis}}: Integer = 2\nDEFINE {{total_response_time_limit}}: Integer = 3\nDEFINE {{error_log_retention_days}}: Integer = 90\nDEFINE {{access_log_retention_days}}: Integer = 30\nDEFINE {{debug_log_retention_days}}: Integer = 7\nDEFINE {{alert_duration_minutes}}: Integer = 10\nDEFINE {{alert_duration_response_time_minutes}}: Integer = 5\nIF {{query_type}} == \"简单事实查询\"\n    {{similarity}} = CALL vector_search({{user_query}})\n    IF {{similarity}} > {{similarity_threshold}}\n        {{results}} = CALL return_top_n_results({{top_n_vector_search}})\n    ELSE\n        {{results}} = CALL reorder_results({{top_n_reordered_results}})\n    ENDIF\nELIF {{query_type}} == \"复杂推理查询\"\n    {{intent}} = CALL intent_decomposition({{user_query}})\n    {{results}} = CALL graph_database_search({{intent}}, {{knowledge_graph_exploration_steps}})\n    IF {{results}} == \"无匹配\"\n        {{results}} = CALL full_search()\n    ENDIF\nELIF {{query_type}} == \"代码相关问题\"\n    IF {{code_lines}} > {{max_code_lines_static_analysis}}\n        {{results}} = CALL static_analysis({{user_code}})\n    ELSE\n        {{results}} = CALL semantic_analysis({{user_code}})\n    ENDIF\nENDIF\n{{cache}} = CALL cache_results({{results}}, {{cache_expiration_time}})\nIF {{user_feedback}} == \"不满意\"\n    {{regenerate}} = CALL enable_stronger_model()\n    IF {{regenerate_count}} >= 3\n        {{queue}} = CALL escalate_to_human_review()\n    ENDIF\nENDIF\n{{data_sources}} = CALL configure_data_sources({{knowledge_base_A_documents}}, {{knowledge_base_B_documents}}, {{knowledge_base_C_documents}}, {{vector_index_dimension}})\nIF {{current_requests}} > {{max_concurrent_requests}}\n    {{queue}} = CALL queue_requests()\nENDIF\n{{filtered_query}} = CALL filter_sensitive_words({{user_query}})\nIF {{filtered_query}} == \"违规内容\"\n    CALL reject_service()\n    CALL log_error()\nENDIF\nIF {{query_type}} == \"金融类查询\"\n    {{identity_confirmation}} = CALL confirm_user_identity()\nENDIF\nIF {{response_time}} > {{total_response_time_limit}}\n    CALL degrade_service()\nENDIF\nCALL upload_logs({{error_log_retention_days}}, {{access_log_retention_days}}, {{debug_log_retention_days}})\nIF {{qps}} < {{qps_threshold_alert}} AND {{duration}} >= {{alert_duration_minutes}}\n    CALL trigger_alert()\nENDIF\nIF {{95th_percentile_response_time}} > {{total_response_time_limit}} AND {{duration}} >= {{alert_duration_response_time_minutes}}\n    CALL trigger_scaling()\nENDIF",
+          "total_errors": 46,
+          "error_analysis": {
+            "p0_count": 0,
+            "p1_count": 0,
+            "p2_count": 46,
+            "total": 46
+          }
+        },
+        {
+          "attempt": 2,
+          "dsl_code": "DEFINE {{similarity_threshold}}: String = \"0.85\"\nDEFINE {{top_n_vector_search}}: Integer = 3\nDEFINE {{top_n_reordered_results}}: Integer = 5\nDEFINE {{knowledge_graph_exploration_steps}}: Integer = 2\nDEFINE {{cache_expiration_time}}: Integer = 30\nDEFINE {{max_code_lines_static_analysis}}: Integer = 500\nDEFINE {{knowledge_base_A_documents}}: Integer = 2000\nDEFINE {{knowledge_base_B_documents}}: Integer = 3000\nDEFINE {{knowledge_base_C_documents}}: Integer = 1500\nDEFINE {{vector_index_dimension}}: Integer = 1536\nDEFINE {{max_concurrent_requests}}: Integer = 50\nDEFINE {{qps_threshold_alert}}: Integer = 10\nDEFINE {{response_time_vector_search}}: Integer = 500\nDEFINE {{response_time_graph_database}}: Integer = 1\nDEFINE {{response_time_code_analysis}}: Integer = 2\nDEFINE {{total_response_time_limit}}: Integer = 3\nDEFINE {{error_log_retention_days}}: Integer = 90\nDEFINE {{access_log_retention_days}}: Integer = 30\nDEFINE {{debug_log_retention_days}}: Integer = 7\nDEFINE {{alert_duration_minutes}}: Integer = 10\nDEFINE {{alert_duration_response_time_minutes}}: Integer = 5\nIF {{query_type}} == \"simple_fact\"\n    {{similarity}} = CALL vector_search({{user_query}})\n    IF {{similarity}} >= {{similarity_threshold}}\n        {{results}} = CALL return_top_n_results({{top_n_vector_search}})\n    ELSE\n        {{results}} = CALL reorder_results({{top_n_reordered_results}})\n    ENDIF\nELIF {{query_type}} == \"complex_reasoning\"\n    {{intent}} = CALL decompose_intent({{user_query}})\n    {{results}} = CALL graph_database_search({{intent}}, {{knowledge_graph_exploration_steps}})\n    IF {{results}} == \"no_match\"\n        {{results}} = CALL full_search()\n    ENDIF\nELIF {{query_type}} == \"code_related\"\n    IF {{code_lines}} > {{max_code_lines_static_analysis}}\n        {{results}} = CALL static_analysis({{user_code}})\n    ELSE\n        {{results}} = CALL semantic_analysis({{user_code}})\n    ENDIF\nENDIF\n{{cache}} = CALL cache_results({{results}}, {{cache_expiration_time}})\nIF {{user_feedback}} == \"regenerate\"\n    {{results}} = CALL stronger_reasoning_model({{user_query}})\n    IF {{user_feedback_count}} >= 3\n        CALL escalate_to_human_review()\n    ENDIF\nENDIF\n{{knowledge_base_A}} = {{knowledge_base_A_documents}}\n{{knowledge_base_B}} = {{knowledge_base_B_documents}}\n{{knowledge_base_C}} = {{knowledge_base_C_documents}}\nIF {{current_requests}} > {{max_concurrent_requests}}\n    CALL queue_request()\nENDIF\nIF {{contains_sensitive_words}} == TRUE\n    CALL reject_service()\n    CALL log_violation()\nENDIF\nIF {{query_type}} == \"financial\"\n    CALL confirm_user_identity()\nENDIF\nIF {{response_time}} > {{total_response_time_limit}}\n    CALL degrade_service()\nENDIF\nCALL upload_logs({{error_log_retention_days}}, {{access_log_retention_days}}, {{debug_log_retention_days}})\nIF {{qps}} < {{qps_threshold_alert}} AND {{duration}} >= 10\n    CALL trigger_alert()\nENDIF\nIF {{95th_percentile_response_time}} > {{total_response_time_limit}} AND {{duration}} >= 5\n    CALL trigger_scaling()\nENDIF",
+          "total_errors": 42,
+          "error_analysis": {
+            "p0_count": 0,
+            "p1_count": 0,
+            "p2_count": 42,
+            "total": 42
+          }
+        },
+        {
+          "attempt": 3,
+          "dsl_code": "DEFINE {{similarity_threshold}}: String = \"0.85\"\nDEFINE {{top_n_vector_search}}: Integer = 3\nDEFINE {{top_n_reordered_results}}: Integer = 5\nDEFINE {{knowledge_graph_exploration_steps}}: Integer = 2\nDEFINE {{cache_expiration_time}}: Integer = 30\nDEFINE {{max_code_lines_static_analysis}}: Integer = 500\nDEFINE {{knowledge_base_A_documents}}: Integer = 2000\nDEFINE {{knowledge_base_B_documents}}: Integer = 3000\nDEFINE {{knowledge_base_C_documents}}: Integer = 1500\nDEFINE {{vector_index_dimension}}: Integer = 1536\nDEFINE {{max_concurrent_requests}}: Integer = 50\nDEFINE {{qps_threshold_alert}}: Integer = 10\nDEFINE {{response_time_vector_search}}: Integer = 500\nDEFINE {{response_time_graph_database}}: Integer = 1\nDEFINE {{response_time_code_analysis}}: Integer = 2\nDEFINE {{total_response_time_limit}}: Integer = 3\nDEFINE {{error_log_retention_days}}: Integer = 90\nDEFINE {{access_log_retention_days}}: Integer = 30\nDEFINE {{debug_log_retention_days}}: Integer = 7\nDEFINE {{alert_duration_minutes}}: Integer = 10\nDEFINE {{alert_duration_response_time_minutes}}: Integer = 5\nIF {{query_type}} == \"simple_fact\"\n    {{similarity}} = CALL vector_search({{user_query}})\n    IF {{similarity}} >= {{similarity_threshold}}\n        {{results}} = CALL return_top_n_results({{top_n_vector_search}})\n    ELSE\n        {{results}} = CALL reorder_results({{top_n_reordered_results}})\n    ENDIF\nELIF {{query_type}} == \"complex_reasoning\"\n    {{intent}} = CALL decompose_intent({{user_query}})\n    {{results}} = CALL graph_database_search({{intent}}, {{knowledge_graph_exploration_steps}})\n    IF {{results}} == \"no_match\"\n        {{results}} = CALL full_search()\n    ENDIF\nELIF {{query_type}} == \"code_related\"\n    IF {{code_lines}} > {{max_code_lines_static_analysis}}\n        {{results}} = CALL static_analysis({{user_code}})\n    ELSE\n        {{results}} = CALL semantic_analysis({{user_code}})\n    ENDIF\nENDIF\n{{cache}} = CALL cache_results({{results}}, {{cache_expiration_time}})\nIF {{user_feedback}} == \"regenerate\"\n    {{results}} = CALL stronger_reasoning_model({{user_query}})\n    IF {{user_feedback_count}} >= 3\n        CALL escalate_to_human_review()\n    ENDIF\nENDIF\n{{knowledge_base_A}} = {{knowledge_base_A_documents}}\n{{knowledge_base_B}} = {{knowledge_base_B_documents}}\n{{knowledge_base_C}} = {{knowledge_base_C_documents}}\nIF {{current_requests}} > {{max_concurrent_requests}}\n    CALL queue_requests()\nENDIF\nIF {{contains_sensitive_words}} == TRUE\n    CALL reject_service()\n    CALL log_violation()\nENDIF\nIF {{query_type}} == \"financial\"\n    CALL confirm_user_identity()\nENDIF\nIF {{response_time_vector_search}} > {{response_time_vector_search}} OR \n   {{response_time_graph_database}} > {{response_time_graph_database}} OR \n   {{response_time_code_analysis}} > {{response_time_code_analysis}} OR \n   {{total_response_time}} > {{total_response_time_limit}}\n    CALL degrade_service()\nENDIF\nCALL upload_logs({{error_log_retention_days}}, {{access_log_retention_days}}, {{debug_log_retention_days}})\nIF {{qps}} < {{qps_threshold_alert}} AND {{duration}} >= {{alert_duration_minutes}}\n    CALL trigger_alert()\nENDIF\nIF {{95th_percentile_response_time}} > {{total_response_time_limit}} AND {{duration}} >= {{alert_duration_response_time_minutes}}\n    CALL trigger_scaling()\nENDIF",
+          "total_errors": 43,
+          "error_analysis": {
+            "p0_count": 0,
+            "p1_count": 0,
+            "p2_count": 43,
+            "total": 43
+          }
+        }
+      ],
+      "final_decision": "failed",
+      "error_summary": {
+        "p0_count": 0,
+        "p1_count": 0,
+        "p2_count": 43,
+        "total": 43
+      },
+      "auto_fix_applied": true
+    },
+    "prompt30_success": false,
+    "prompt40_id": "5aa4b4d5",
+    "prompt40_modules": [],
+    "prompt40_module_count": 0,
+    "prompt40_main_code": "",
+    "prompt40_time_ms": 0,
+    "prompt40_step1_parsing": {},
+    "prompt40_step2_dependency": {},
+    "prompt40_step3_clustering": {},
+    "prompt40_step4_generation": {},
+    "prompt40_step5_orchestration": {},
+    "overall_status": "partial",
+    "total_time_ms": 47746,
+    "error_message": null
   }
 }

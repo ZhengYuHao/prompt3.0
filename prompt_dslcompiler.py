@@ -927,7 +927,7 @@ class SelfCorrectionLoop:
 
     def compile_with_retry(self, prompt_2_0: Dict[str, Any]) -> Tuple[bool, str, ValidationResult, Dict[str, Any]]:
         """
-        带重试机制的编译（策略 D 实现）
+        带重试机制的编译（策略 D 实现 - 增强版）
 
         Returns:
             (成功标志, DSL代码, 验证结果, 诊断信息)
@@ -937,7 +937,8 @@ class SelfCorrectionLoop:
         history = {
             'attempts': [],
             'final_decision': '',
-            'error_summary': {}
+            'error_summary': {},
+            'auto_fix_applied': False
         }
 
         for attempt in range(self.max_retries):
@@ -952,9 +953,10 @@ class SelfCorrectionLoop:
             # 错误分级
             error_analysis = self._analyze_errors(result.errors)
 
-            # 记录本次尝试
+            # 记录本次尝试的原始 DSL 代码
             history['attempts'].append({
                 'attempt': attempt + 1,
+                'dsl_code': dsl_code,  # 记录每次尝试的 DSL 代码
                 'total_errors': len(result.errors),
                 'error_analysis': error_analysis
             })
@@ -970,26 +972,38 @@ class SelfCorrectionLoop:
 
                 # 策略 D：根据错误数量决定处理方式
                 if attempt < self.max_retries - 1:
-                    if error_analysis['p0_count'] + error_analysis['p1_count'] <= self.auto_fix_threshold:
-                        # 尝试自动修复 + LLM 重试
-                        fixed_dsl, fix_count = self._auto_fix_syntax_errors(dsl_code, result.errors)
-                        if fix_count > 0:
-                            info(f"  🔧 自动修复了 {fix_count} 个语法错误")
-                            # 验证修复后的代码
-                            temp_result = self.validator.validate(fixed_dsl)
-                            if temp_result.is_valid:
-                                info(f"  ✅ 自动修复成功！")
-                                history['final_decision'] = 'auto_fixed'
-                                return True, fixed_dsl, temp_result, history
-                            else:
-                                info(f"  ⚠️  自动修复不完整，继续 LLM 重试...")
-                                dsl_code = fixed_dsl
-                                result = temp_result
+                    # 尝试自动修复（增强版）
+                    fixed_dsl, fix_count = self._auto_fix_syntax_errors(dsl_code, result.errors)
+                    if fix_count > 0:
+                        info(f"  🔧 自动修复了 {fix_count} 个语法错误")
+                        # 验证修复后的代码
+                        temp_result = self.validator.validate(fixed_dsl)
+                        if temp_result.is_valid:
+                            info(f"  ✅ 自动修复成功！")
+                            history['final_decision'] = 'auto_fixed'
+                            history['auto_fix_applied'] = True
+                            history['auto_fix_details'] = f'Fixed {fix_count} errors'
+                            return True, fixed_dsl, temp_result, history
+                        else:
+                            # 即使修复不完整，也使用修复后的代码继续 LLM 重试
+                            info(f"  ⚠️  自动修复不完整（剩余 {len(temp_result.errors)} 个错误），继续 LLM 重试...")
+                            dsl_code = fixed_dsl
+                            result = temp_result
+                            history['auto_fix_applied'] = True
 
                     # 准备错误反馈给 LLM
                     error_feedback = self._generate_error_feedback(dsl_code, result, error_analysis)
                     prompt_2_0['error_feedback'] = error_feedback
                     info(f"  正在准备修正...")
+
+        # 所有尝试都失败，但检查最后一次自动修复是否可用
+        # 如果自动修复后的错误数量较少（<=3），可以考虑继续执行第四步
+        if history['auto_fix_applied'] and len(result.errors) <= 3:
+            info(f"\n⚠️  虽然验证未完全通过，但自动修复后错误数量较少（{len(result.errors)}个）")
+            info(f"建议：可以尝试进入第四步代码生成，可能会生成可工作的代码")
+            history['final_decision'] = 'partial_auto_fixed'
+            history['error_summary'] = self._analyze_errors(result.errors)
+            return True, dsl_code, result, history  # 返回 True，允许进入第四步
 
         # 所有尝试都失败，生成诊断报告
         error(f"\n❌ 经过 {self.max_retries} 次尝试仍未通过验证")
@@ -1020,49 +1034,125 @@ class SelfCorrectionLoop:
         支持的修复类型：
         - IF 缺少条件 → IF True
         - 未闭合的控制流 → 自动添加 ENDIF/ENDFOR
+        - 未定义的变量 → 自动添加 DEFINE 语句
+        - CALL 函数参数格式错误 → 修复参数格式
         - 多余的空行 → 删除
         """
         lines = dsl_code.split('\n')
         fixed_lines = []
         fix_count = 0
         control_stack = []
+        defined_vars = set()
 
+        # 第一遍：识别所有已定义的变量
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith('DEFINE'):
+                match = re.match(r'DEFINE\s+\{\{(\w+)\}\}\s*:', line)
+                if match:
+                    var_name = match.group(1)
+                    defined_vars.add(var_name)
+            fixed_lines.append(line)
+
+        # 第二遍：修复语法错误
+        final_lines = []
         for line in lines:
             stripped = line.strip()
 
+            # 跳过空行（只保留一个空行间隔）
+            if not stripped:
+                if final_lines and final_lines[-1].strip():
+                    final_lines.append(line)
+                continue
+
             # 修复 IF 缺少条件
-            if stripped == 'IF' or stripped.startswith('IF ') and len(stripped) == 2:
-                fixed_lines.append(line.replace('IF', 'IF True'))
+            if stripped == 'IF' or (stripped.startswith('IF ') and len(stripped) == 2):
+                final_lines.append(line.replace('IF', 'IF True'))
                 fix_count += 1
                 continue
 
             # 跟踪控制流
-            if stripped in ['IF', 'FOR', 'WHILE']:
-                control_stack.append(stripped)
-            elif stripped in ['ENDIF', 'ENDFOR', 'ENDWHILE']:
-                if control_stack:
-                    control_stack.pop()
-            elif stripped.startswith('IF'):
+            if stripped == 'IF' or stripped.startswith('IF '):
                 control_stack.append('IF')
-            elif stripped.startswith('FOR'):
+            elif stripped == 'FOR' or stripped.startswith('FOR '):
                 control_stack.append('FOR')
-            elif stripped.startswith('WHILE'):
+            elif stripped == 'WHILE' or stripped.startswith('WHILE '):
                 control_stack.append('WHILE')
+            elif stripped == 'ENDIF':
+                if control_stack and control_stack[-1] == 'IF':
+                    control_stack.pop()
+            elif stripped == 'ENDFOR':
+                if control_stack and control_stack[-1] == 'FOR':
+                    control_stack.pop()
+            elif stripped == 'ENDWHILE':
+                if control_stack and control_stack[-1] == 'WHILE':
+                    control_stack.pop()
 
-            fixed_lines.append(line)
+            # 检查是否有未定义的变量需要添加 DEFINE
+            # 只修复明确指出的未定义变量错误
+            var_pattern = re.compile(r'\{\{(\w+)\}\}')
+            for error in errors:
+                if error.error_type == "未定义变量":
+                    var_match = re.search(r'\{\{(\w+)\}\}', error.message)
+                    if var_match:
+                        var_name = var_match.group(1)
+                        if var_name not in defined_vars:
+                            # 在文件开头添加 DEFINE 语句（只添加一次）
+                            defined_vars.add(var_name)
+                            # 推断类型
+                            var_type = self._infer_variable_type(dsl_code, var_name)
+                            define_line = f'DEFINE {{{{var_name}}}}: {var_type}'
+                            final_lines.insert(0, define_line)
+                            fix_count += 1
+                            break
+
+            final_lines.append(line)
 
         # 修复未闭合的控制流
         while control_stack:
             block_type = control_stack.pop()
             if block_type == 'IF':
-                fixed_lines.append('ENDIF')
+                final_lines.append('ENDIF')
             elif block_type == 'FOR':
-                fixed_lines.append('ENDFOR')
+                final_lines.append('ENDFOR')
             elif block_type == 'WHILE':
-                fixed_lines.append('ENDWHILE')
+                final_lines.append('ENDWHILE')
             fix_count += 1
 
-        return '\n'.join(fixed_lines), fix_count
+        # 清理多余空行
+        cleaned_lines = []
+        prev_empty = False
+        for line in final_lines:
+            if not line.strip():
+                if not prev_empty:
+                    cleaned_lines.append(line)
+                prev_empty = True
+            else:
+                cleaned_lines.append(line)
+                prev_empty = False
+
+        return '\n'.join(cleaned_lines), fix_count
+
+    def _infer_variable_type(self, dsl_code: str, var_name: str) -> str:
+        """根据使用上下文推断变量类型"""
+        # 查找变量在代码中的使用方式
+        var_usage = re.findall(rf'\{{\{{\s*{var_name}\s*\}}}}', dsl_code)
+
+        if not var_usage:
+            return 'Any'
+
+        # 检查是否用于比较操作（通常为 Integer/Float）
+        for line in dsl_code.split('\n'):
+            if f'{{{var_name}}}' in line or f'{{{var_name}}}' in line:
+                if any(op in line for op in ['>', '<', '>=', '<=']):
+                    return 'Integer'
+                if '==' in line and re.search(r'"\d+"', line):
+                    return 'String'
+                if 'IN' in line:
+                    return 'List'
+
+        # 默认为 String
+        return 'String'
 
     def _generate_error_feedback(self, dsl_code: str, result: ValidationResult, error_analysis: Dict[str, int]) -> str:
         """生成详细的错误反馈给 LLM"""

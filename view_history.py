@@ -197,7 +197,12 @@ def show_pipeline_detail(pipeline_id: str):
     info(f"【阶段 3: Prompt 3.0 DSL 编译】")
     info(f"{'─'*90}")
     info(f"DSL 编译时间: {history.prompt30_time_ms}ms")
-    info(f"编译状态: {'成功' if history.dsl_code else '失败'}")
+    info(f"编译状态: {'成功' if history.prompt30_success else '失败'}")
+    if history.prompt30_dsl_code:
+        info(f"DSL 代码长度: {len(history.prompt30_dsl_code)} 字符")
+    if history.prompt30_compile_history:
+        compile_history = history.prompt30_compile_history
+        info(f"编译策略: {compile_history.get('final_decision', 'unknown')}")
 
     # Prompt 4.0 信息
     info(f"\n{'─'*90}")

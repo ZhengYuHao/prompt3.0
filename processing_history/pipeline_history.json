@@ -860,5 +860,352 @@
     "overall_status": "success",
     "total_time_ms": 17692,
     "error_message": null
+  },
+  "19613ea2": {
+    "pipeline_id": "19613ea2",
+    "timestamp": "2026-01-28 11:01:09",
+    "raw_input": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_id": "1c5497f5",
+    "prompt10_original": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_processed": "请开发一个基于API封装的检索增强生成(RAG)应用。该应用将以大型语言模型(LLM)为基础，处理链(Chain)的复杂度较高，需支持三种以上的检索模式。团队由五人组成，其中两名开发人员使用Java，三名使用Python。项目周期约为八周，预算大约为五十万元。技术栈包括LangChain、Milvus和FastAPI。应用需支持多轮对话，能够存储约20轮的历史上下文。部署环境为Kubernetes集群，需开发成微服务架构，服务数量约为十个。此外，请添加监控和日志功能，使用Prometheus和ELK日志系统（Elasticsearch、Logstash和Kibana）。最后，应用需支持中英文双语，响应时间控制在两秒以内。",
+    "prompt10_mode": "dictionary",
+    "prompt10_steps": [
+      {
+        "step_name": "术语对齐",
+        "step_index": 1,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": [
+          "替换 16 处"
+        ]
+      },
+      {
+        "step_name": "术语对齐",
+        "step_index": 2,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": []
+      },
+      {
+        "step_name": "LLM语义重构",
+        "step_index": 3,
+        "input_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "请开发一个基于API封装的检索增强生成(RAG)应用。该应用将以大型语言模型(LLM)为基础，处理链(Chain)的复杂度较高，需支持三种以上的检索模式。团队由五人组成，其中两名开发人员使用Java，三名使用Python。项目周期约为八周，预算大约为五十万元。技术栈包括LangChain、Milvus和FastAPI。应用需支持多轮对话，能够存储约20轮的历史上下文。部署环境为Kubernetes集群，需开发成微服务架构，服务数量约为十个。此外，请添加监控和日志功能，使用Prometheus和ELK日志系统（Elasticsearch、Logstash和Kibana）。最后，应用需支持中英文双语，响应时间控制在两秒以内。",
+        "changes": {
+          "标准化": "335字 → 314字"
+        },
+        "duration_ms": 8008,
+        "notes": []
+      }
+    ],
+    "prompt10_terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "prompt10_ambiguity_detected": false,
+    "prompt10_status": "success",
+    "prompt10_time_ms": 8009,
+    "prompt20_id": "5afca598",
+    "prompt20_template": "请开发一个基于API封装的检索增强生成(RAG)应用。该应用将以大型语言模型(LLM)为基础，处理链(Chain)的复杂度较高，需支持三种以上的检索模式。团队由{{team_size}}组成，其中{{java_developers}}，{{python_developers}}。项目周期约为{{project_duration_weeks}}，预算大约为{{budget}}。技术栈包括LangChain、Milvus和FastAPI。应用需支持多轮对话，能够存储约{{context_history_rounds}}的历史上下文。部署环境为Kubernetes集群，需开发成微服务架构，服务数量约为{{service_count}}。此外，请添加监控和日志功能，使用Prometheus和ELK日志系统（Elasticsearch、Logstash和Kibana）。最后，应用需支持中英文双语，响应时间控制在{{response_time_seconds}}以内。",
+    "prompt20_variables": [
+      {
+        "variable": "team_size",
+        "original_text": "五人",
+        "value": 5,
+        "type": "Integer"
+      },
+      {
+        "variable": "java_developers",
+        "original_text": "两名开发人员使用Java",
+        "value": 2,
+        "type": "Integer"
+      },
+      {
+        "variable": "python_developers",
+        "original_text": "三名使用Python",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "project_duration_weeks",
+        "original_text": "八周",
+        "value": 8,
+        "type": "Integer"
+      },
+      {
+        "variable": "budget",
+        "original_text": "五十万元",
+        "value": 500000,
+        "type": "Integer"
+      },
+      {
+        "variable": "context_history_rounds",
+        "original_text": "20轮",
+        "value": 20,
+        "type": "Integer"
+      },
+      {
+        "variable": "service_count",
+        "original_text": "十个",
+        "value": 10,
+        "type": "Integer"
+      },
+      {
+        "variable": "response_time_seconds",
+        "original_text": "两秒",
+        "value": 2,
+        "type": "Integer"
+      }
+    ],
+    "prompt20_variable_count": 8,
+    "prompt20_type_stats": {
+      "Integer": 8
+    },
+    "prompt20_extraction_log": [],
+    "prompt20_time_ms": 0,
+    "prompt30_id": "58662654",
+    "prompt30_dsl_code": "DEFINE {{team_size}}: Integer = 5\nDEFINE {{java_developers}}: Integer = 2\nDEFINE {{python_developers}}: Integer = 3\nDEFINE {{project_duration_weeks}}: Integer = 8\nDEFINE {{budget}}: Integer = 500000\nDEFINE {{context_history_rounds}}: Integer = 20\nDEFINE {{service_count}}: Integer = 10\nDEFINE {{response_time_seconds}}: Integer = 2\nDEFINE {{result}}: Any\n{{result}} = CALL develop_RAG_application({{team_size}}, {{java_developers}}, {{python_developers}}, {{project_duration_weeks}}, {{budget}}, {{context_history_rounds}}, {{service_count}}, {{response_time_seconds}})",
+    "prompt30_validation_result": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "defined_variables": {
+        "team_size": {
+          "name": "team_size",
+          "var_type": "Integer",
+          "initial_value": "5",
+          "line_number": 1
+        },
+        "java_developers": {
+          "name": "java_developers",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 2
+        },
+        "python_developers": {
+          "name": "python_developers",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 3
+        },
+        "project_duration_weeks": {
+          "name": "project_duration_weeks",
+          "var_type": "Integer",
+          "initial_value": "8",
+          "line_number": 4
+        },
+        "budget": {
+          "name": "budget",
+          "var_type": "Integer",
+          "initial_value": "500000",
+          "line_number": 5
+        },
+        "context_history_rounds": {
+          "name": "context_history_rounds",
+          "var_type": "Integer",
+          "initial_value": "20",
+          "line_number": 6
+        },
+        "service_count": {
+          "name": "service_count",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 7
+        },
+        "response_time_seconds": {
+          "name": "response_time_seconds",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 8
+        },
+        "result": {
+          "name": "result",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 9
+        }
+      },
+      "function_calls": [
+        {
+          "function_name": "develop_RAG_application",
+          "arguments": [
+            "{{team_size}}",
+            "{{java_developers}}",
+            "{{python_developers}}",
+            "{{project_duration_weeks}}",
+            "{{budget}}",
+            "{{context_history_rounds}}",
+            "{{service_count}}",
+            "{{response_time_seconds}}"
+          ],
+          "result_var": "result",
+          "line_number": 10
+        }
+      ],
+      "control_blocks": [],
+      "max_nesting_depth": 0
+    },
+    "prompt30_time_ms": 12555,
+    "prompt40_id": "8e5cbdc8",
+    "prompt40_modules": [
+      {
+        "name": "step_1_develop_RAG_application",
+        "inputs": [
+          "budget",
+          "context_history_rounds",
+          "java_developers",
+          "project_duration_weeks",
+          "python_developers",
+          "response_time_seconds",
+          "service_count",
+          "team_size"
+        ],
+        "outputs": [
+          "result"
+        ],
+        "is_async": true
+      }
+    ],
+    "prompt40_module_count": 1,
+    "prompt40_main_code": "async def main_workflow(input_params: dict):\n    \"\"\"\n    主工作流 - 自动生成\n    \n    Args:\n        input_params: 包含 ['budget', 'context_history_rounds', 'java_developers', 'project_duration_weeks', 'python_developers', 'response_time_seconds', 'service_count', 'team_size'] 的字典\n    \n    Returns:\n        执行结果上下文\n    \"\"\"\n    # 初始化上下文\n    ctx = input_params.copy()\n\n    # Module 1: step_1_develop_RAG_application\n    ctx[\"result\"] = await step_1_develop_RAG_application(ctx.get(\"budget\"), ctx.get(\"context_history_rounds\"), ctx.get(\"java_developers\"), ctx.get(\"project_duration_weeks\"), ctx.get(\"python_developers\"), ctx.get(\"response_time_seconds\"), ctx.get(\"service_count\"), ctx.get(\"team_size\"))\n\n    return ctx",
+    "prompt40_time_ms": 3,
+    "prompt40_step1_parsing": {
+      "total_blocks": 1,
+      "block_types": {
+        "CALL": 1
+      },
+      "blocks": [
+        {
+          "id": "OP_0",
+          "type": "CALL",
+          "line_number": 10,
+          "is_async": true,
+          "inputs": [
+            "context_history_rounds",
+            "java_developers",
+            "project_duration_weeks",
+            "team_size",
+            "service_count",
+            "budget",
+            "python_developers",
+            "response_time_seconds"
+          ],
+          "outputs": [
+            "result"
+          ],
+          "code_lines": [
+            "{{result}} = CALL develop_RAG_application({{team_size}}, {{java_developers}}, {{python_developers}}, {{project_duration_weeks}}, {{budget}}, {{context_history_rounds}}, {{service_count}}, {{response_time_seconds}})"
+          ]
+        }
+      ]
+    },
+    "prompt40_step2_dependency": {
+      "has_cycles": false,
+      "dead_code_count": 1,
+      "dead_code_blocks": [
+        "OP_0"
+      ],
+      "topological_order": [
+        "OP_0"
+      ],
+      "edge_count": 0,
+      "node_count": 1
+    },
+    "prompt40_step3_clustering": {
+      "strategy": "hybrid",
+      "total_clusters": 1,
+      "clusters": [
+        {
+          "cluster_id": 1,
+          "block_count": 1,
+          "blocks": [
+            "OP_0"
+          ]
+        }
+      ]
+    },
+    "prompt40_step4_generation": {
+      "total_modules": 1,
+      "async_modules": 1,
+      "sync_modules": 0,
+      "modules": [
+        {
+          "name": "step_1_develop_RAG_application",
+          "inputs": [
+            "budget",
+            "context_history_rounds",
+            "java_developers",
+            "project_duration_weeks",
+            "python_developers",
+            "response_time_seconds",
+            "service_count",
+            "team_size"
+          ],
+          "outputs": [
+            "result"
+          ],
+          "is_async": true,
+          "body_code": "async def step_1_develop_RAG_application(budget, context_history_rounds, java_developers, project_duration_weeks, python_developers, response_time_seconds, service_count, team_size):\n    \"\"\"Auto-generated module\"\"\"\n    result = await invoke_function('develop_RAG_application', team_size=team_size, java_developers=java_developers, python_developers=python_developers, project_duration_weeks=project_duration_weeks, budget=budget, context_history_rounds=context_history_rounds, service_count=service_count, response_time_seconds=response_time_seconds)\n    return result",
+          "original_block_count": 1
+        }
+      ]
+    },
+    "prompt40_step5_orchestration": {
+      "main_inputs": [
+        "budget",
+        "context_history_rounds",
+        "java_developers",
+        "project_duration_weeks",
+        "python_developers",
+        "response_time_seconds",
+        "service_count",
+        "team_size"
+      ],
+      "input_count": 8,
+      "main_code": "async def main_workflow(input_params: dict):\n    \"\"\"\n    主工作流 - 自动生成\n    \n    Args:\n        input_params: 包含 ['budget', 'context_history_rounds', 'java_developers', 'project_duration_weeks', 'python_developers', 'response_time_seconds', 'service_count', 'team_size'] 的字典\n    \n    Returns:\n        执行结果上下文\n    \"\"\"\n    # 初始化上下文\n    ctx = input_params.copy()\n\n    # Module 1: step_1_develop_RAG_application\n    ctx[\"result\"] = await step_1_develop_RAG_application(ctx.get(\"budget\"), ctx.get(\"context_history_rounds\"), ctx.get(\"java_developers\"), ctx.get(\"project_duration_weeks\"), ctx.get(\"python_developers\"), ctx.get(\"response_time_seconds\"), ctx.get(\"service_count\"), ctx.get(\"team_size\"))\n\n    return ctx"
+    },
+    "overall_status": "success",
+    "total_time_ms": 20567,
+    "error_message": null
   }
 }

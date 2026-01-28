@@ -91,7 +91,14 @@ class PipelineHistory:
     prompt40_module_count: int = 0
     prompt40_main_code: str = ""
     prompt40_time_ms: int = 0
-    
+
+    # 阶段4子步骤详情
+    prompt40_step1_parsing: Dict[str, Any] = field(default_factory=dict)  # 词法解析
+    prompt40_step2_dependency: Dict[str, Any] = field(default_factory=dict)  # 依赖分析
+    prompt40_step3_clustering: Dict[str, Any] = field(default_factory=dict)  # 模块聚类
+    prompt40_step4_generation: Dict[str, Any] = field(default_factory=dict)  # 代码生成
+    prompt40_step5_orchestration: Dict[str, Any] = field(default_factory=dict)  # 主控编排
+
     # 整体状态
     overall_status: str = ""
     total_time_ms: int = 0
@@ -100,6 +107,242 @@ class PipelineHistory:
 
 class HistoryManager:
     """处理历史管理器"""
+
+    def _generate_step_details_html(self, history: PipelineHistory) -> str:
+        """生成第四步编译步骤详情的 HTML"""
+        html = '<div class="step-cards">'
+
+        # Step 1: 词法解析
+        if history.prompt40_step1_parsing:
+            step1 = history.prompt40_step1_parsing
+            total_blocks = step1.get('total_blocks', 0)
+            block_types = step1.get('block_types', {})
+            blocks = step1.get('blocks', [])
+
+            block_types_str = ", ".join([f"{k}: {v}" for k, v in block_types.items()])
+
+            blocks_preview = ""
+            if blocks:
+                for block in blocks[:3]:  # 只显示前3个块
+                    block_id = block.get('id', 'N/A')
+                    block_type = block.get('type', 'N/A')
+                    block_inputs = ", ".join(block.get('inputs', []))
+                    block_outputs = ", ".join(block.get('outputs', []))
+                    is_async = '异步' if block.get('is_async') else '同步'
+                    blocks_preview += f"""
+                        <div class="change-item">
+                            <strong>Block {block_id}</strong> ({block_type}, {is_async})<br>
+                            &nbsp;&nbsp;输入: {block_inputs or '无'}<br>
+                            &nbsp;&nbsp;输出: {block_outputs or '无'}
+                        </div>
+                    """
+                if len(blocks) > 3:
+                    blocks_preview += f'<div class="change-item" style="color:#666;">... 还有 {len(blocks) - 3} 个代码块</div>'
+
+            html += f"""
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <span class="step-title">词法解析</span>
+                        <span class="step-duration"></span>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-section">
+                            <h5>统计信息</h5>
+                            <div class="change-item">代码块总数: {total_blocks}</div>
+                            <div class="change-item">类型分布: {block_types_str}</div>
+                        </div>
+                        <div class="step-section">
+                            <h5>代码块详情 (前3个)</h5>
+                            {blocks_preview}
+                        </div>
+                    </div>
+                </div>
+            """
+
+        # Step 2: 依赖分析
+        if history.prompt40_step2_dependency:
+            step2 = history.prompt40_step2_dependency
+            has_cycles = step2.get('has_cycles', False)
+            dead_code_count = step2.get('dead_code_count', 0)
+            dead_code_blocks = step2.get('dead_code_blocks', [])
+            node_count = step2.get('node_count', 0)
+            edge_count = step2.get('edge_count', 0)
+            topological_order = step2.get('topological_order', [])
+
+            dead_code_str = ""
+            if dead_code_blocks:
+                dead_code_str = ", ".join(dead_code_blocks[:5])
+                if len(dead_code_blocks) > 5:
+                    dead_code_str += f" ... 还有 {len(dead_code_blocks) - 5} 个"
+
+            topological_str = ""
+            if topological_order:
+                topological_str = " → ".join(topological_order[:8])
+                if len(topological_order) > 8:
+                    topological_str += f" ... 还有 {len(topological_order) - 8} 个"
+
+            html += f"""
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <span class="step-title">依赖分析</span>
+                        <span class="step-duration"></span>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-section">
+                            <h5>图结构</h5>
+                            <div class="change-item">节点数量: {node_count}</div>
+                            <div class="change-item">边数量: {edge_count}</div>
+                            <div class="change-item">循环依赖: {'是 ❌' if has_cycles else '否 ✅'}</div>
+                        </div>
+                        <div class="step-section">
+                            <h5>死代码检测</h5>
+                            <div class="change-item">发现 {dead_code_count} 个死代码块</div>
+                            {f'<div class="change-item">死代码: {dead_code_str}</div>' if dead_code_blocks else ''}
+                        </div>
+                        <div class="step-section">
+                            <h5>拓扑排序</h5>
+                            <div class="change-item" style="word-break:break-all;">{topological_str or '无'}</div>
+                        </div>
+                    </div>
+                </div>
+            """
+
+        # Step 3: 模块聚类
+        if history.prompt40_step3_clustering:
+            step3 = history.prompt40_step3_clustering
+            strategy = step3.get('strategy', 'hybrid')
+            total_clusters = step3.get('total_clusters', 0)
+            clusters = step3.get('clusters', [])
+
+            clusters_str = ""
+            if clusters:
+                for cluster in clusters[:4]:  # 只显示前4个簇
+                    cluster_id = cluster.get('cluster_id', 0)
+                    block_count = cluster.get('block_count', 0)
+                    block_ids = ", ".join(cluster.get('blocks', [])[:5])
+                    if len(cluster.get('blocks', [])) > 5:
+                        block_ids += " ..."
+                    clusters_str += f"""
+                        <div class="change-item">
+                            <strong>模块 {cluster_id}</strong> ({block_count} 个代码块)<br>
+                            &nbsp;&nbsp;代码块: {block_ids}
+                        </div>
+                    """
+                if len(clusters) > 4:
+                    clusters_str += f'<div class="change-item" style="color:#666;">... 还有 {len(clusters) - 4} 个模块</div>'
+
+            html += f"""
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <span class="step-title">模块聚类</span>
+                        <span class="step-duration"></span>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-section">
+                            <h5>聚类策略</h5>
+                            <div class="change-item">策略类型: <strong>{strategy}</strong></div>
+                            <div class="change-item">模块总数: {total_clusters}</div>
+                        </div>
+                        <div class="step-section">
+                            <h5>聚类结果 (前4个)</h5>
+                            {clusters_str}
+                        </div>
+                    </div>
+                </div>
+            """
+
+        # Step 4: 代码生成
+        if history.prompt40_step4_generation:
+            step4 = history.prompt40_step4_generation
+            total_modules = step4.get('total_modules', 0)
+            async_modules = step4.get('async_modules', 0)
+            sync_modules = step4.get('sync_modules', 0)
+            modules = step4.get('modules', [])
+
+            modules_str = ""
+            if modules:
+                for module in modules[:4]:  # 只显示前4个模块
+                    name = module.get('name', 'N/A')
+                    inputs = ", ".join(module.get('inputs', []))
+                    outputs = ", ".join(module.get('outputs', []))
+                    block_count = module.get('original_block_count', 0)
+                    modules_str += f"""
+                        <div class="change-item">
+                            <strong>{name}</strong><br>
+                            &nbsp;&nbsp;输入: {inputs or '无'}<br>
+                            &nbsp;&nbsp;输出: {outputs or '无'}<br>
+                            &nbsp;&nbsp;代码块数: {block_count}
+                        </div>
+                    """
+                if len(modules) > 4:
+                    modules_str += f'<div class="change-item" style="color:#666;">... 还有 {len(modules) - 4} 个模块</div>'
+
+            html += f"""
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">4</span>
+                        <span class="step-title">代码生成</span>
+                        <span class="step-duration"></span>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-section">
+                            <h5>生成统计</h5>
+                            <div class="change-item">总模块数: {total_modules}</div>
+                            <div class="change-item">异步模块: {async_modules}</div>
+                            <div class="change-item">同步模块: {sync_modules}</div>
+                        </div>
+                        <div class="step-section">
+                            <h5>模块详情 (前4个)</h5>
+                            {modules_str}
+                        </div>
+                    </div>
+                </div>
+            """
+
+        # Step 5: 主控编排
+        if history.prompt40_step5_orchestration:
+            step5 = history.prompt40_step5_orchestration
+            main_inputs = step5.get('main_inputs', [])
+            input_count = step5.get('input_count', 0)
+            main_code = step5.get('main_code', '')
+
+            inputs_str = ", ".join(main_inputs) if main_inputs else "无"
+
+            main_code_preview = ""
+            if main_code:
+                code_lines = main_code.split('\n')
+                for line in code_lines[:5]:  # 只显示前5行
+                    escaped_line = line.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+                    main_code_preview += f'<div class="note-item">{escaped_line}</div>'
+                if len(code_lines) > 5:
+                    main_code_preview += f'<div class="note-item" style="color:#666;">... 还有 {len(code_lines) - 5} 行</div>'
+
+            html += f"""
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">5</span>
+                        <span class="step-title">主控编排</span>
+                        <span class="step-duration"></span>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-section">
+                            <h5>外部输入参数</h5>
+                            <div class="change-item">参数数量: {input_count}</div>
+                            <div class="change-item" style="word-break:break-all;">{inputs_str}</div>
+                        </div>
+                        <div class="step-section">
+                            <h5>主工作流代码 (预览)</h5>
+                            {main_code_preview}
+                        </div>
+                    </div>
+                </div>
+            """
+
+        html += '</div>'
+        return html
     
     def __init__(self, storage_dir: str = "processing_history"):
         """
@@ -984,7 +1227,10 @@ class HistoryManager:
             """
         else:
             main_code_html = '<p style="color:#999; font-style:italic;">未生成主代码</p>'
-        
+
+        # 第四步编译步骤详情 HTML
+        step_details_html = self._generate_step_details_html(history)
+
         # 时间百分比计算
         time1_pct = history.prompt10_time_ms / history.total_time_ms * 100 if history.total_time_ms > 0 else 0
         time2_pct = history.prompt20_time_ms / history.total_time_ms * 100 if history.total_time_ms > 0 else 0
@@ -1364,11 +1610,14 @@ class HistoryManager:
         <div class="stage stage-4">
             <div class="stage-header">💻 阶段 4: Prompt 4.0 代码生成 (耗时 {history.prompt40_time_ms}ms)</div>
             <div class="stage-content">
+                <h4>编译步骤详情</h4>
+                {step_details_html}
+
                 <h4>工作流模块 ({history.prompt40_module_count} 个)</h4>
                 <div class="module-cards">
                     {modules_html}
                 </div>
-                
+
                 <h4>主工作流代码</h4>
                 {main_code_html}
             </div>

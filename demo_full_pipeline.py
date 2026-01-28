@@ -548,7 +548,7 @@ def run_full_pipeline():
 
         # 创建代码编译器
         code_compiler = WaActCompiler()
-        modules, main_code = code_compiler.compile(
+        modules, main_code, compile_details = code_compiler.compile(
             dsl_code,
             clustering_strategy="hybrid",
             visualize=False
@@ -645,7 +645,12 @@ def run_full_pipeline():
     prompt40_module_count = 0
     prompt40_main_code = ""
     prompt40_time_ms = 0
-    
+    prompt40_step1_parsing = {}
+    prompt40_step2_dependency = {}
+    prompt40_step3_clustering = {}
+    prompt40_step4_generation = {}
+    prompt40_step5_orchestration = {}
+
     if success:
         # 转换 ModuleDefinition 对象为字典，排除不可序列化的字段
         for module in modules:
@@ -654,19 +659,25 @@ def run_full_pipeline():
                 'inputs': module.inputs,
                 'outputs': module.outputs,
                 'is_async': module.is_async,
-                # 不保存 original_blocks，因为包含不可序列化的枚举
             }
             prompt40_modules_dict.append(module_dict)
         prompt40_module_count = len(modules)
         prompt40_main_code = main_code
         prompt40_time_ms = codegen_time
-    
+
+        # 保存编译步骤详情
+        prompt40_step1_parsing = compile_details.get('step1_parsing', {})
+        prompt40_step2_dependency = compile_details.get('step2_dependency', {})
+        prompt40_step3_clustering = compile_details.get('step3_clustering', {})
+        prompt40_step4_generation = compile_details.get('step4_generation', {})
+        prompt40_step5_orchestration = compile_details.get('step5_orchestration', {})
+
     # 创建流水线历史记录
     pipeline_history = PipelineHistory(
         pipeline_id=generate_id(),
         timestamp=get_timestamp(),
         raw_input=RAW_INPUT,
-        
+
         # 阶段1结果
         prompt10_id=prompt10_result.id,
         prompt10_original=prompt10_result.original_text,
@@ -677,7 +688,7 @@ def run_full_pipeline():
         prompt10_ambiguity_detected=prompt10_result.ambiguity_detected,
         prompt10_status=prompt10_result.status,
         prompt10_time_ms=prompt10_result.processing_time_ms,
-        
+
         # 阶段2结果
         prompt20_id=generate_id(),
         prompt20_template=template,
@@ -686,20 +697,27 @@ def run_full_pipeline():
         prompt20_type_stats=type_stats,
         prompt20_extraction_log=[],
         prompt20_time_ms=0,
-        
+
         # 阶段3结果 (DSL编译)
         prompt30_id=generate_id(),
         prompt30_dsl_code=dsl_code if success else "",
         prompt30_validation_result=validation_result.to_dict() if success else {},
         prompt30_time_ms=dsl_compile_time,
-        
+
         # 阶段4结果 (代码生成)
         prompt40_id=generate_id(),
         prompt40_modules=prompt40_modules_dict,
         prompt40_module_count=prompt40_module_count,
         prompt40_main_code=prompt40_main_code,
         prompt40_time_ms=prompt40_time_ms,
-        
+
+        # 阶段4子步骤详情
+        prompt40_step1_parsing=prompt40_step1_parsing,
+        prompt40_step2_dependency=prompt40_step2_dependency,
+        prompt40_step3_clustering=prompt40_step3_clustering,
+        prompt40_step4_generation=prompt40_step4_generation,
+        prompt40_step5_orchestration=prompt40_step5_orchestration,
+
         # 整体状态
         overall_status="success" if success else "partial",
         total_time_ms=prompt10_result.processing_time_ms + dsl_compile_time + prompt40_time_ms,

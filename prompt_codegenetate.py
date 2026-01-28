@@ -9,7 +9,7 @@ WaAct S.E.D.E Framework - Step 4: 依赖分析、模块分解与代码生成
 import re
 import json
 import networkx as nx
-from typing import List, Dict, Set, Tuple, Optional
+from typing import List, Dict, Set, Tuple, Optional, Any
 from dataclasses import dataclass, field
 from enum import Enum
 from collections import defaultdict
@@ -737,78 +737,157 @@ class WaActCompiler:
         self.parser = PseudoCodeParser()
         self.synthesizer = ModuleSynthesizer()
         
-    def compile(self, dsl_code: str, 
+    def compile(self, dsl_code: str,
                 clustering_strategy: str = "hybrid",
-                visualize: bool = False) -> Tuple[List[ModuleDefinition], str]:
+                visualize: bool = False) -> Tuple[List[ModuleDefinition], str, Dict[str, Any]]:
         """
         编译 DSL 为可执行 Python 代码
-        
+
         Args:
             dsl_code: Prompt 3.0 伪代码
             clustering_strategy: 聚类策略 (io_isolation/control_flow/hybrid)
             visualize: 是否生成依赖图可视化
-            
+
         Returns:
-            (模块列表, 主函数代码)
+            (模块列表, 主函数代码, 编译步骤详情)
         """
         info("=" * 60)
         info("WaAct Compiler v2.0 - 开始编译")
         info("=" * 60)
-        
+
+        # 收集步骤详情
+        compile_details = {}
+
         # Stage 1: 词法解析
         info("\n[Stage 1] 词法解析 (Lexical Parsing)...")
         blocks = self.parser.parse(dsl_code)
         info(f"✅ 解析出 {len(blocks)} 个代码块")
-        
+
+        # 收集 Stage 1 详情
+        block_types_count = {}
+        for block in blocks:
+            block_type = block.type.value
+            block_types_count[block_type] = block_types_count.get(block_type, 0) + 1
+
+        compile_details['step1_parsing'] = {
+            'total_blocks': len(blocks),
+            'block_types': block_types_count,
+            'blocks': [
+                {
+                    'id': block.id,
+                    'type': block.type.value,
+                    'line_number': block.line_number,
+                    'is_async': block.is_async,
+                    'inputs': list(block.inputs),
+                    'outputs': list(block.outputs),
+                    'code_lines': block.code_lines
+                }
+                for block in blocks
+            ]
+        }
+
         # Stage 2: 依赖分析
         info("\n[Stage 2] 依赖分析 (Dependency Analysis)...")
         analyzer = DependencyAnalyzer(blocks)
         analyzer.build_graph()
-        
+
         # 循环检测
-        if analyzer.detect_cycles():
+        has_cycles = analyzer.detect_cycles()
+        if has_cycles:
             raise ValueError("❌ 编译失败：检测到循环依赖")
-        
+
         # 死代码检测
         dead_code = analyzer.find_dead_code()
         if dead_code:
             warning(f"发现 {len(dead_code)} 个死代码块: {dead_code}")
-        
+
+        # 拓扑排序
+        topological_order = analyzer.topological_sort()
+
         info("✅ 依赖图构建完成")
-        
+
+        # 收集 Stage 2 详情
+        compile_details['step2_dependency'] = {
+            'has_cycles': has_cycles,
+            'dead_code_count': len(dead_code),
+            'dead_code_blocks': dead_code,
+            'topological_order': topological_order,
+            'edge_count': analyzer.graph.number_of_edges(),
+            'node_count': analyzer.graph.number_of_nodes()
+        }
+
         if visualize:
             analyzer.visualize()
-        
+
         # Stage 3: 模块聚类
         info(f"\n[Stage 3] 模块聚类 (Strategy: {clustering_strategy})...")
         clusters = analyzer.analyze_clusters(clustering_strategy)
         info(f"✅ 拆分为 {len(clusters)} 个模块")
-        
+
+        # 收集 Stage 3 详情
+        compile_details['step3_clustering'] = {
+            'strategy': clustering_strategy,
+            'total_clusters': len(clusters),
+            'clusters': [
+                {
+                    'cluster_id': i,
+                    'block_count': len(cluster),
+                    'blocks': [block.id for block in cluster]
+                }
+                for i, cluster in enumerate(clusters, 1)
+            ]
+        }
+
         # Stage 4: 代码生成
         info("\n[Stage 4] 代码生成 (Code Synthesis)...")
         modules = []
-        
+
         for i, cluster in enumerate(clusters, 1):
             module = self.synthesizer.generate_module(cluster, i)
             modules.append(module)
             info(f"  ├─ Module {i}: {module.name} "
                   f"({'async' if module.is_async else 'sync'})")
-        
+
+        # 收集 Stage 4 详情
+        compile_details['step4_generation'] = {
+            'total_modules': len(modules),
+            'async_modules': sum(1 for m in modules if m.is_async),
+            'sync_modules': sum(1 for m in modules if not m.is_async),
+            'modules': [
+                {
+                    'name': module.name,
+                    'inputs': module.inputs,
+                    'outputs': module.outputs,
+                    'is_async': module.is_async,
+                    'body_code': module.body_code,
+                    'original_block_count': len(module.original_blocks)
+                }
+                for module in modules
+            ]
+        }
+
         # Stage 4.5: 语法验证
         info("\n[Stage 4.5] 语法验证 (Syntax Validation)...")
         self._validate_generated_code(modules)
-        
+
         # Stage 5: 主控生成
         info("\n[Stage 5] 主控编排 (Orchestration)...")
         main_inputs = self._extract_main_inputs(blocks)
         main_code = self.synthesizer.generate_orchestrator(modules, main_inputs)
         info("✅ 主工作流生成完成")
-        
+
+        # 收集 Stage 5 详情
+        compile_details['step5_orchestration'] = {
+            'main_inputs': main_inputs,
+            'input_count': len(main_inputs),
+            'main_code': main_code
+        }
+
         info("\n" + "=" * 60)
         info("编译成功！")
         info("=" * 60)
-        
-        return modules, main_code
+
+        return modules, main_code, compile_details
     
     def _extract_main_inputs(self, blocks: List[CodeBlock]) -> List[str]:
         """提取工作流的外部输入参数"""

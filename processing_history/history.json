@@ -109,5 +109,60 @@
     "ambiguity_detected": false,
     "success": true,
     "processing_time_ms": 5983
+  },
+  "2026-01-28 11:00:06": {
+    "timestamp": "2026-01-28 11:00:06",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": false,
+    "processing_time_ms": 2
+  },
+  "2026-01-28 11:00:43": {
+    "timestamp": "2026-01-28 11:00:43",
+    "original_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "processed_text": "请开发一个基于API封装的检索增强生成(RAG)应用。该应用将以大型语言模型(LLM)为基础，处理链(Chain)的复杂度较高，需支持三种以上的检索模式。团队由五人组成，其中两名开发人员使用Java，三名使用Python。项目周期约为八周，预算大约为五十万元。技术栈包括LangChain、Milvus和FastAPI。应用需支持多轮对话，能够存储约20轮的历史上下文。部署环境为Kubernetes集群，需开发成微服务架构，服务数量约为十个。此外，请添加监控和日志功能，使用Prometheus和ELK日志系统（Elasticsearch、Logstash和Kibana）。最后，应用需支持中英文双语，响应时间控制在两秒以内。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 12 类术语共 16 处",
+      "[OK] LLM语义重构完成 (耗时 8008ms)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 8009
   }
 }

@@ -293,7 +293,7 @@ class DependencyAnalyzer:
     def analyze_clusters(self, strategy="io_isolation") -> List[List[CodeBlock]]:
         """
         模块聚类 - 将代码块分组为逻辑模块
-        
+
         策略:
         - io_isolation: IO 隔离策略（每个 LLM 调用独立成模块）
         - control_flow: 控制流内聚策略
@@ -302,29 +302,54 @@ class DependencyAnalyzer:
         sorted_nodes = self.topological_sort()
         modules = []
         current_module = []
-        
+
+        # 控制流块类型
+        control_flow_types = [
+            BlockType.IF, BlockType.ELSE, BlockType.ENDIF,
+            BlockType.FOR, BlockType.ENDFOR,
+            BlockType.WHILE, BlockType.ENDWHILE
+        ]
+
+        in_control_flow = False  # 标记是否在控制流内部
+
         for node_id in sorted_nodes:
             node_data = self.graph.nodes[node_id]['data']
+
+            # 如果遇到控制流开始，进入控制流模式
+            if node_data.type in [BlockType.IF, BlockType.FOR, BlockType.WHILE]:
+                in_control_flow = True
+                current_module.append(node_data)
+                continue
+
+            # 如果遇到控制流结束，退出控制流模式
+            if node_data.type in [BlockType.ENDIF, BlockType.ENDFOR, BlockType.ENDWHILE]:
+                in_control_flow = False
+                current_module.append(node_data)
+                # 控制流结束后切分
+                if current_module:
+                    modules.append(current_module)
+                    current_module = []
+                continue
+
+            # 普通代码块（CALL, ASSIGN）
             current_module.append(node_data)
-            
+
             # 切分条件
             should_split = False
-            
-            if strategy == "io_isolation":
-                # 每个 CALL 都独立成模块
-                should_split = node_data.type == BlockType.CALL
-            
-            elif strategy == "control_flow":
-                # 控制流边界切分
-                should_split = node_data.type in [BlockType.ENDIF, BlockType.ENDFOR, BlockType.ENDWHILE]
-            
-            elif strategy == "hybrid":
-                # CALL 或控制流结束时切分
-                should_split = (
-                    node_data.type == BlockType.CALL or 
-                    node_data.type in [BlockType.ENDIF, BlockType.ENDFOR, BlockType.ENDWHILE]
-                )
-            
+
+            if not in_control_flow:  # 不在控制流内部时才考虑切分
+                if strategy == "io_isolation":
+                    # 每个 CALL 都独立成模块
+                    should_split = node_data.type == BlockType.CALL
+
+                elif strategy == "control_flow":
+                    # 控制流边界切分（已在上方处理）
+                    pass
+
+                elif strategy == "hybrid":
+                    # CALL 时切分
+                    should_split = node_data.type == BlockType.CALL
+
             if should_split and current_module:
                 modules.append(current_module)
                 current_module = []

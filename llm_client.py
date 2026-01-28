@@ -22,7 +22,7 @@ except ImportError:
 
 # 默认桥接地址与 Key；生产环境建议使用环境变量，勿将 key 提交仓库
 DEFAULT_BASE_URL = "https://api.rcouyi.com/v1"
-DEFAULT_API_KEY = "sk-0JL8T592b6roD3uaDaD0Ac0f081c4040810d978e38CdAa01"
+DEFAULT_API_KEY = "sk-it8g8EIm4cjH2sfg4dA1C03e468b4b8aA2327a001d2e7847"
 
 
 class LLMModel(Enum):

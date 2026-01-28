@@ -682,6 +682,22 @@ class HistoryManager:
         lines.append("└────────────────────────────────────────────────────────────────────────────┘")
         lines.append("")
         
+        # 处理步骤详情
+        if history.prompt10_steps:
+            lines.append("【处理步骤详情】")
+            for i, step in enumerate(history.prompt10_steps, 1):
+                lines.append(f"\n  步骤 {i}: {step.get('step_name', 'N/A')}")
+                lines.append(f"    耗时: {step.get('duration_ms', 0)}ms")
+                changes = step.get('changes', {})
+                if changes:
+                    lines.append(f"    变更: {len(changes)} 处")
+                    for old, new in list(changes.items())[:3]:  # 只显示前3个
+                        new_str = f"'{new}'" if new else "(删除)"
+                        lines.append(f"      • '{old}' → {new_str}")
+                    if len(changes) > 3:
+                        lines.append(f"      ... 还有 {len(changes) - 3} 处变更")
+            lines.append("")
+        
         # 术语替换
         if history.prompt10_terminology_changes:
             lines.append("【术语替换】")
@@ -746,8 +762,12 @@ class HistoryManager:
                 valid = history.prompt30_validation_result.get('is_valid', False)
                 errors = history.prompt30_validation_result.get('errors', [])
                 warnings = history.prompt30_validation_result.get('warnings', [])
+                defined_vars = history.prompt30_validation_result.get('defined_variables', {})
+                function_calls = history.prompt30_validation_result.get('function_calls', [])
                 
                 lines.append(f"验证状态: {'✅ 通过' if valid else '❌ 失败'}")
+                lines.append(f"定义变量数: {len(defined_vars)} 个")
+                lines.append(f"函数调用数: {len(function_calls)} 个")
                 if errors:
                     lines.append(f"错误数量: {len(errors)} 个")
                 if warnings:
@@ -759,6 +779,40 @@ class HistoryManager:
         lines.append(f"处理耗时: {history.prompt30_time_ms}ms")
         lines.append("")
 
+        # ===== 阶段 4: Prompt 4.0 代码生成 =====
+        lines.append("=" * 80)
+        lines.append("【阶段 4: Prompt 4.0 代码生成】")
+        lines.append("=" * 80)
+        lines.append("")
+        
+        if history.prompt40_modules:
+            lines.append(f"【工作流模块】共 {history.prompt40_module_count} 个模块")
+            lines.append("")
+            for i, module in enumerate(history.prompt40_modules, 1):
+                module_name = module.get('name', 'N/A')
+                inputs = module.get('inputs', [])
+                outputs = module.get('outputs', [])
+                is_async = module.get('is_async', False)
+                lines.append(f"  模块 {i}: {module_name}")
+                lines.append(f"    输入变量: {', '.join(inputs) if inputs else '无'}")
+                lines.append(f"    输出变量: {', '.join(outputs) if outputs else '无'}")
+                lines.append(f"    执行模式: {'异步' if is_async else '同步'}")
+                lines.append("")
+            
+            lines.append("┌─ 主工作流代码 (Prompt 4.0) ───────────────────────────────────────────────┐")
+            code_lines = history.prompt40_main_code.split('\n')
+            for line in code_lines[:30]:  # 最多显示30行
+                lines.append(f"│ {line}")
+            if len(code_lines) > 30:
+                lines.append(f"│ ... 还有 {len(code_lines) - 30} 行")
+            lines.append("└────────────────────────────────────────────────────────────────────────────┘")
+        else:
+            lines.append("  未进行代码生成")
+        
+        lines.append("")
+        lines.append(f"处理耗时: {history.prompt40_time_ms}ms")
+        lines.append("")
+
         # ===== 总结 =====
         lines.append("=" * 80)
         lines.append("【处理总结】")
@@ -767,7 +821,13 @@ class HistoryManager:
         lines.append(f"  标准化后长度: {len(history.prompt10_processed)} 字符")
         lines.append(f"  识别变量数量: {history.prompt20_variable_count} 个")
         lines.append(f"  DSL 编译状态: {'✅ 成功' if history.prompt30_dsl_code else '❌ 未执行'}")
+        lines.append(f"  代码生成状态: {'✅ 成功' if history.prompt40_modules else '❌ 未执行'}")
         lines.append(f"  总处理耗时: {history.total_time_ms}ms")
+        lines.append("")
+        lines.append(f"  阶段 1 (预处理): {history.prompt10_time_ms}ms ({history.prompt10_time_ms / history.total_time_ms * 100:.1f}%)")
+        lines.append(f"  阶段 2 (结构化): {history.prompt20_time_ms}ms ({history.prompt20_time_ms / history.total_time_ms * 100:.1f}%)")
+        lines.append(f"  阶段 3 (DSL编译): {history.prompt30_time_ms}ms ({history.prompt30_time_ms / history.total_time_ms * 100:.1f}%)")
+        lines.append(f"  阶段 4 (代码生成): {history.prompt40_time_ms}ms ({history.prompt40_time_ms / history.total_time_ms * 100:.1f}%)")
         lines.append("█" * 80)
         
         return "\n".join(lines)
@@ -806,6 +866,43 @@ class HistoryManager:
                 </tr>
 """
         
+        # 处理步骤HTML
+        steps_html = ""
+        for i, step in enumerate(history.prompt10_steps, 1):
+            step_name = step.get('step_name', f'Step {i}')
+            duration = step.get('duration_ms', 0)
+            changes = step.get('changes', {})
+            notes = step.get('notes', [])
+            
+            changes_html = ""
+            if changes:
+                for old, new in list(changes.items())[:3]:
+                    new_str = f"'{new}'" if new else "(删除)"
+                    changes_html += f'<div class="change-item"><span class="old">{old}</span> → <span class="new">{new_str}</span></div>'
+                if len(changes) > 3:
+                    changes_html += f'<div class="change-item">... 还有 {len(changes) - 3} 处变更</div>'
+            else:
+                changes_html = '<div class="change-item">无变更</div>'
+            
+            notes_html = "".join([f'<div class="note-item">• {note}</div>' for note in notes])
+            
+            steps_html += f"""
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">{i}</span>
+                        <span class="step-title">{step_name}</span>
+                        <span class="step-duration">{duration}ms</span>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-section">
+                            <h5>变更记录</h5>
+                            {changes_html}
+                        </div>
+                        {f'<div class="step-section"><h5>备注</h5>{notes_html}</div>' if notes else ''}
+                    </div>
+                </div>
+"""
+        
         # 术语替换HTML
         terminology_html = ""
         for old, new in history.prompt10_terminology_changes.items():
@@ -817,7 +914,6 @@ class HistoryManager:
         # DSL 代码 HTML
         dsl_code_html = ""
         if history.prompt30_dsl_code:
-            # 转义HTML特殊字符
             escaped_dsl = history.prompt30_dsl_code.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
             dsl_code_html = f"""
                 <div class="text-box dsl-code">
@@ -833,10 +929,14 @@ class HistoryManager:
             valid = history.prompt30_validation_result.get('is_valid', False)
             errors = history.prompt30_validation_result.get('errors', [])
             warnings = history.prompt30_validation_result.get('warnings', [])
+            defined_vars = history.prompt30_validation_result.get('defined_variables', {})
+            function_calls = history.prompt30_validation_result.get('function_calls', [])
             
             validation_html = f"""
                 <div class="validation-result">
                     <p><strong>验证状态:</strong> {'✅ 通过' if valid else '❌ 失败'}</p>
+                    <p><strong>定义变量:</strong> {len(defined_vars)} 个</p>
+                    <p><strong>函数调用:</strong> {len(function_calls)} 个</p>
                     <p><strong>错误数量:</strong> {len(errors)} 个</p>
                     <p><strong>警告数量:</strong> {len(warnings)} 个</p>
                 </div>
@@ -844,8 +944,58 @@ class HistoryManager:
         else:
             validation_html = '<p style="color:#999; font-style:italic;">无验证结果</p>'
         
-        html = f"""
-<!DOCTYPE html>
+        # 模块列表HTML
+        modules_html = ""
+        if history.prompt40_modules:
+            for i, module in enumerate(history.prompt40_modules, 1):
+                module_name = module.get('name', 'N/A')
+                inputs = module.get('inputs', [])
+                outputs = module.get('outputs', [])
+                is_async = module.get('is_async', False)
+                
+                inputs_str = ", ".join(inputs) if inputs else "无"
+                outputs_str = ", ".join(outputs) if outputs else "无"
+                mode_str = '<span class="badge-async">异步</span>' if is_async else '<span class="badge-sync">同步</span>'
+                
+                modules_html += f"""
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">{i}</span>
+                            <span class="module-name">{module_name}</span>
+                            {mode_str}
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> {inputs_str}</div>
+                            <div><strong>输出:</strong> {outputs_str}</div>
+                        </div>
+                    </div>
+"""
+        else:
+            modules_html = '<p style="color:#999; font-style:italic;">未生成工作流模块</p>'
+        
+        # 主代码 HTML
+        main_code_html = ""
+        if history.prompt40_main_code:
+            escaped_code = history.prompt40_main_code.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+            main_code_html = f"""
+                <div class="text-box main-code">
+                    <pre>{escaped_code}</pre>
+                </div>
+            """
+        else:
+            main_code_html = '<p style="color:#999; font-style:italic;">未生成主代码</p>'
+        
+        # 时间百分比计算
+        time1_pct = history.prompt10_time_ms / history.total_time_ms * 100 if history.total_time_ms > 0 else 0
+        time2_pct = history.prompt20_time_ms / history.total_time_ms * 100 if history.total_time_ms > 0 else 0
+        time3_pct = history.prompt30_time_ms / history.total_time_ms * 100 if history.total_time_ms > 0 else 0
+        time4_pct = history.prompt40_time_ms / history.total_time_ms * 100 if history.total_time_ms > 0 else 0
+        
+        # 定义变量和函数调用数量
+        defined_vars_count = len(history.prompt30_validation_result.get('defined_variables', {})) if history.prompt30_validation_result else 0
+        function_calls_count = len(history.prompt30_validation_result.get('function_calls', [])) if history.prompt30_validation_result else 0
+        
+        html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -911,6 +1061,7 @@ class HistoryManager:
         .stage-1 .stage-header {{ background: linear-gradient(90deg, #667eea, #764ba2); }}
         .stage-2 .stage-header {{ background: linear-gradient(90deg, #11998e, #38ef7d); }}
         .stage-3 .stage-header {{ background: linear-gradient(90deg, #ff7e5f, #feb47b); }}
+        .stage-4 .stage-header {{ background: linear-gradient(90deg, #f093fb, #f5576c); }}
         .stage-content {{
             padding: 20px;
         }}
@@ -923,10 +1074,12 @@ class HistoryManager:
             white-space: pre-wrap;
             font-family: 'Consolas', monospace;
             line-height: 1.8;
+            max-height: 400px;
+            overflow-y: auto;
         }}
-        .text-box.template {{
-            border-left-color: #11998e;
-        }}
+        .text-box.template {{ border-left-color: #11998e; }}
+        .text-box.dsl-code {{ border-left-color: #ff7e5f; }}
+        .text-box.main-code {{ border-left-color: #f093fb; max-height: 500px; }}
         .term-changes {{
             display: flex;
             flex-wrap: wrap;
@@ -991,12 +1144,146 @@ class HistoryManager:
             font-size: 14px;
             opacity: 0.9;
         }}
+        .step-cards {{
+            display: grid;
+            gap: 15px;
+        }}
+        .step-card {{
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }}
+        .step-header {{
+            background: #f8f9fa;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }}
+        .step-number {{
+            background: #667eea;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }}
+        .step-title {{
+            flex: 1;
+            font-weight: bold;
+        }}
+        .step-duration {{
+            color: #666;
+            font-size: 14px;
+        }}
+        .step-body {{
+            padding: 15px;
+        }}
+        .step-section {{
+            margin-bottom: 15px;
+        }}
+        .step-section:last-child {{ margin-bottom: 0; }}
+        .step-section h5 {{
+            margin: 0 0 10px 0;
+            color: #666;
+            font-size: 14px;
+            font-weight: bold;
+        }}
+        .change-item {{
+            padding: 5px 0;
+            font-size: 14px;
+        }}
+        .note-item {{
+            padding: 3px 0;
+            color: #666;
+            font-size: 14px;
+        }}
+        .module-cards {{
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }}
+        .module-card {{
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }}
+        .module-header {{
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }}
+        .module-number {{
+            background: rgba(255,255,255,0.3);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+        }}
+        .module-name {{
+            flex: 1;
+            font-weight: bold;
+        }}
+        .badge-async, .badge-sync {{
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }}
+        .badge-async {{ background: #4CAF50; }}
+        .badge-sync {{ background: #2196F3; }}
+        .module-body {{
+            padding: 15px;
+            font-size: 14px;
+        }}
+        .module-body div {{
+            margin: 5px 0;
+        }}
+        .time-breakdown {{
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }}
+        .time-item {{
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }}
+        .time-item:last-child {{ border-bottom: none; }}
+        .time-bar {{
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-top: 5px;
+            overflow: hidden;
+        }}
+        .time-fill {{
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }}
+        .time-fill.stage-2 {{ background: linear-gradient(90deg, #11998e, #38ef7d); }}
+        .time-fill.stage-3 {{ background: linear-gradient(90deg, #ff7e5f, #feb47b); }}
+        .time-fill.stage-4 {{ background: linear-gradient(90deg, #f093fb, #f5576c); }}
     </style>
 </head>
 <body>
     <div class="container">
         <h1>📊 完整流水线处理报告</h1>
-        <p class="subtitle">Prompt 1.0 预处理 → Prompt 2.0 结构化</p>
+        <p class="subtitle">Prompt 1.0 预处理 → Prompt 2.0 结构化 → Prompt 3.0 DSL 编译 → Prompt 4.0 代码生成</p>
         
         <div class="meta-bar">
             <div class="meta-item">
@@ -1026,6 +1313,11 @@ class HistoryManager:
                 
                 <h4>标准化输出</h4>
                 <div class="text-box">{history.prompt10_processed}</div>
+                
+                <h4>处理步骤详情 ({len(history.prompt10_steps)} 个步骤)</h4>
+                <div class="step-cards">
+                    {steps_html if steps_html else '<p style="color:#999">无处理步骤记录</p>'}
+                </div>
                 
                 <h4>术语替换 ({len(history.prompt10_terminology_changes)} 处)</h4>
                 <div class="term-changes">{terminology_html if terminology_html else '<span style="color:#999">无术语替换</span>'}</div>
@@ -1068,6 +1360,20 @@ class HistoryManager:
             </div>
         </div>
         
+        <!-- 阶段 4 -->
+        <div class="stage stage-4">
+            <div class="stage-header">💻 阶段 4: Prompt 4.0 代码生成 (耗时 {history.prompt40_time_ms}ms)</div>
+            <div class="stage-content">
+                <h4>工作流模块 ({history.prompt40_module_count} 个)</h4>
+                <div class="module-cards">
+                    {modules_html}
+                </div>
+                
+                <h4>主工作流代码</h4>
+                {main_code_html}
+            </div>
+        </div>
+        
         <!-- 统计 -->
         <div class="stats">
             <div class="stat-card">
@@ -1085,6 +1391,55 @@ class HistoryManager:
             <div class="stat-card">
                 <div class="number">{history.prompt20_variable_count}</div>
                 <div class="label">识别变量</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">{history.prompt40_module_count}</div>
+                <div class="label">工作流模块</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">{defined_vars_count}</div>
+                <div class="label">定义变量</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">{function_calls_count}</div>
+                <div class="label">函数调用</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">{history.total_time_ms}</div>
+                <div class="label">总耗时(ms)</div>
+            </div>
+        </div>
+        
+        <!-- 时间分解 -->
+        <div class="time-breakdown">
+            <h3 style="margin-top:0;">⏱️ 耗时分解</h3>
+            <div class="time-item">
+                <span>阶段 1: 预处理</span>
+                <span>{history.prompt10_time_ms}ms ({time1_pct:.1f}%)</span>
+            </div>
+            <div class="time-bar">
+                <div class="time-fill" style="width: {time1_pct}%;"></div>
+            </div>
+            <div class="time-item">
+                <span>阶段 2: 结构化</span>
+                <span>{history.prompt20_time_ms}ms ({time2_pct:.1f}%)</span>
+            </div>
+            <div class="time-bar">
+                <div class="time-fill stage-2" style="width: {time2_pct}%;"></div>
+            </div>
+            <div class="time-item">
+                <span>阶段 3: DSL 编译</span>
+                <span>{history.prompt30_time_ms}ms ({time3_pct:.1f}%)</span>
+            </div>
+            <div class="time-bar">
+                <div class="time-fill stage-3" style="width: {time3_pct}%;"></div>
+            </div>
+            <div class="time-item">
+                <span>阶段 4: 代码生成</span>
+                <span>{history.prompt40_time_ms}ms ({time4_pct:.1f}%)</span>
+            </div>
+            <div class="time-bar">
+                <div class="time-fill stage-4" style="width: {time4_pct}%;"></div>
             </div>
         </div>
     </div>

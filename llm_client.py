@@ -201,13 +201,30 @@ class UnifiedLLMClient:
         
         system_prompt = f"""你是一个实体抽取专家。你的任务是从文本中识别需要动态调整的"变量"。
 
-{types_hint}严格规则:
-1. 只输出 JSON 数组格式,不要有任何其他文字
-2. 必须原样返回原文片段,严禁同义词替换
-3. 必须返回精确的 start_index 和 end_index
-4. 数据类型仅限: String, Integer, Boolean, List, Enum
+{types_hint}核心原则：
+1. 变量 = 可配置参数（具体数字、时间值、可选项）
+2. 常量 = 固定需求描述、功能列表、技术限制
 
-输出格式:
+识别规则：
+✅ 提取为变量：
+- 具体数字：3年、5人、50万、20轮
+- 时间相关：2周、8周
+- 可选项：Python/Java、Milvus/Pinecone
+- 专有名词：K8s、LangChain、RAG
+- 技术栈列表：如 "LangChain、Milvus、FastAPI"
+
+❌ 不提取（视为常量）：
+- 功能需求描述："需要支持多轮对话"、"用大模型做底座"、"支持中英文双语"
+- 固定配置："响应时间控制在2秒以内"、"上下文窗口存20轮"（如果没有数字）
+- 架构描述："微服务架构"、"分布式系统"
+- 通用动词："需要"、"要"、"支持"、"实现"（单独出现时）
+
+特殊情况处理：
+- "需要支持多轮对话，上下文窗口存20轮" → 只提取 "20轮" 作为变量
+- "团队5个人，其中2个Java，3个Python" → 只提取 "5个人" 为 team_size，不拆分 Java/Python 人数
+- "用LangChain、Milvus、FastAPI" → 整体提取为 tech_stack 变量，类型为 List
+
+输出格式（JSON 数组）:
 [
   {{
     "name": "变量英文名(snake_case)",
@@ -219,10 +236,35 @@ class UnifiedLLMClient:
   }}
 ]
 
-识别原则:
-- 数字、时间、人名、专有名词 -> 变量
-- 通用描述、固定格式文本 -> 常量
-- 优先识别最长匹配项"""
+示例对比：
+
+示例1:
+原文: "项目团队5个人，其中2个Java，3个Python"
+✓ 正确提取: [{{"name": "team_size", "original_text": "5个人", "value": 5, "type": "Integer"}}]
+✗ 错误提取: [{{"name": "java_developers", "original_text": "2个Java", ...}}, {{"name": "python_developers", "original_text": "3个Python", ...}}]
+
+示例2:
+原文: "需要支持多轮对话，上下文窗口存20轮"
+✓ 正确提取: [{{"name": "context_rounds", "original_text": "20轮", "value": 20, "type": "Integer"}}]
+✗ 错误提取: [{{"name": "multi_turn_dialogue", "original_text": "多轮对话", ...}}]
+
+示例3:
+原文: "用LangChain、Milvus、FastAPI"
+✓ 正确提取: [{{"name": "tech_stack", "original_text": "LangChain、Milvus、FastAPI", "value": ["LangChain", "Milvus", "FastAPI"], "type": "List"}}]
+✗ 错误: 将每个技术单独提取为变量
+
+示例4:
+原文: "支持中英文双语，响应时间控制在2秒以内"
+✓ 正确提取: [{{"name": "response_time_limit", "original_text": "2秒", "value": 2, "type": "Integer"}}]
+✗ 错误提取: [{{"name": "bilingual_support", "original_text": "中英文双语", ...}}]
+
+严格规则:
+1. 只输出 JSON 数组格式，不要有任何其他文字
+2. 必须原样返回原文片段，严禁同义词替换
+3. 必须返回精确的 start_index 和 end_index
+4. 数据类型仅限: String, Integer, Boolean, List, Enum
+5. 优先识别最长匹配项（如 "5个人" 优于 "5"）
+6. 如果描述包含动词+名词但没有数字，大概率是固定需求，不要提取"""
         
         response = self.call(system_prompt, text)
         

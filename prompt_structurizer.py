@@ -150,6 +150,135 @@ class HallucinationFirewall:
         return extracted == original_snippet
 
 
+# ========== 实体后处理校验器 ==========
+class EntityPostValidator:
+    """后处理实体校验器 - 过滤掉固定描述而非变量的实体"""
+    
+    # 固定描述关键词（包含这些词且没有数字的可能是固定需求）
+    FIXED_DESCRIPTION_KEYWORDS = ["需要", "要", "支持", "确保", "实现", "提供", "用", "采用"]
+    
+    # 常见固定需求模式（整体不提取为变量）
+    FIXED_DEMAND_PATTERNS = [
+        r"需要支持.*对话",  # "需要支持多轮对话"
+        r"支持.*双语",  # "支持中英文双语"
+        r"用.*做底座",  # "用大模型做底座"
+        r"响应时间控制在.*以内",  # 整体为配置描述
+        r"上下文窗口存.*轮",  # 有数字但要单独提取
+        r"用LangChain.*Milvus.*FastAPI",  # 技术栈整体提取
+    ]
+    
+    # 变量关键词（表明是可配置参数）
+    VARIABLE_KEYWORDS = ["个", "人", "万", "年", "周", "月", "天", "轮", "秒", "小时", "分钟"]
+    
+    @classmethod
+    def filter_entities(cls, entities: List[Dict], original_text: str) -> Tuple[List[Dict], List[str]]:
+        """
+        过滤掉固定描述而非变量的实体
+        
+        Returns:
+            (过滤后的实体列表, 过滤日志列表)
+        """
+        filtered = []
+        filter_logs = []
+        
+        for entity in entities:
+            orig_text = entity.get('original_text', '')
+            entity_name = entity.get('name', '')
+            filter_reason = cls._should_filter(orig_text, entity_name)
+            
+            if filter_reason:
+                filter_logs.append(f"过滤: '{orig_text}' - {filter_reason}")
+                continue
+            
+            filtered.append(entity)
+        
+        return filtered, filter_logs
+    
+    @classmethod
+    def _should_filter(cls, text: str, entity_name: str) -> Optional[str]:
+        """判断是否应该过滤该实体，返回过滤原因或 None"""
+        # 规则1: 包含固定描述关键词但没有数字 -> 可能是固定需求
+        if any(kw in text for kw in cls.FIXED_DESCRIPTION_KEYWORDS):
+            # 检查是否有数字
+            if not re.search(r'\d+', text):
+                # 特殊情况：技术栈列表（如 "LangChain、Milvus、FastAPI"）
+                if not cls._is_tech_stack(text):
+                    return "包含需求描述关键词但无数字，可能是固定需求"
+        
+        # 规则2: 明确的固定需求描述（即使有数字也要过滤）
+        # "需要支持多轮对话" - 整体描述
+        if text in ["需要支持多轮对话", "需要中英文双语", "用大模型做底座"]:
+            return "明确的固定需求描述"
+        
+        # "响应时间控制在2秒以内" - 配置描述，应只提取 "2秒"
+        if "响应时间控制" in text:
+            return "配置描述，应只提取数值部分"
+        
+        # 规则3: 细分变量（如 "java_developers"）-> 如果原文有总人数，只保留总人数
+        if re.search(r'(java|python|frontend|backend).*developers?', entity_name, re.IGNORECASE):
+            return "细分变量，建议合并为团队总人数"
+        
+        # 规则4: 检查是否包含变量关键词
+        has_variable_keyword = any(kw in text for kw in cls.VARIABLE_KEYWORDS)
+        if not has_variable_keyword:
+            # 没有变量关键词的可能是固定描述
+            # 但技术栈、专有名词例外
+            if not cls._is_tech_stack(text) and not cls._is_proper_noun(text):
+                return "不包含变量关键词，可能是固定描述"
+        
+        return None
+    
+    @classmethod
+    def _is_tech_stack(cls, text: str) -> bool:
+        """判断是否为技术栈列表"""
+        tech_indicators = ["LangChain", "Milvus", "FastAPI", "K8s", "Kubernetes", "ELK", "Prometheus", "Grafana"]
+        return any(tech in text for tech in tech_indicators) and "、" in text
+    
+    @classmethod
+    def _is_proper_noun(cls, text: str) -> bool:
+        """判断是否为专有名词（技术术语）"""
+        proper_nouns = ["RAG", "LLM", "API", "K8s", "Kubernetes", "LangChain", "Milvus", "FastAPI"]
+        return any(noun in text for noun in proper_nouns)
+    
+    @staticmethod
+    def merge_duplicate_entities(entities: List[Dict]) -> List[Dict]:
+        """
+        合并重复或重叠的实体
+        
+        例如：
+        - "5个人" 和 "5" → 保留 "5个人"
+        - "8周" 和 "周" → 保留 "8周"
+        """
+        if not entities:
+            return []
+        
+        merged = []
+        processed_indices = set()
+        
+        for i, entity1 in enumerate(entities):
+            if i in processed_indices:
+                continue
+            
+            orig_text1 = entity1.get('original_text', '')
+            
+            # 查找是否有其他实体包含当前实体
+            for j, entity2 in enumerate(entities):
+                if i >= j or j in processed_indices:
+                    continue
+                
+                orig_text2 = entity2.get('original_text', '')
+                
+                # 如果 entity1 包含 entity2，保留 entity1（更长的）
+                if orig_text2 in orig_text1:
+                    processed_indices.add(j)
+                    logger.info(f"合并实体: '{orig_text2}' → '{orig_text1}'")
+            
+            merged.append(entity1)
+            processed_indices.add(i)
+        
+        return merged
+
+
 # ========== 强类型清洗器 ==========
 class TypeCleaner:
     """强类型清洗与转换 (Code-Layer)"""
@@ -301,6 +430,7 @@ class PromptStructurizer:
         self.firewall = HallucinationFirewall()
         self.type_cleaner = TypeCleaner()
         self.conflict_resolver = EntityConflictResolver()
+        self.entity_validator = EntityPostValidator()  # 新增：后处理校验器
         self.extraction_log = []
         self.use_mock = use_mock
         self.history_manager = HistoryManager()
@@ -424,6 +554,12 @@ class PromptStructurizer:
         # ===== 解决实体冲突 =====
         resolved_entities = self.conflict_resolver.resolve_overlaps(validated_entities)
         self._log(f"冲突解析完成,保留 {len(resolved_entities)} 个实体")
+        
+        # ===== 阶段 2.2.5: 后处理校验（过滤固定描述）=====
+        filtered_entities, filter_logs = self.entity_validator.filter_entities(resolved_entities, clean_text)
+        for log in filter_logs:
+            self._log(f"🔍 {log}")
+        self._log(f"后处理校验完成,保留 {len(filtered_entities)} 个变量")
         
         # ===== 阶段 2.3: 强类型清洗与转换 (Code-Layer) =====
         variable_metas = []

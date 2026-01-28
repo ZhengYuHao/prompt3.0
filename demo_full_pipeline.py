@@ -599,10 +599,23 @@ def run_full_pipeline():
         for line in dsl_code.split('\n'):
             info(line)
         info("─" * 60)
-        
+
         info("\n❌ 验证错误:")
         for err in validation_result.errors[:5]:
             error(f"  {err}")
+
+        # DSL 编译失败时，跳过代码生成阶段，但保留空数据
+        info("\n>>> DSL 编译失败，跳过代码生成阶段")
+        modules = []
+        main_code = ""
+        compile_details = {
+            'step1_parsing': {'status': 'skipped', 'reason': 'DSL compilation failed'},
+            'step2_dependency': {'status': 'skipped', 'reason': 'DSL compilation failed'},
+            'step3_clustering': {'status': 'skipped', 'reason': 'DSL compilation failed'},
+            'step4_generation': {'status': 'skipped', 'reason': 'DSL compilation failed'},
+            'step5_orchestration': {'status': 'skipped', 'reason': 'DSL compilation failed'}
+        }
+        codegen_time = 0
 
     # =========================================================================
     # 总结

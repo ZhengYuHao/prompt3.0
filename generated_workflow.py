@@ -7,10 +7,64 @@ from typing import Dict, Any
 from llm_client import invoke_function  # 需要实现 LLM 客户端
 
 
-async def step_1_develop_RAG_application(budget, context_history_rounds, java_developers, project_duration_weeks, python_developers, response_time_seconds, service_count, team_size):
+async def step_1_create_application():
     """Auto-generated module"""
-    result = await invoke_function('develop_RAG_application', team_size=team_size, java_developers=java_developers, python_developers=python_developers, project_duration_weeks=project_duration_weeks, budget=budget, context_history_rounds=context_history_rounds, service_count=service_count, response_time_seconds=response_time_seconds)
-    return result
+    application = await invoke_function('create_application')
+    return application
+
+
+async def step_2_design_chain():
+    """Auto-generated module"""
+    chain_design = await invoke_function('design_chain')
+    return chain_design
+
+
+async def step_3_define_retrieval_modes():
+    """Auto-generated module"""
+    retrieval_modes = await invoke_function('define_retrieval_modes')
+    return retrieval_modes
+
+
+async def step_4_setup_tech_stack(java_developers, python_developers):
+    """Auto-generated module"""
+    tech_stack = await invoke_function('setup_tech_stack', java_developers=java_developers, python_developers=python_developers)
+    return tech_stack
+
+
+async def step_5_enable_dialogue_support(history_context_rounds):
+    """Auto-generated module"""
+    dialogue_support = await invoke_function('enable_dialogue_support', history_context_rounds=history_context_rounds)
+    return dialogue_support
+
+
+async def step_6_deploy_to_kubernetes(service_count):
+    """Auto-generated module"""
+    deployment = await invoke_function('deploy_to_kubernetes', service_count=service_count)
+    return deployment
+
+
+async def step_7_create_microservices():
+    """Auto-generated module"""
+    microservices = await invoke_function('create_microservices')
+    return microservices
+
+
+async def step_8_setup_monitoring_logging():
+    """Auto-generated module"""
+    monitoring_logging = await invoke_function('setup_monitoring_logging')
+    return monitoring_logging
+
+
+async def step_9_enable_bilingual_support(supported_languages):
+    """Auto-generated module"""
+    bilingual_support = await invoke_function('enable_bilingual_support', supported_languages=supported_languages)
+    return bilingual_support
+
+
+async def step_10_set_response_time_control(response_time_seconds):
+    """Auto-generated module"""
+    response_time_control = await invoke_function('set_response_time_control', response_time_seconds=response_time_seconds)
+    return response_time_control
 
 
 async def main_workflow(input_params: dict):
@@ -18,7 +72,7 @@ async def main_workflow(input_params: dict):
     主工作流 - 自动生成
     
     Args:
-        input_params: 包含 ['budget', 'context_history_rounds', 'java_developers', 'project_duration_weeks', 'python_developers', 'response_time_seconds', 'service_count', 'team_size'] 的字典
+        input_params: 包含 ['history_context_rounds', 'java_developers', 'python_developers', 'response_time_seconds', 'service_count', 'supported_languages'] 的字典
     
     Returns:
         执行结果上下文
@@ -26,8 +80,35 @@ async def main_workflow(input_params: dict):
     # 初始化上下文
     ctx = input_params.copy()
 
-    # Module 1: step_1_develop_RAG_application
-    ctx["result"] = await step_1_develop_RAG_application(ctx.get("budget"), ctx.get("context_history_rounds"), ctx.get("java_developers"), ctx.get("project_duration_weeks"), ctx.get("python_developers"), ctx.get("response_time_seconds"), ctx.get("service_count"), ctx.get("team_size"))
+    # Module 1: step_1_create_application
+    ctx["application"] = await step_1_create_application()
+
+    # Module 2: step_2_design_chain
+    ctx["chain_design"] = await step_2_design_chain()
+
+    # Module 3: step_3_define_retrieval_modes
+    ctx["retrieval_modes"] = await step_3_define_retrieval_modes()
+
+    # Module 4: step_4_setup_tech_stack
+    ctx["tech_stack"] = await step_4_setup_tech_stack(ctx.get("java_developers"), ctx.get("python_developers"))
+
+    # Module 5: step_5_enable_dialogue_support
+    ctx["dialogue_support"] = await step_5_enable_dialogue_support(ctx.get("history_context_rounds"))
+
+    # Module 6: step_6_deploy_to_kubernetes
+    ctx["deployment"] = await step_6_deploy_to_kubernetes(ctx.get("service_count"))
+
+    # Module 7: step_7_create_microservices
+    ctx["microservices"] = await step_7_create_microservices()
+
+    # Module 8: step_8_setup_monitoring_logging
+    ctx["monitoring_logging"] = await step_8_setup_monitoring_logging()
+
+    # Module 9: step_9_enable_bilingual_support
+    ctx["bilingual_support"] = await step_9_enable_bilingual_support(ctx.get("supported_languages"))
+
+    # Module 10: step_10_set_response_time_control
+    ctx["response_time_control"] = await step_10_set_response_time_control(ctx.get("response_time_seconds"))
 
     return ctx
 

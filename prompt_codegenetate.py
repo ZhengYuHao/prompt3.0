@@ -525,73 +525,104 @@ class ModuleSynthesizer:
     
     def generate_module(self, cluster: List[CodeBlock], module_id: int) -> ModuleDefinition:
         """生成单个模块的 Python 代码"""
-        
+
         # 收集输入输出
         all_inputs = set()
         all_outputs = set()
         internal_vars = set()
         body_lines = []
         is_async = False
-        
+
         for block in cluster:
             all_inputs.update(block.inputs)
             all_outputs.update(block.outputs)
             internal_vars.update(block.outputs)
-            
+
             if block.is_async:
                 is_async = True
-        
+
         # 真实的外部输入 = 所需输入 - 内部产生的变量
         external_inputs = sorted(list(all_inputs - internal_vars))
         final_outputs = sorted(list(all_outputs))
-        
+
         # 生成函数名
         func_name = self._generate_function_name(cluster, module_id)
-        
+
         # 组装函数体
         async_kw = "async " if is_async else ""
         code_lines = [f"{async_kw}def {func_name}({', '.join(external_inputs)}):"]
         code_lines.append('    """Auto-generated module"""')
-        
+
+        # 控制流状态跟踪
+        control_flow_depth = 0  # 控制流嵌套深度
+        control_flow_types = [BlockType.IF, BlockType.FOR, BlockType.WHILE]
+        control_flow_end_types = [BlockType.ENDIF, BlockType.ENDFOR, BlockType.ENDWHILE]
+
         # 转换代码行并处理多行CALL语句
         for block in cluster:
-            # 检查是否是多行CALL block
-            is_multiline_call = len(block.code_lines) > 1 and any("CALL" in line for line in block.code_lines)
-            
-            if is_multiline_call:
-                # 多行CALL：合并后一次性转换
-                translated = self._parse_multiline_call(block.code_lines)
-                if translated and translated.strip():
-                    code_lines.append(f"    {translated}")
-            else:
-                # 单行处理
+            block_type = block.type
+
+            # 处理控制流开始
+            if block_type in control_flow_types:
                 for line in block.code_lines:
-                    # 检查原始行是否包含CALL
-                    if "CALL" in line:
-                        # 单行CALL，直接转换
-                        if '(' in line and ')' in line:
-                            cleaned = self._clean_line(line)
-                            code_lines.append(f"    {cleaned}")
-                        else:
-                            # 异常情况：单行CALL不完整，尝试处理
-                            warning(f"单行CALL语句格式异常: {line}")
-                            cleaned = self._clean_line(line)
-                            if cleaned and cleaned.strip():
-                                code_lines.append(f"    {cleaned}")
-                    elif line.strip():
-                        # 其他代码行
+                    if line.strip():
                         cleaned = self._clean_line(line)
                         if cleaned and cleaned.strip():
                             code_lines.append(f"    {cleaned}")
-        
+                control_flow_depth += 1
+
+            # 处理控制流结束
+            elif block_type in control_flow_end_types:
+                control_flow_depth = max(0, control_flow_depth - 1)
+                for line in block.code_lines:
+                    if line.strip():
+                        cleaned = self._clean_line(line)
+                        # ENDIF/ENDFOR 等通常不需要生成代码，因为 Python 使用缩进
+                        if cleaned and cleaned.strip() and block_type != BlockType.ENDIF:
+                            code_lines.append(f"    {cleaned}")
+
+            # 处理普通代码块（CALL, ASSIGN, ELSE）
+            else:
+                # 计算当前缩进级别
+                indent = "    " + "    " * control_flow_depth
+
+                # 检查是否是多行CALL block
+                is_multiline_call = len(block.code_lines) > 1 and any("CALL" in line for line in block.code_lines)
+
+                if is_multiline_call:
+                    # 多行CALL：合并后一次性转换
+                    translated = self._parse_multiline_call(block.code_lines)
+                    if translated and translated.strip():
+                        code_lines.append(f"{indent}{translated}")
+                else:
+                    # 单行处理
+                    for line in block.code_lines:
+                        # 检查原始行是否包含CALL
+                        if "CALL" in line:
+                            # 单行CALL，直接转换
+                            if '(' in line and ')' in line:
+                                cleaned = self._clean_line(line)
+                                code_lines.append(f"{indent}{cleaned}")
+                            else:
+                                # 异常情况：单行CALL不完整，尝试处理
+                                warning(f"单行CALL语句格式异常: {line}")
+                                cleaned = self._clean_line(line)
+                                if cleaned and cleaned.strip():
+                                    code_lines.append(f"{indent}{cleaned}")
+                        elif line.strip():
+                            # 其他代码行
+                            cleaned = self._clean_line(line)
+                            if cleaned and cleaned.strip():
+                                code_lines.append(f"{indent}{cleaned}")
+
         # 返回值
         if final_outputs:
             code_lines.append(f"    return {', '.join(final_outputs)}")
         else:
             code_lines.append("    return None")
-        
+
         body_code = '\n'.join(code_lines)
-        
+
         return ModuleDefinition(
             name=func_name,
             inputs=external_inputs,

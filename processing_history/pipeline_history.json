@@ -1207,5 +1207,842 @@
     "overall_status": "success",
     "total_time_ms": 20567,
     "error_message": null
+  },
+  "97715e32": {
+    "pipeline_id": "97715e32",
+    "timestamp": "2026-01-28 14:48:36",
+    "raw_input": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_id": "9dc0ed38",
+    "prompt10_original": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+    "prompt10_processed": "请开发一个基于API封装的检索增强生成(RAG)应用。该应用应以大型语言模型(LLM)为基础，处理链(Chain)设计较为复杂，需支持三种以上的检索模式。团队由五人组成，其中两名开发Java，三名开发Python。项目周期约为八周，预算大约为五十万元。技术栈使用LangChain、Milvus和FastAPI。应用需支持多轮对话，能够存储约20轮的历史上下文。部署环境为Kubernetes集群，需开发成微服务架构，服务数量约为十个。最后，请确保添加监控和日志功能，使用Prometheus和ELK日志系统（Elasticsearch、Logstash、Kibana）。此外，应用需支持中英文双语，响应时间控制在两秒以内。",
+    "prompt10_mode": "dictionary",
+    "prompt10_steps": [
+      {
+        "step_name": "术语对齐",
+        "step_index": 1,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": [
+          "替换 16 处"
+        ]
+      },
+      {
+        "step_name": "术语对齐",
+        "step_index": 2,
+        "input_text": "那个，帮我搞一个RAG的套壳应用吧。\n要用大模型做底座，chain的话复杂一点，差不多要支持3种以上的检索模式。\n团队就5个人，其中2个是搞Java的，还有3个写Python的。\n项目周期嘛，大概8周吧，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是K8s集群，要搞成微服务架构，服务数量差不多10来个。\n最后记得加上监控和日志，用Prometheus和ELK那套。\n对了，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "changes": {
+          "那个": "",
+          "搞": "开发",
+          "RAG": "检索增强生成(RAG)",
+          "套壳": "基于API封装的应用",
+          "吧": "",
+          "大模型": "大型语言模型(LLM)",
+          "chain": "处理链(Chain)",
+          "差不多": "大约",
+          "嘛": "",
+          "K8s": "Kubernetes",
+          "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+          "对了": "另外"
+        },
+        "duration_ms": 0,
+        "notes": []
+      },
+      {
+        "step_name": "LLM语义重构",
+        "step_index": 3,
+        "input_text": "，帮我开发一个检索增强生成(RAG)的基于API封装的应用应用。\n要用大型语言模型(LLM)做底座，处理链(Chain)的话复杂一点，大约要支持3种以上的检索模式。\n团队就5个人，其中2个是开发Java的，还有3个写Python的。\n项目周期，大概8周，预算的话50万左右应该够了。\n技术栈就用LangChain、Milvus、还有FastAPI这些。\n需要支持多轮对话，上下文窗口要能存个20轮左右的历史。\n部署环境是Kubernetes集群，要开发成微服务架构，服务数量大约10来个。\n最后记得加上监控和日志，用Prometheus和ELK日志系统(Elasticsearch+Logstash+Kibana)那套。\n另外，要支持中英文双语，响应时间控制在2秒以内。",
+        "output_text": "请开发一个基于API封装的检索增强生成(RAG)应用。该应用应以大型语言模型(LLM)为基础，处理链(Chain)设计较为复杂，需支持三种以上的检索模式。团队由五人组成，其中两名开发Java，三名开发Python。项目周期约为八周，预算大约为五十万元。技术栈使用LangChain、Milvus和FastAPI。应用需支持多轮对话，能够存储约20轮的历史上下文。部署环境为Kubernetes集群，需开发成微服务架构，服务数量约为十个。最后，请确保添加监控和日志功能，使用Prometheus和ELK日志系统（Elasticsearch、Logstash、Kibana）。此外，应用需支持中英文双语，响应时间控制在两秒以内。",
+        "changes": {
+          "标准化": "335字 → 312字"
+        },
+        "duration_ms": 6353,
+        "notes": []
+      }
+    ],
+    "prompt10_terminology_changes": {
+      "那个": "",
+      "搞": "开发",
+      "RAG": "检索增强生成(RAG)",
+      "套壳": "基于API封装的应用",
+      "吧": "",
+      "大模型": "大型语言模型(LLM)",
+      "chain": "处理链(Chain)",
+      "差不多": "大约",
+      "嘛": "",
+      "K8s": "Kubernetes",
+      "ELK": "ELK日志系统(Elasticsearch+Logstash+Kibana)",
+      "对了": "另外"
+    },
+    "prompt10_ambiguity_detected": false,
+    "prompt10_status": "success",
+    "prompt10_time_ms": 6354,
+    "prompt20_id": "d8b4e945",
+    "prompt20_template": "请开发一个基于API封装的检索增强生成(RAG)应用。该应用应以大型语言模型(LLM)为基础，处理链(Chain)设计较为复杂，需支持三种以上的检索模式。{{team_size}}，{{java_developers}}，{{python_developers}}。{{project_duration_weeks}}，{{budget}}。技术栈使用LangChain、Milvus和FastAPI。应用需支持多轮对话，{{history_context_rounds}}。部署环境为Kubernetes集群，需开发成微服务架构，{{service_count}}。最后，请确保添加监控和日志功能，使用Prometheus和ELK日志系统（Elasticsearch、Logstash、Kibana）。此外，{{supported_languages}}，{{response_time_seconds}}。",
+    "prompt20_variables": [
+      {
+        "variable": "team_size",
+        "original_text": "团队由五人组成",
+        "value": 5,
+        "type": "Integer"
+      },
+      {
+        "variable": "java_developers",
+        "original_text": "其中两名开发Java",
+        "value": 2,
+        "type": "Integer"
+      },
+      {
+        "variable": "python_developers",
+        "original_text": "三名开发Python",
+        "value": 3,
+        "type": "Integer"
+      },
+      {
+        "variable": "project_duration_weeks",
+        "original_text": "项目周期约为八周",
+        "value": 8,
+        "type": "Integer"
+      },
+      {
+        "variable": "budget",
+        "original_text": "预算大约为五十万元",
+        "value": 500000,
+        "type": "Integer"
+      },
+      {
+        "variable": "history_context_rounds",
+        "original_text": "能够存储约20轮的历史上下文",
+        "value": 20,
+        "type": "Integer"
+      },
+      {
+        "variable": "service_count",
+        "original_text": "服务数量约为十个",
+        "value": 10,
+        "type": "Integer"
+      },
+      {
+        "variable": "supported_languages",
+        "original_text": "应用需支持中英文双语",
+        "value": [
+          "[\"中文\"",
+          "\"英文\"]"
+        ],
+        "type": "List"
+      },
+      {
+        "variable": "response_time_seconds",
+        "original_text": "响应时间控制在两秒以内",
+        "value": 2,
+        "type": "Integer"
+      }
+    ],
+    "prompt20_variable_count": 9,
+    "prompt20_type_stats": {
+      "Integer": 8,
+      "List": 1
+    },
+    "prompt20_extraction_log": [],
+    "prompt20_time_ms": 0,
+    "prompt30_id": "d5f22fba",
+    "prompt30_dsl_code": "DEFINE {{team_size}}: Integer = 5\nDEFINE {{java_developers}}: Integer = 2\nDEFINE {{python_developers}}: Integer = 3\nDEFINE {{project_duration_weeks}}: Integer = 8\nDEFINE {{budget}}: Integer = 500000\nDEFINE {{history_context_rounds}}: Integer = 20\nDEFINE {{service_count}}: Integer = 10\nDEFINE {{supported_languages}}: List = ['[\"中文\"', '\"英文\"]']\nDEFINE {{response_time_seconds}}: Integer = 2\nDEFINE {{application}}: Any\nDEFINE {{chain_design}}: Any\nDEFINE {{retrieval_modes}}: Any\nDEFINE {{tech_stack}}: Any\nDEFINE {{dialogue_support}}: Any\nDEFINE {{deployment}}: Any\nDEFINE {{microservices}}: Any\nDEFINE {{monitoring_logging}}: Any\nDEFINE {{bilingual_support}}: Any\nDEFINE {{response_time_control}}: Any\n{{application}} = CALL create_application()\n{{chain_design}} = CALL design_chain()\n{{retrieval_modes}} = CALL define_retrieval_modes()\n{{tech_stack}} = CALL setup_tech_stack({{java_developers}}, {{python_developers}})\n{{dialogue_support}} = CALL enable_dialogue_support({{history_context_rounds}})\n{{deployment}} = CALL deploy_to_kubernetes({{service_count}})\n{{microservices}} = CALL create_microservices()\n{{monitoring_logging}} = CALL setup_monitoring_logging()\n{{bilingual_support}} = CALL enable_bilingual_support({{supported_languages}})\n{{response_time_control}} = CALL set_response_time_control({{response_time_seconds}})",
+    "prompt30_validation_result": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "defined_variables": {
+        "team_size": {
+          "name": "team_size",
+          "var_type": "Integer",
+          "initial_value": "5",
+          "line_number": 1
+        },
+        "java_developers": {
+          "name": "java_developers",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 2
+        },
+        "python_developers": {
+          "name": "python_developers",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 3
+        },
+        "project_duration_weeks": {
+          "name": "project_duration_weeks",
+          "var_type": "Integer",
+          "initial_value": "8",
+          "line_number": 4
+        },
+        "budget": {
+          "name": "budget",
+          "var_type": "Integer",
+          "initial_value": "500000",
+          "line_number": 5
+        },
+        "history_context_rounds": {
+          "name": "history_context_rounds",
+          "var_type": "Integer",
+          "initial_value": "20",
+          "line_number": 6
+        },
+        "service_count": {
+          "name": "service_count",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 7
+        },
+        "supported_languages": {
+          "name": "supported_languages",
+          "var_type": "List",
+          "initial_value": "['[\"中文\"', '\"英文\"]']",
+          "line_number": 8
+        },
+        "response_time_seconds": {
+          "name": "response_time_seconds",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 9
+        },
+        "application": {
+          "name": "application",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 10
+        },
+        "chain_design": {
+          "name": "chain_design",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 11
+        },
+        "retrieval_modes": {
+          "name": "retrieval_modes",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 12
+        },
+        "tech_stack": {
+          "name": "tech_stack",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 13
+        },
+        "dialogue_support": {
+          "name": "dialogue_support",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 14
+        },
+        "deployment": {
+          "name": "deployment",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 15
+        },
+        "microservices": {
+          "name": "microservices",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 16
+        },
+        "monitoring_logging": {
+          "name": "monitoring_logging",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 17
+        },
+        "bilingual_support": {
+          "name": "bilingual_support",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 18
+        },
+        "response_time_control": {
+          "name": "response_time_control",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 19
+        }
+      },
+      "function_calls": [
+        {
+          "function_name": "create_application",
+          "arguments": [],
+          "result_var": "application",
+          "line_number": 20
+        },
+        {
+          "function_name": "design_chain",
+          "arguments": [],
+          "result_var": "chain_design",
+          "line_number": 21
+        },
+        {
+          "function_name": "define_retrieval_modes",
+          "arguments": [],
+          "result_var": "retrieval_modes",
+          "line_number": 22
+        },
+        {
+          "function_name": "setup_tech_stack",
+          "arguments": [
+            "{{java_developers}}",
+            "{{python_developers}}"
+          ],
+          "result_var": "tech_stack",
+          "line_number": 23
+        },
+        {
+          "function_name": "enable_dialogue_support",
+          "arguments": [
+            "{{history_context_rounds}}"
+          ],
+          "result_var": "dialogue_support",
+          "line_number": 24
+        },
+        {
+          "function_name": "deploy_to_kubernetes",
+          "arguments": [
+            "{{service_count}}"
+          ],
+          "result_var": "deployment",
+          "line_number": 25
+        },
+        {
+          "function_name": "create_microservices",
+          "arguments": [],
+          "result_var": "microservices",
+          "line_number": 26
+        },
+        {
+          "function_name": "setup_monitoring_logging",
+          "arguments": [],
+          "result_var": "monitoring_logging",
+          "line_number": 27
+        },
+        {
+          "function_name": "enable_bilingual_support",
+          "arguments": [
+            "{{supported_languages}}"
+          ],
+          "result_var": "bilingual_support",
+          "line_number": 28
+        },
+        {
+          "function_name": "set_response_time_control",
+          "arguments": [
+            "{{response_time_seconds}}"
+          ],
+          "result_var": "response_time_control",
+          "line_number": 29
+        }
+      ],
+      "control_blocks": [],
+      "max_nesting_depth": 0
+    },
+    "prompt30_time_ms": 12317,
+    "prompt40_id": "e0e4d66a",
+    "prompt40_modules": [
+      {
+        "name": "step_1_create_application",
+        "inputs": [],
+        "outputs": [
+          "application"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_2_design_chain",
+        "inputs": [],
+        "outputs": [
+          "chain_design"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_3_define_retrieval_modes",
+        "inputs": [],
+        "outputs": [
+          "retrieval_modes"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_4_setup_tech_stack",
+        "inputs": [
+          "java_developers",
+          "python_developers"
+        ],
+        "outputs": [
+          "tech_stack"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_5_enable_dialogue_support",
+        "inputs": [
+          "history_context_rounds"
+        ],
+        "outputs": [
+          "dialogue_support"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_6_deploy_to_kubernetes",
+        "inputs": [
+          "service_count"
+        ],
+        "outputs": [
+          "deployment"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_7_create_microservices",
+        "inputs": [],
+        "outputs": [
+          "microservices"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_8_setup_monitoring_logging",
+        "inputs": [],
+        "outputs": [
+          "monitoring_logging"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_9_enable_bilingual_support",
+        "inputs": [
+          "supported_languages"
+        ],
+        "outputs": [
+          "bilingual_support"
+        ],
+        "is_async": true
+      },
+      {
+        "name": "step_10_set_response_time_control",
+        "inputs": [
+          "response_time_seconds"
+        ],
+        "outputs": [
+          "response_time_control"
+        ],
+        "is_async": true
+      }
+    ],
+    "prompt40_module_count": 10,
+    "prompt40_main_code": "async def main_workflow(input_params: dict):\n    \"\"\"\n    主工作流 - 自动生成\n    \n    Args:\n        input_params: 包含 ['history_context_rounds', 'java_developers', 'python_developers', 'response_time_seconds', 'service_count', 'supported_languages'] 的字典\n    \n    Returns:\n        执行结果上下文\n    \"\"\"\n    # 初始化上下文\n    ctx = input_params.copy()\n\n    # Module 1: step_1_create_application\n    ctx[\"application\"] = await step_1_create_application()\n\n    # Module 2: step_2_design_chain\n    ctx[\"chain_design\"] = await step_2_design_chain()\n\n    # Module 3: step_3_define_retrieval_modes\n    ctx[\"retrieval_modes\"] = await step_3_define_retrieval_modes()\n\n    # Module 4: step_4_setup_tech_stack\n    ctx[\"tech_stack\"] = await step_4_setup_tech_stack(ctx.get(\"java_developers\"), ctx.get(\"python_developers\"))\n\n    # Module 5: step_5_enable_dialogue_support\n    ctx[\"dialogue_support\"] = await step_5_enable_dialogue_support(ctx.get(\"history_context_rounds\"))\n\n    # Module 6: step_6_deploy_to_kubernetes\n    ctx[\"deployment\"] = await step_6_deploy_to_kubernetes(ctx.get(\"service_count\"))\n\n    # Module 7: step_7_create_microservices\n    ctx[\"microservices\"] = await step_7_create_microservices()\n\n    # Module 8: step_8_setup_monitoring_logging\n    ctx[\"monitoring_logging\"] = await step_8_setup_monitoring_logging()\n\n    # Module 9: step_9_enable_bilingual_support\n    ctx[\"bilingual_support\"] = await step_9_enable_bilingual_support(ctx.get(\"supported_languages\"))\n\n    # Module 10: step_10_set_response_time_control\n    ctx[\"response_time_control\"] = await step_10_set_response_time_control(ctx.get(\"response_time_seconds\"))\n\n    return ctx",
+    "prompt40_time_ms": 5,
+    "prompt40_step1_parsing": {
+      "total_blocks": 10,
+      "block_types": {
+        "CALL": 10
+      },
+      "blocks": [
+        {
+          "id": "OP_0",
+          "type": "CALL",
+          "line_number": 20,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [
+            "application"
+          ],
+          "code_lines": [
+            "{{application}} = CALL create_application()"
+          ]
+        },
+        {
+          "id": "OP_1",
+          "type": "CALL",
+          "line_number": 21,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [
+            "chain_design"
+          ],
+          "code_lines": [
+            "{{chain_design}} = CALL design_chain()"
+          ]
+        },
+        {
+          "id": "OP_2",
+          "type": "CALL",
+          "line_number": 22,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [
+            "retrieval_modes"
+          ],
+          "code_lines": [
+            "{{retrieval_modes}} = CALL define_retrieval_modes()"
+          ]
+        },
+        {
+          "id": "OP_3",
+          "type": "CALL",
+          "line_number": 23,
+          "is_async": true,
+          "inputs": [
+            "python_developers",
+            "java_developers"
+          ],
+          "outputs": [
+            "tech_stack"
+          ],
+          "code_lines": [
+            "{{tech_stack}} = CALL setup_tech_stack({{java_developers}}, {{python_developers}})"
+          ]
+        },
+        {
+          "id": "OP_4",
+          "type": "CALL",
+          "line_number": 24,
+          "is_async": true,
+          "inputs": [
+            "history_context_rounds"
+          ],
+          "outputs": [
+            "dialogue_support"
+          ],
+          "code_lines": [
+            "{{dialogue_support}} = CALL enable_dialogue_support({{history_context_rounds}})"
+          ]
+        },
+        {
+          "id": "OP_5",
+          "type": "CALL",
+          "line_number": 25,
+          "is_async": true,
+          "inputs": [
+            "service_count"
+          ],
+          "outputs": [
+            "deployment"
+          ],
+          "code_lines": [
+            "{{deployment}} = CALL deploy_to_kubernetes({{service_count}})"
+          ]
+        },
+        {
+          "id": "OP_6",
+          "type": "CALL",
+          "line_number": 26,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [
+            "microservices"
+          ],
+          "code_lines": [
+            "{{microservices}} = CALL create_microservices()"
+          ]
+        },
+        {
+          "id": "OP_7",
+          "type": "CALL",
+          "line_number": 27,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [
+            "monitoring_logging"
+          ],
+          "code_lines": [
+            "{{monitoring_logging}} = CALL setup_monitoring_logging()"
+          ]
+        },
+        {
+          "id": "OP_8",
+          "type": "CALL",
+          "line_number": 28,
+          "is_async": true,
+          "inputs": [
+            "supported_languages"
+          ],
+          "outputs": [
+            "bilingual_support"
+          ],
+          "code_lines": [
+            "{{bilingual_support}} = CALL enable_bilingual_support({{supported_languages}})"
+          ]
+        },
+        {
+          "id": "OP_9",
+          "type": "CALL",
+          "line_number": 29,
+          "is_async": true,
+          "inputs": [
+            "response_time_seconds"
+          ],
+          "outputs": [
+            "response_time_control"
+          ],
+          "code_lines": [
+            "{{response_time_control}} = CALL set_response_time_control({{response_time_seconds}})"
+          ]
+        }
+      ]
+    },
+    "prompt40_step2_dependency": {
+      "has_cycles": false,
+      "dead_code_count": 10,
+      "dead_code_blocks": [
+        "OP_0",
+        "OP_1",
+        "OP_2",
+        "OP_3",
+        "OP_4",
+        "OP_5",
+        "OP_6",
+        "OP_7",
+        "OP_8",
+        "OP_9"
+      ],
+      "topological_order": [
+        "OP_0",
+        "OP_1",
+        "OP_2",
+        "OP_3",
+        "OP_4",
+        "OP_5",
+        "OP_6",
+        "OP_7",
+        "OP_8",
+        "OP_9"
+      ],
+      "edge_count": 0,
+      "node_count": 10
+    },
+    "prompt40_step3_clustering": {
+      "strategy": "hybrid",
+      "total_clusters": 10,
+      "clusters": [
+        {
+          "cluster_id": 1,
+          "block_count": 1,
+          "blocks": [
+            "OP_0"
+          ]
+        },
+        {
+          "cluster_id": 2,
+          "block_count": 1,
+          "blocks": [
+            "OP_1"
+          ]
+        },
+        {
+          "cluster_id": 3,
+          "block_count": 1,
+          "blocks": [
+            "OP_2"
+          ]
+        },
+        {
+          "cluster_id": 4,
+          "block_count": 1,
+          "blocks": [
+            "OP_3"
+          ]
+        },
+        {
+          "cluster_id": 5,
+          "block_count": 1,
+          "blocks": [
+            "OP_4"
+          ]
+        },
+        {
+          "cluster_id": 6,
+          "block_count": 1,
+          "blocks": [
+            "OP_5"
+          ]
+        },
+        {
+          "cluster_id": 7,
+          "block_count": 1,
+          "blocks": [
+            "OP_6"
+          ]
+        },
+        {
+          "cluster_id": 8,
+          "block_count": 1,
+          "blocks": [
+            "OP_7"
+          ]
+        },
+        {
+          "cluster_id": 9,
+          "block_count": 1,
+          "blocks": [
+            "OP_8"
+          ]
+        },
+        {
+          "cluster_id": 10,
+          "block_count": 1,
+          "blocks": [
+            "OP_9"
+          ]
+        }
+      ]
+    },
+    "prompt40_step4_generation": {
+      "total_modules": 10,
+      "async_modules": 10,
+      "sync_modules": 0,
+      "modules": [
+        {
+          "name": "step_1_create_application",
+          "inputs": [],
+          "outputs": [
+            "application"
+          ],
+          "is_async": true,
+          "body_code": "async def step_1_create_application():\n    \"\"\"Auto-generated module\"\"\"\n    application = await invoke_function('create_application')\n    return application",
+          "original_block_count": 1
+        },
+        {
+          "name": "step_2_design_chain",
+          "inputs": [],
+          "outputs": [
+            "chain_design"
+          ],
+          "is_async": true,
+          "body_code": "async def step_2_design_chain():\n    \"\"\"Auto-generated module\"\"\"\n    chain_design = await invoke_function('design_chain')\n    return chain_design",
+          "original_block_count": 1
+        },
+        {
+          "name": "step_3_define_retrieval_modes",
+          "inputs": [],
+          "outputs": [
+            "retrieval_modes"
+          ],
+          "is_async": true,
+          "body_code": "async def step_3_define_retrieval_modes():\n    \"\"\"Auto-generated module\"\"\"\n    retrieval_modes = await invoke_function('define_retrieval_modes')\n    return retrieval_modes",
+          "original_block_count": 1
+        },
+        {
+          "name": "step_4_setup_tech_stack",
+          "inputs": [
+            "java_developers",
+            "python_developers"
+          ],
+          "outputs": [
+            "tech_stack"
+          ],
+          "is_async": true,
+          "body_code": "async def step_4_setup_tech_stack(java_developers, python_developers):\n    \"\"\"Auto-generated module\"\"\"\n    tech_stack = await invoke_function('setup_tech_stack', java_developers=java_developers, python_developers=python_developers)\n    return tech_stack",
+          "original_block_count": 1
+        },
+        {
+          "name": "step_5_enable_dialogue_support",
+          "inputs": [
+            "history_context_rounds"
+          ],
+          "outputs": [
+            "dialogue_support"
+          ],
+          "is_async": true,
+          "body_code": "async def step_5_enable_dialogue_support(history_context_rounds):\n    \"\"\"Auto-generated module\"\"\"\n    dialogue_support = await invoke_function('enable_dialogue_support', history_context_rounds=history_context_rounds)\n    return dialogue_support",
+          "original_block_count": 1
+        },
+        {
+          "name": "step_6_deploy_to_kubernetes",
+          "inputs": [
+            "service_count"
+          ],
+          "outputs": [
+            "deployment"
+          ],
+          "is_async": true,
+          "body_code": "async def step_6_deploy_to_kubernetes(service_count):\n    \"\"\"Auto-generated module\"\"\"\n    deployment = await invoke_function('deploy_to_kubernetes', service_count=service_count)\n    return deployment",
+          "original_block_count": 1
+        },
+        {
+          "name": "step_7_create_microservices",
+          "inputs": [],
+          "outputs": [
+            "microservices"
+          ],
+          "is_async": true,
+          "body_code": "async def step_7_create_microservices():\n    \"\"\"Auto-generated module\"\"\"\n    microservices = await invoke_function('create_microservices')\n    return microservices",
+          "original_block_count": 1
+        },
+        {
+          "name": "step_8_setup_monitoring_logging",
+          "inputs": [],
+          "outputs": [
+            "monitoring_logging"
+          ],
+          "is_async": true,
+          "body_code": "async def step_8_setup_monitoring_logging():\n    \"\"\"Auto-generated module\"\"\"\n    monitoring_logging = await invoke_function('setup_monitoring_logging')\n    return monitoring_logging",
+          "original_block_count": 1
+        },
+        {
+          "name": "step_9_enable_bilingual_support",
+          "inputs": [
+            "supported_languages"
+          ],
+          "outputs": [
+            "bilingual_support"
+          ],
+          "is_async": true,
+          "body_code": "async def step_9_enable_bilingual_support(supported_languages):\n    \"\"\"Auto-generated module\"\"\"\n    bilingual_support = await invoke_function('enable_bilingual_support', supported_languages=supported_languages)\n    return bilingual_support",
+          "original_block_count": 1
+        },
+        {
+          "name": "step_10_set_response_time_control",
+          "inputs": [
+            "response_time_seconds"
+          ],
+          "outputs": [
+            "response_time_control"
+          ],
+          "is_async": true,
+          "body_code": "async def step_10_set_response_time_control(response_time_seconds):\n    \"\"\"Auto-generated module\"\"\"\n    response_time_control = await invoke_function('set_response_time_control', response_time_seconds=response_time_seconds)\n    return response_time_control",
+          "original_block_count": 1
+        }
+      ]
+    },
+    "prompt40_step5_orchestration": {
+      "main_inputs": [
+        "history_context_rounds",
+        "java_developers",
+        "python_developers",
+        "response_time_seconds",
+        "service_count",
+        "supported_languages"
+      ],
+      "input_count": 6,
+      "main_code": "async def main_workflow(input_params: dict):\n    \"\"\"\n    主工作流 - 自动生成\n    \n    Args:\n        input_params: 包含 ['history_context_rounds', 'java_developers', 'python_developers', 'response_time_seconds', 'service_count', 'supported_languages'] 的字典\n    \n    Returns:\n        执行结果上下文\n    \"\"\"\n    # 初始化上下文\n    ctx = input_params.copy()\n\n    # Module 1: step_1_create_application\n    ctx[\"application\"] = await step_1_create_application()\n\n    # Module 2: step_2_design_chain\n    ctx[\"chain_design\"] = await step_2_design_chain()\n\n    # Module 3: step_3_define_retrieval_modes\n    ctx[\"retrieval_modes\"] = await step_3_define_retrieval_modes()\n\n    # Module 4: step_4_setup_tech_stack\n    ctx[\"tech_stack\"] = await step_4_setup_tech_stack(ctx.get(\"java_developers\"), ctx.get(\"python_developers\"))\n\n    # Module 5: step_5_enable_dialogue_support\n    ctx[\"dialogue_support\"] = await step_5_enable_dialogue_support(ctx.get(\"history_context_rounds\"))\n\n    # Module 6: step_6_deploy_to_kubernetes\n    ctx[\"deployment\"] = await step_6_deploy_to_kubernetes(ctx.get(\"service_count\"))\n\n    # Module 7: step_7_create_microservices\n    ctx[\"microservices\"] = await step_7_create_microservices()\n\n    # Module 8: step_8_setup_monitoring_logging\n    ctx[\"monitoring_logging\"] = await step_8_setup_monitoring_logging()\n\n    # Module 9: step_9_enable_bilingual_support\n    ctx[\"bilingual_support\"] = await step_9_enable_bilingual_support(ctx.get(\"supported_languages\"))\n\n    # Module 10: step_10_set_response_time_control\n    ctx[\"response_time_control\"] = await step_10_set_response_time_control(ctx.get(\"response_time_seconds\"))\n\n    return ctx"
+    },
+    "overall_status": "success",
+    "total_time_ms": 18676,
+    "error_message": null
   }
 }

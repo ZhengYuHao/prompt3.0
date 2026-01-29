@@ -9,6 +9,7 @@ from typing import Optional, List, Dict, Any, Union
 from dataclasses import dataclass
 from enum import Enum
 from logger import info, warning, error, debug
+from dotenv import load_dotenv
 
 try:
     from openai import OpenAI
@@ -20,9 +21,18 @@ except ImportError:
 # 配置常量
 # ============================================================================
 
-# 默认桥接地址与 Key；生产环境建议使用环境变量，勿将 key 提交仓库
-DEFAULT_BASE_URL = "https://api.rcouyi.com/v1"
-DEFAULT_API_KEY = "sk-it8g8EIm4cjH2sfg4dA1C03e468b4b8aA2327a001d2e7847"
+# 加载环境变量
+load_dotenv()
+
+# 从环境变量读取配置，提供默认值
+DEFAULT_BASE_URL = os.getenv(
+    "LLM_BASE_URL",
+    "https://api.rcouyi.com/v1"
+)
+DEFAULT_API_KEY = os.getenv(
+    "LLM_API_KEY",
+    ""  # 默认为空，强制从环境变量配置
+)
 
 
 class LLMModel(Enum):

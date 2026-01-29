@@ -231,9 +231,10 @@ class ValidationResult:
     is_valid: bool
     errors: List[ValidationError] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
-    
+
     # 分析结果
     defined_variables: Dict[str, Variable] = field(default_factory=dict)
+    runtime_variables: Set[str] = field(default_factory=set)  # 运行时变量（不需要预定义）
     function_calls: List[FunctionCall] = field(default_factory=list)
     control_blocks: List[ControlBlock] = field(default_factory=list)
     max_nesting_depth: int = 0
@@ -241,25 +242,26 @@ class ValidationResult:
     def get_report(self) -> str:
         """生成验证报告"""
         report = []
-        
+
         if self.is_valid:
             report.append("✅ 验证通过！DSL 代码符合规范。\n")
         else:
             report.append("❌ 验证失败！发现以下错误：\n")
             for error in self.errors:
                 report.append(f"  {error}\n")
-        
+
         if self.warnings:
             report.append("\n⚠️  警告：")
             for warning in self.warnings:
                 report.append(f"  - {warning}")
-        
+
         report.append(f"\n📊 代码统计:")
-        report.append(f"  - 定义变量: {len(self.defined_variables)} 个")
+        report.append(f"  - 定义变量（配置参数）: {len(self.defined_variables)} 个")
+        report.append(f"  - 运行时变量: {len(self.runtime_variables)} 个")
         report.append(f"  - 函数调用: {len(self.function_calls)} 次")
         report.append(f"  - 控制块: {len(self.control_blocks)} 个")
         report.append(f"  - 最大嵌套深度: {self.max_nesting_depth}")
-        
+
         return "\n".join(report)
     
     def to_dict(self) -> Dict[str, Any]:
@@ -269,6 +271,7 @@ class ValidationResult:
             'errors': [asdict(error) for error in self.errors],
             'warnings': self.warnings,
             'defined_variables': {name: var.to_dict() for name, var in self.defined_variables.items()},
+            'runtime_variables': list(self.runtime_variables),  # 转换为列表以便序列化
             'function_calls': [asdict(fc) for fc in self.function_calls],
             'control_blocks': [asdict(cb) for cb in self.control_blocks],
             'max_nesting_depth': self.max_nesting_depth
@@ -454,6 +457,7 @@ class DSLValidator:
         self.current_nesting = 0
         self.max_nesting = 0
         self.schema = schema or DSLSchema()
+        self.runtime_vars: Set[str] = set()  # 运行时变量集合（不要求预定义）
     
     def validate(self, dsl_code: str) -> ValidationResult:
         """执行完整的静态分析"""
@@ -479,17 +483,18 @@ class DSLValidator:
         # 检查嵌套深度
         if self.max_nesting > 5:
             self.warnings.append(f"嵌套深度过深({self.max_nesting}层)，建议重构为函数调用")
-        
+
         # 构建结果
         result = ValidationResult(
             is_valid=len(self.errors) == 0,
             errors=self.errors,
             warnings=self.warnings,
             defined_variables=self.defined_vars,
+            runtime_variables=self.runtime_vars.copy(),  # 复制运行时变量集合
             function_calls=self.function_calls,
             max_nesting_depth=self.max_nesting
         )
-        
+
         return result
     
     def _reset(self):
@@ -501,6 +506,7 @@ class DSLValidator:
         self.warnings = []
         self.current_nesting = 0
         self.max_nesting = 0
+        self.runtime_vars = set()  # 重置运行时变量集合
     
     def _parse_line(self, line_num: int, line: str):
         """解析单行代码"""
@@ -790,13 +796,22 @@ class DSLValidator:
         assign_match = re.match(DSLSyntax.PATTERNS['ASSIGN'], line)
         if assign_match:
             var_name = assign_match.group(1)
-            if var_name not in self.defined_vars:
-                self.errors.append(ValidationError(
-                    line_number=line_num,
-                    error_type="未定义变量",
-                    message=f"变量 {{{{{var_name}}}}} 在使用前未定义",
-                    suggestion=f"在代码开头添加: DEFINE {{{{{var_name}}}}}: Type"
-                ))
+            if var_name not in self.defined_vars and var_name not in self.runtime_vars:
+                # 赋值左侧的变量：如果是运行时变量，允许首次赋值
+                if self._is_runtime_variable(var_name):
+                    self.runtime_vars.add(var_name)
+                    self.warnings.append(
+                        f"运行时变量 '{var_name}' 首次赋值（将在运行时动态创建）"
+                    )
+                else:
+                    # 配置参数不能作为赋值目标（应该DEFINE）
+                    self.errors.append(ValidationError(
+                        line_number=line_num,
+                        error_type="未定义变量",
+                        message=f"配置参数 {{{{{var_name}}}}} 在使用前未定义",
+                        suggestion=f"在DSL开头添加: DEFINE {{{{{var_name}}}}}: Type",
+                        severity="P1"
+                    ))
             rhs = assign_match.group(2)
             rhs_vars = re.findall(r'\{\{(\w+)\}\}', rhs)
             self._check_variables_exist(line_num, rhs_vars)
@@ -824,24 +839,38 @@ class DSLValidator:
         left, op, right = match.groups()
         left_type = self._infer_expr_type(left.strip())
         right_type = self._infer_expr_type(right.strip())
-        
+
         if op in ('>', '<', '>=', '<='):
-            if left_type not in (VarType.INTEGER, VarType.FLOAT, VarType.ANY) or \
-               right_type not in (VarType.INTEGER, VarType.FLOAT, VarType.ANY):
+            # 如果任一侧是ANY类型（运行时变量），则不检查类型（运行时可能正确）
+            if left_type == VarType.ANY or right_type == VarType.ANY:
+                # 警告：建议用户确保类型兼容
+                self.warnings.append(
+                    f"比较运算 {op} 涉及运行时变量（类型将在运行时确定），请确保逻辑正确"
+                )
+            elif left_type not in (VarType.INTEGER, VarType.FLOAT) or \
+                 right_type not in (VarType.INTEGER, VarType.FLOAT):
+                # 只有两侧都是确定类型时才检查
                 self.errors.append(ValidationError(
                     line_number=line_num,
                     error_type="类型错误",
                     message=f"比较运算 {op} 仅支持数字类型，当前为 {left_type.value} 与 {right_type.value}",
-                    suggestion="将变量类型改为 Integer/Float，或改用 == / !="
+                    suggestion="将变量类型改为 Integer/Float，或改用 == / !=",
+                    severity="P1"
                 ))
-        
+
         if op == 'IN':
-            if right_type not in (VarType.LIST, VarType.DICT, VarType.ANY):
+            # 如果右侧是ANY类型（运行时变量），则不检查类型
+            if right_type == VarType.ANY:
+                self.warnings.append(
+                    "IN 运算涉及运行时变量（类型将在运行时确定），请确保是集合类型"
+                )
+            elif right_type not in (VarType.LIST, VarType.DICT):
                 self.errors.append(ValidationError(
                     line_number=line_num,
                     error_type="类型错误",
                     message=f"IN 运算右侧必须为 List/Dict，当前为 {right_type.value}",
-                    suggestion="确保集合类型变量为 List 或 Dict"
+                    suggestion="确保集合类型变量为 List 或 Dict",
+                    severity="P1"
                 ))
     
     def _infer_expr_type(self, expr: str) -> VarType:
@@ -892,15 +921,127 @@ class DSLValidator:
             self._check_variables_exist(line_num, vars_in_arg)
     
     def _check_variables_exist(self, line_num: int, var_names: List[str]):
-        """检查变量是否已定义"""
+        """检查变量是否已定义 - 区分配置参数和运行时变量"""
         for var_name in var_names:
-            if var_name not in self.defined_vars:
+            # 如果已经在运行时变量集合中，跳过检查
+            if var_name in self.runtime_vars:
+                continue
+
+            # 如果已经在定义变量中，跳过检查
+            if var_name in self.defined_vars:
+                continue
+
+            # 变量既未定义也不在运行时集合中，需要判断类型
+            if self._is_runtime_variable(var_name):
+                # 运行时变量：记录为警告，不报错
+                self.runtime_vars.add(var_name)
+                self.warnings.append(
+                    f"运行时变量 '{var_name}' 未预定义（将在运行时动态创建）"
+                )
+            else:
+                # 配置参数未定义：严重错误（P1）
                 self.errors.append(ValidationError(
                     line_number=line_num,
                     error_type="未定义变量",
-                    message=f"变量 {{{{{var_name}}}}} 在使用前未定义",
-                    suggestion=f"在代码开头添加: DEFINE {{{{{var_name}}}}}: Type"
+                    message=f"配置参数 {{{{{var_name}}}}} 未在Prompt 2.0中提取",
+                    suggestion=f"在Prompt 2.0阶段提取此参数，或在DSL开头添加: DEFINE {{{{{var_name}}}}}: Type",
+                    severity="P1"
                 ))
+
+    def _is_runtime_variable(self, var_name: str) -> bool:
+        """
+        判断变量是否是运行时变量（启发式规则）
+
+        运行时变量特点：
+        1. 用户输入/输出相关（包含user/input/query/output/result等关键词）
+        2. 函数返回值（在赋值左侧出现）
+        3. 状态/控制变量（包含count/duration/index/state/flag等）
+        4. 中间计算结果（如similarity, score, ranking等）
+        5. 时间/性能指标（如response_time, qps, duration等）
+        """
+        var_name_lower = var_name.lower()
+
+        # 规则1: 用户输入相关变量
+        user_input_keywords = [
+            'user', 'input', 'query', 'request', 'feedback',
+            'prompt', 'command', 'message', 'text'
+        ]
+        if any(kw in var_name_lower for kw in user_input_keywords):
+            return True
+
+        # 规则2: 结果/输出相关变量
+        output_keywords = [
+            'result', 'output', 'response', 'answer', 'return',
+            'value', 'item', 'element', 'entry', 'record'
+        ]
+        if any(kw in var_name_lower for kw in output_keywords):
+            return True
+
+        # 规则3: 状态/控制变量
+        state_keywords = [
+            'count', 'duration', 'index', 'state', 'flag',
+            'status', 'iteration', 'step', 'stage', 'phase',
+            'loop', 'iteration', 'position'
+        ]
+        if any(kw in var_name_lower for kw in state_keywords):
+            return True
+
+        # 规则4: 中间计算结果
+        intermediate_keywords = [
+            'similarity', 'score', 'ranking', 'confidence',
+            'match', 'filter', 'sort', 'rank', 'weight',
+            'vector', 'embedding', 'feature'
+        ]
+        if any(kw in var_name_lower for kw in intermediate_keywords):
+            return True
+
+        # 规则5: 性能/监控指标
+        metric_keywords = [
+            'time', 'qps', 'latency', 'throughput', 'rate',
+            'percentile', 'duration', 'elapsed', 'speed'
+        ]
+        if any(kw in var_name_lower for kw in metric_keywords):
+            return True
+
+        # 规则6: 数据源实例（通常是配置参数的运行时实例）
+        data_source_keywords = [
+            'cache', 'queue', 'buffer', 'pool', 'session',
+            'context', 'environment', 'workspace'
+        ]
+        if any(kw in var_name_lower for kw in data_source_keywords):
+            return True
+
+        # 规则7: 意图/语义相关
+        intent_keywords = [
+            'intent', 'category', 'type', 'class', 'label',
+            'tag', 'keyword', 'topic', 'domain'
+        ]
+        if any(kw in var_name_lower for kw in intent_keywords):
+            return True
+
+        # 规则8: 过滤/检查相关
+        filter_keywords = [
+            'filtered', 'checked', 'validated', 'verified',
+            'approved', 'rejected', 'allowed', 'denied'
+        ]
+        if any(kw in var_name_lower for kw in filter_keywords):
+            return True
+
+        # 规则9: 特殊前缀（常见的临时变量模式）
+        if var_name_lower.startswith(('temp', 'tmp', 'buf', 'aux', 'helper')):
+            return True
+
+        # 规则10: 复合变量名（包含多个单词，通常是运行时构造的）
+        if '_' in var_name and len(var_name.split('_')) >= 2:
+            parts = var_name.split('_')
+            # 如果包含上述任何关键词，也认为是运行时变量
+            for part in parts:
+                if any(kw in part.lower() for kw in
+                    user_input_keywords + output_keywords + state_keywords):
+                    return True
+
+        # 如果都不匹配，认为是配置参数，需要预定义
+        return False
 
 
 # ============================================================

@@ -202,9 +202,9 @@ class PseudoCodeParser:
                 left, right = line.split("=", 1)
                 outputs = self._extract_vars(left)
                 inputs = self._extract_vars(right)
-                
+
                 is_async = "CALL" in right
-                
+
                 blocks.append(CodeBlock(
                     id=f"OP_{block_counter}",
                     type=block_type,
@@ -215,7 +215,76 @@ class PseudoCodeParser:
                     is_async=is_async
                 ))
                 block_counter += 1
-            
+            # 修复 P0-1: 处理 RETURN CALL 语句（没有等号的情况）
+            elif line.upper().startswith("RETURN") and "CALL" in line:
+                # RETURN CALL 语句，提取变量
+                inputs = vars_in_line
+                outputs = set()  # RETURN 语句没有本地输出，直接返回
+
+                blocks.append(CodeBlock(
+                    id=f"OP_{block_counter}",
+                    type=block_type,
+                    code_lines=[line],
+                    inputs=inputs,
+                    outputs=outputs,
+                    line_number=i + 1,
+                    is_async=True  # RETURN CALL 也是异步的
+                ))
+                block_counter += 1
+            # 修复 P1-2: 处理单纯的 CALL 语句（没有等号，也不是 RETURN CALL）
+            elif line.upper().startswith("CALL") or ("CALL" in line and not line.upper().startswith("RETURN")):
+                # 纯 CALL 语句，提取变量
+                inputs = vars_in_line
+                outputs = set()  # 无输出的调用
+
+                blocks.append(CodeBlock(
+                    id=f"OP_{block_counter}",
+                    type=block_type,
+                    code_lines=[line],
+                    inputs=inputs,
+                    outputs=outputs,
+                    line_number=i + 1,
+                    is_async=True
+                ))
+                block_counter += 1
+            # 处理单纯 RETURN 语句（没有 CALL）
+            elif line.upper().startswith("RETURN ") and "CALL" not in line:
+                # RETURN var 语句，提取返回的变量作为输出
+                inputs = vars_in_line
+                # 手动提取 RETURN 后的变量名
+                return_part = line.strip()[7:].strip()  # 去掉 "RETURN "
+                outputs = set()
+                if return_part and not return_part.startswith('await') and not return_part.startswith('invoke'):
+                    # 简单变量名（不是表达式）
+                    if ' ' not in return_part and not return_part.endswith(')'):
+                        outputs.add(return_part)
+
+                blocks.append(CodeBlock(
+                    id=f"OP_{block_counter}",
+                    type=block_type,
+                    code_lines=[line],
+                    inputs=inputs,
+                    outputs=outputs,
+                    line_number=i + 1,
+                    is_async=False
+                ))
+                block_counter += 1
+            # 处理其他普通语句（没有CALL，没有等号，比如条件表达式）
+            elif block_type == BlockType.ASSIGN:
+                inputs = vars_in_line
+                outputs = set()
+
+                blocks.append(CodeBlock(
+                    id=f"OP_{block_counter}",
+                    type=block_type,
+                    code_lines=[line],
+                    inputs=inputs,
+                    outputs=outputs,
+                    line_number=i + 1,
+                    is_async=False
+                ))
+                block_counter += 1
+
             i += 1
         
         return blocks
@@ -304,31 +373,33 @@ class DependencyAnalyzer:
         current_module = []
 
         # 控制流块类型
-        control_flow_types = [
-            BlockType.IF, BlockType.ELSE, BlockType.ENDIF,
-            BlockType.FOR, BlockType.ENDFOR,
-            BlockType.WHILE, BlockType.ENDWHILE
-        ]
+        control_flow_start_types = [BlockType.IF, BlockType.FOR, BlockType.WHILE]
+        control_flow_end_types = [BlockType.ENDIF, BlockType.ENDFOR, BlockType.ENDWHILE]
+        control_flow_types = control_flow_start_types + control_flow_end_types
 
         in_control_flow = False  # 标记是否在控制流内部
 
         for node_id in sorted_nodes:
             node_data = self.graph.nodes[node_id]['data']
 
-            # 如果遇到控制流开始，进入控制流模式
-            if node_data.type in [BlockType.IF, BlockType.FOR, BlockType.WHILE]:
+            # 如果遇到控制流开始
+            if node_data.type in control_flow_start_types:
+                # 先保存之前的模块（如果有）
+                if current_module:
+                    modules.append(current_module)
+                    current_module = []
                 in_control_flow = True
                 current_module.append(node_data)
                 continue
 
-            # 如果遇到控制流结束，退出控制流模式
-            if node_data.type in [BlockType.ENDIF, BlockType.ENDFOR, BlockType.ENDWHILE]:
-                in_control_flow = False
+            # 如果遇到控制流结束
+            if node_data.type in control_flow_end_types:
                 current_module.append(node_data)
                 # 控制流结束后切分
                 if current_module:
                     modules.append(current_module)
                     current_module = []
+                in_control_flow = False
                 continue
 
             # 普通代码块（CALL, ASSIGN）
@@ -445,19 +516,60 @@ class ModuleSynthesizer:
             args_str = match.group(3)
             return self._format_call(result_var, func_name, args_str)
         
-        # 容错模式4: 多行参数（匹配到参数名列表）
+        # 容错模式5: 单纯 CALL 语句（没有等号）CALL func(arg1, arg2)
+        match = re.match(r'CALL\s+(\w+)\s*\((.*?)\)\s*$', cleaned)
+        if match:
+            func_name = match.group(1)
+            args_str = match.group(2)
+
+            if not args_str.strip():
+                return f"await invoke_function('{func_name}')"
+
+            # 处理参数
+            args = []
+            for arg in args_str.split(','):
+                arg = arg.strip()
+                if arg:
+                    if '=' in arg:
+                        parts = arg.split('=', 1)
+                        if len(parts) == 2:
+                            param_name = self._sanitize_identifier(parts[0].strip())
+                            param_value = parts[1].strip()
+                            if param_value and not (param_value.startswith('"') or param_value.startswith("'")):
+                                param_value = self._sanitize_identifier(param_value)
+                            args.append(f"{param_name}={param_value}")
+                    else:
+                        cleaned_arg = self._sanitize_identifier(arg)
+                        args.append(f"{cleaned_arg}={cleaned_arg}")
+
+            kwargs_str = ', '.join(args) if args else ''
+            return f"await invoke_function('{func_name}'{', ' + kwargs_str if kwargs_str else ''})"
+
+        # 容错模式6: 单纯 CALL 语句（没有等号，没有参数）CALL func
+        match = re.match(r'CALL\s+(\w+)\s*$', cleaned)
+        if match:
+            func_name = match.group(1)
+            return f"await invoke_function('{func_name}')"
+
+        # 容错模式7: 多行参数（匹配到参数名列表）
         match = re.match(r'(\w+)\s*=\s*CALL\s+(\w+)', cleaned)
         if match:
             result_var = match.group(1)
             func_name = match.group(2)
             warning(f"CALL 语句格式不完整，使用默认调用: {pseudo_line}")
             return f"{result_var} = await invoke_function('{func_name}')"
-        
+
         # 无法解析，返回原始行并警告
         warning(f"无法解析 CALL 语句: {pseudo_line}")
         return cleaned
     
     def _format_call(self, result_var: str, func_name: str, args_str: str) -> str:
+        """格式化参数并生成 invoke_function 调用"""
+        # 清理结果变量名
+        result_var = self._sanitize_identifier(result_var)
+        
+        if not args_str.strip():
+            return f"{result_var} = await invoke_function('{func_name}')"
         """格式化参数并生成 invoke_function 调用"""
         if not args_str.strip():
             return f"{result_var} = await invoke_function('{func_name}')"
@@ -469,10 +581,19 @@ class ModuleSynthesizer:
             if arg:
                 # 检查是否是参数赋值格式 param=value
                 if '=' in arg:
-                    args.append(arg)
+                    # 清理参数名和值
+                    parts = arg.split('=', 1)
+                    if len(parts) == 2:
+                        param_name = self._sanitize_identifier(parts[0].strip())
+                        param_value = parts[1].strip()
+                        # 清理值部分（如果是变量名）
+                        if param_value and not (param_value.startswith('"') or param_value.startswith("'")):
+                            param_value = self._sanitize_identifier(param_value)
+                        args.append(f"{param_name}={param_value}")
                 else:
                     # 纯变量名，转换为 keyword argument
-                    args.append(f"{arg}={arg}")
+                    cleaned_arg = self._sanitize_identifier(arg)
+                    args.append(f"{cleaned_arg}={cleaned_arg}")
         
         kwargs_str = ', '.join(args)
         return f"{result_var} = await invoke_function('{func_name}', {kwargs_str})"
@@ -481,6 +602,38 @@ class ModuleSynthesizer:
         """清理伪代码为 Python 代码（增强 FOR 循环转换）"""
         # 去除 {{}}
         cleaned = line.replace("{{", "").replace("}}", "")
+        
+        # 修复 P0-1: 处理 RETURN CALL 语句
+        # 将 "RETURN CALL func(...)" 转换为 "return await invoke_function('func', ...)"
+        if re.match(r'^RETURN\s+CALL\s+\w+', cleaned, flags=re.IGNORECASE):
+            match = re.match(r'RETURN\s+CALL\s+(\w+)\s*\((.*?)\)\s*$', cleaned, flags=re.IGNORECASE)
+            if match:
+                func_name = match.group(1)
+                args_str = match.group(2)
+                # 格式化参数
+                if args_str.strip():
+                    args = []
+                    for arg in args_str.split(','):
+                        arg = arg.strip()
+                        if arg:
+                            if '=' in arg:
+                                # 清理参数名和值
+                                parts = arg.split('=', 1)
+                                if len(parts) == 2:
+                                    param_name = self._sanitize_identifier(parts[0].strip())
+                                    param_value = parts[1].strip()
+                                    # 清理值部分（如果是变量名）
+                                    if param_value and not (param_value.startswith('"') or param_value.startswith("'")):
+                                        param_value = self._sanitize_identifier(param_value)
+                                    args.append(f"{param_name}={param_value}")
+                            else:
+                                # 纯变量名，转换为 keyword argument
+                                cleaned_arg = self._sanitize_identifier(arg)
+                                args.append(f"{cleaned_arg}={cleaned_arg}")
+                    kwargs_str = ', '.join(args)
+                    return f"return await invoke_function('{func_name}', {kwargs_str})"
+                else:
+                    return f"return await invoke_function('{func_name}')"
         
         # 转换控制流
         cleaned = re.sub(r'^IF\s+', 'if ', cleaned, flags=re.IGNORECASE)
@@ -510,18 +663,110 @@ class ModuleSynthesizer:
         cleaned = re.sub(r'\bOR\b', ' or ', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'\bNOT\b', ' not ', cleaned, flags=re.IGNORECASE)
         
+        # 转换 IS NOT 运算符（DSL -> Python）
+        cleaned = re.sub(r'\bIS\s+NOT\b', ' is not ', cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r'\bIS\b', ' is ', cleaned, flags=re.IGNORECASE)
+        
         # 转换 IN 运算符（DSL -> Python）
         cleaned = re.sub(r'\bIN\b', ' in ', cleaned)
+        
+        # 修复 P1-1: 处理 IF CALL 语句
+        # 检查是否是 "IF CALL func(...)" 格式
+        if re.match(r'^IF\s+CALL\s+\w+', cleaned, flags=re.IGNORECASE):
+            match = re.match(r'IF\s+CALL\s+(\w+)\s*\((.*?)\)\s*$', cleaned, flags=re.IGNORECASE)
+            if match:
+                func_name = match.group(1)
+                args_str = match.group(2)
+                # 格式化参数
+                if args_str.strip():
+                    args = []
+                    for arg in args_str.split(','):
+                        arg = arg.strip()
+                        if arg:
+                            if '=' in arg:
+                                parts = arg.split('=', 1)
+                                if len(parts) == 2:
+                                    param_name = self._sanitize_identifier(parts[0].strip())
+                                    param_value = parts[1].strip()
+                                    if param_value and not (param_value.startswith('"') or param_value.startswith("'")):
+                                        param_value = self._sanitize_identifier(param_value)
+                                    args.append(f"{param_name}={param_value}")
+                            else:
+                                cleaned_arg = self._sanitize_identifier(arg)
+                                args.append(f"{cleaned_arg}={cleaned_arg}")
+                    kwargs_str = ', '.join(args)
+                    cleaned = f"if await invoke_function('{func_name}', {kwargs_str}):"
+                else:
+                    cleaned = f"if await invoke_function('{func_name}'):"
         
         # 确保if语句以冒号结尾（如果还没有）
         if cleaned.strip().startswith('if ') and not cleaned.strip().endswith(':'):
             cleaned = cleaned.strip() + ':'
-        
-        # 处理 CALL
+
+        # 处理 RETURN 语句（将 RETURN 转换为小写的 return）
+        if cleaned.strip().startswith("RETURN "):
+            # 提取 RETURN 后的内容
+            return_expr = cleaned.strip()[7:].strip()
+            cleaned = f"return {return_expr}"
+
+        # 处理 CALL（非 IF CALL 的情况）
         if "CALL" in line:
             cleaned = self._translate_call(line)
         
+        # 修复 P0-2: 清理非 CALL 行中的变量引用
+        # 查找所有可能的标识符（不以数字开头的字母数字下划线组合）
+        # 但要跳过关键字、字符串、数字等
+        cleaned = self._sanitize_line_variables(cleaned)
+        
         return cleaned
+    
+    def _sanitize_line_variables(self, line: str) -> str:
+        """
+        清理代码行中的变量引用，使其符合 Python 标识符规范
+        只处理非 CALL 语句中的变量引用
+        """
+        # 定义 Python 关键字，不进行替换
+        python_keywords = {
+            'if', 'else', 'elif', 'for', 'while', 'in', 'and', 'or', 'not',
+            'is', 'none', 'true', 'false', 'return', 'def', 'async', 'await',
+            'import', 'from', 'class', 'pass', 'break', 'continue'
+        }
+        
+        # 查找所有标识符（包括以数字开头的）
+        # 匹配：字母、数字、下划线的组合（包括以数字开头的）
+        tokens = re.findall(r'\b[a-zA-Z0-9_]+\b', line)
+        
+        # 对每个 token 检查是否需要清理
+        for token in set(tokens):
+            token_lower = token.lower()
+            # 跳过关键字
+            if token_lower in python_keywords:
+                continue
+            # 跳过纯数字
+            if token.isdigit():
+                continue
+            # 如果以数字开头，需要清理
+            if token[0].isdigit():
+                sanitized = self._sanitize_identifier(token)
+                # 替换所有出现的位置（作为独立单词）
+                line = re.sub(r'\b' + re.escape(token) + r'\b', sanitized, line)
+        
+        return line
+    
+    def _sanitize_identifier(self, identifier: str) -> str:
+        """
+        清理变量名，确保符合 Python 标识符规范
+        - 不能以数字开头
+        - 只能包含字母、数字、下划线
+        """
+        # 如果以数字开头，添加下划线前缀
+        if identifier and identifier[0].isdigit():
+            identifier = '_' + identifier
+        
+        # 替换非字母数字下划线字符为下划线
+        identifier = re.sub(r'[^a-zA-Z0-9_]', '_', identifier)
+        
+        return identifier
     
     def generate_module(self, cluster: List[CodeBlock], module_id: int) -> ModuleDefinition:
         """生成单个模块的 Python 代码"""
@@ -541,9 +786,9 @@ class ModuleSynthesizer:
             if block.is_async:
                 is_async = True
 
-        # 真实的外部输入 = 所需输入 - 内部产生的变量
-        external_inputs = sorted(list(all_inputs - internal_vars))
-        final_outputs = sorted(list(all_outputs))
+        # 修复 P0-2: 清理变量名，确保符合 Python 标识符规范
+        external_inputs = sorted([self._sanitize_identifier(v) for v in all_inputs - internal_vars])
+        final_outputs = sorted([self._sanitize_identifier(v) for v in all_outputs])
 
         # 生成函数名
         func_name = self._generate_function_name(cluster, module_id)
@@ -557,6 +802,9 @@ class ModuleSynthesizer:
         control_flow_depth = 0  # 控制流嵌套深度
         control_flow_types = [BlockType.IF, BlockType.FOR, BlockType.WHILE]
         control_flow_end_types = [BlockType.ENDIF, BlockType.ENDFOR, BlockType.ENDWHILE]
+
+        # 标记是否已经包含 RETURN 语句
+        has_return_statement = False
 
         # 转换代码行并处理多行CALL语句
         for block in cluster:
@@ -581,7 +829,21 @@ class ModuleSynthesizer:
                         if cleaned and cleaned.strip() and block_type != BlockType.ENDIF:
                             code_lines.append(f"    {cleaned}")
 
-            # 处理普通代码块（CALL, ASSIGN, ELSE）
+            # 处理 ELSE 分支（特殊处理：与 IF 同级缩进）
+            elif block_type == BlockType.ELSE:
+                for line in block.code_lines:
+                    if line.strip():
+                        cleaned = self._clean_line(line)
+                        if cleaned and cleaned.strip():
+                            # ELSE 冒号与 IF 同级
+                            if cleaned.strip() == "else:" or cleaned.strip() == "else":
+                                code_lines.append(f"    else:")
+                            # ELSE 内部代码缩进一级
+                            else:
+                                indent = "    " + "    " * control_flow_depth
+                                code_lines.append(f"{indent}{cleaned}")
+
+            # 处理普通代码块（CALL, ASSIGN）
             else:
                 # 计算当前缩进级别
                 indent = "    " + "    " * control_flow_depth
@@ -614,9 +876,15 @@ class ModuleSynthesizer:
                             cleaned = self._clean_line(line)
                             if cleaned and cleaned.strip():
                                 code_lines.append(f"{indent}{cleaned}")
+                                # 检查是否是 RETURN 语句
+                                if cleaned.strip().startswith('return '):
+                                    has_return_statement = True
 
         # 返回值
-        if final_outputs:
+        if has_return_statement:
+            # 如果已经有 RETURN 语句，不再添加默认 return
+            pass
+        elif final_outputs:
             code_lines.append(f"    return {', '.join(final_outputs)}")
         else:
             code_lines.append("    return None")
@@ -951,6 +1219,11 @@ class WaActCompiler:
                 error_msg = f"  ❌ {module.name}: 语法错误 - {e.msg} (行 {e.lineno})"
                 errors.append(error_msg)
                 error(error_msg)
+                # 打印出错的代码用于调试
+                error(f"\n--- {module.name} 代码内容 ---")
+                for i, line in enumerate(module.body_code.split('\n'), 1):
+                    error(f"{i:3}|{line}")
+                error(f"--- {module.name} 代码结束 ---\n")
                 continue
             
             # 检查是否有残留的 DSL 关键字

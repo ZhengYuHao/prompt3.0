@@ -25,6 +25,7 @@ class BlockType(Enum):
     ASSIGN = "ASSIGN"          # 普通赋值
     CALL = "CALL"              # LLM 调用
     IF = "IF"                  # 条件判断
+    ELIF = "ELIF"              # 否则如果分支
     ELSE = "ELSE"              # 否则分支
     ENDIF = "ENDIF"            # 条件结束
     FOR = "FOR"                # FOR循环
@@ -87,6 +88,8 @@ class PseudoCodeParser:
         line_upper = line.upper().strip()
         if line_upper.startswith("IF "):
             return BlockType.IF
+        elif line_upper.startswith("ELIF "):
+            return BlockType.ELIF
         elif line_upper == "ELSE":
             return BlockType.ELSE
         elif line_upper == "ENDIF":
@@ -182,7 +185,7 @@ class PseudoCodeParser:
             vars_in_line = self._extract_vars(line)
             
             # 控制流语句
-            if block_type in [BlockType.IF, BlockType.ELSE, BlockType.ENDIF, 
+            if block_type in [BlockType.IF, BlockType.ELIF, BlockType.ELSE, BlockType.ENDIF,
                              BlockType.FOR, BlockType.ENDFOR,
                              BlockType.WHILE, BlockType.ENDWHILE]:
                 blocks.append(CodeBlock(
@@ -348,7 +351,7 @@ class DependencyAnalyzer:
         for node in self.graph.nodes():
             if self.graph.in_degree(node) == 0 and self.graph.out_degree(node) == 0:
                 block_data = self.graph.nodes[node]['data']
-                if block_data.type not in [BlockType.IF, BlockType.ELSE, BlockType.ENDIF]:
+                if block_data.type not in [BlockType.IF, BlockType.ELIF, BlockType.ELSE, BlockType.ENDIF]:
                     dead_blocks.append(node)
         return dead_blocks
     
@@ -367,43 +370,71 @@ class DependencyAnalyzer:
         - io_isolation: IO 隔离策略（每个 LLM 调用独立成模块）
         - control_flow: 控制流内聚策略
         - hybrid: 混合策略（推荐）
+
+        修复：使用行号排序而非拓扑排序，保持控制流完整性
         """
-        sorted_nodes = self.topological_sort()
+        # 按源代码行号排序（而非拓扑排序），保持控制流完整
+        sorted_blocks = sorted(self.blocks, key=lambda b: b.line_number)
+
         modules = []
         current_module = []
 
         # 控制流块类型
         control_flow_start_types = [BlockType.IF, BlockType.FOR, BlockType.WHILE]
+        control_flow_middle_types = [BlockType.ELIF, BlockType.ELSE]
         control_flow_end_types = [BlockType.ENDIF, BlockType.ENDFOR, BlockType.ENDWHILE]
-        control_flow_types = control_flow_start_types + control_flow_end_types
+        control_flow_types = control_flow_start_types + control_flow_middle_types + control_flow_end_types
 
         in_control_flow = False  # 标记是否在控制流内部
+        control_flow_depth = 0  # 控制流嵌套深度
 
-        for node_id in sorted_nodes:
-            node_data = self.graph.nodes[node_id]['data']
+        for block in sorted_blocks:
 
             # 如果遇到控制流开始
-            if node_data.type in control_flow_start_types:
+            if block.type in control_flow_start_types:
                 # 先保存之前的模块（如果有）
                 if current_module:
                     modules.append(current_module)
                     current_module = []
                 in_control_flow = True
-                current_module.append(node_data)
+                control_flow_depth += 1
+                current_module.append(block)
                 continue
 
             # 如果遇到控制流结束
-            if node_data.type in control_flow_end_types:
-                current_module.append(node_data)
+            if block.type in control_flow_end_types:
+                current_module.append(block)
                 # 控制流结束后切分
                 if current_module:
                     modules.append(current_module)
                     current_module = []
-                in_control_flow = False
+                control_flow_depth = max(0, control_flow_depth - 1)
+                if control_flow_depth == 0:
+                    in_control_flow = False
+                continue
+
+            # 处理 ELIF 分支（特殊处理：与 IF 同级缩进）
+            if block.type == BlockType.ELIF:
+                # ELIF 必须在控制流内部
+                if not in_control_flow:
+                    warning(f"ELIF 语句不在控制流内部，将被视为普通代码")
+                    current_module.append(block)
+                else:
+                    current_module.append(block)
+                continue
+
+            # 处理 ELSE 分支（特殊处理：与 IF 同级缩进）
+            if block.type == BlockType.ELSE:
+                # ELSE 必须在控制流内部
+                if not in_control_flow:
+                    warning(f"ELSE 语句不在控制流内部，将被视为普通代码")
+                    current_module.append(block)
+                else:
+                    current_module.append(block)
                 continue
 
             # 普通代码块（CALL, ASSIGN）
-            current_module.append(node_data)
+            current_module.append(block)
 
             # 切分条件
             should_split = False
@@ -411,7 +442,7 @@ class DependencyAnalyzer:
             if not in_control_flow:  # 不在控制流内部时才考虑切分
                 if strategy == "io_isolation":
                     # 每个 CALL 都独立成模块
-                    should_split = node_data.type == BlockType.CALL
+                    should_split = block.type == BlockType.CALL
 
                 elif strategy == "control_flow":
                     # 控制流边界切分（已在上方处理）
@@ -419,15 +450,15 @@ class DependencyAnalyzer:
 
                 elif strategy == "hybrid":
                     # CALL 时切分
-                    should_split = node_data.type == BlockType.CALL
+                    should_split = block.type == BlockType.CALL
 
             if should_split and current_module:
                 modules.append(current_module)
                 current_module = []
-        
+
         if current_module:
             modules.append(current_module)
-        
+
         return modules
     
     def visualize(self, output_file="dependency_graph.png"):
@@ -602,7 +633,36 @@ class ModuleSynthesizer:
         """清理伪代码为 Python 代码（增强 FOR 循环转换）"""
         # 去除 {{}}
         cleaned = line.replace("{{", "").replace("}}", "")
-        
+
+        # 修复 P1-1: 处理 IF CALL 语句（必须在去除 {{}} 后立即处理）
+        # 检查是否是 "IF CALL func(...)" 格式
+        if re.match(r'^IF\s+CALL\s+\w+', cleaned, flags=re.IGNORECASE):
+            match = re.match(r'IF\s+CALL\s+(\w+)\s*\((.*?)\)\s*$', cleaned, flags=re.IGNORECASE)
+            if match:
+                func_name = match.group(1)
+                args_str = match.group(2)
+                # 格式化参数
+                if args_str.strip():
+                    args = []
+                    for arg in args_str.split(','):
+                        arg = arg.strip()
+                        if arg:
+                            if '=' in arg:
+                                parts = arg.split('=', 1)
+                                if len(parts) == 2:
+                                    param_name = self._sanitize_identifier(parts[0].strip())
+                                    param_value = parts[1].strip()
+                                    if param_value and not (param_value.startswith('"') or param_value.startswith("'")):
+                                        param_value = self._sanitize_identifier(param_value)
+                                    args.append(f"{param_name}={param_value}")
+                            else:
+                                cleaned_arg = self._sanitize_identifier(arg)
+                                args.append(f"{cleaned_arg}={cleaned_arg}")
+                    kwargs_str = ', '.join(args)
+                    return f"if await invoke_function('{func_name}', {kwargs_str}):"
+                else:
+                    return f"if await invoke_function('{func_name}'):"
+
         # 修复 P0-1: 处理 RETURN CALL 语句
         # 将 "RETURN CALL func(...)" 转换为 "return await invoke_function('func', ...)"
         if re.match(r'^RETURN\s+CALL\s+\w+', cleaned, flags=re.IGNORECASE):
@@ -634,12 +694,17 @@ class ModuleSynthesizer:
                     return f"return await invoke_function('{func_name}', {kwargs_str})"
                 else:
                     return f"return await invoke_function('{func_name}')"
-        
+
         # 转换控制流
         cleaned = re.sub(r'^IF\s+', 'if ', cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r'^ELIF\s+', 'elif ', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'^ELSE$', 'else:', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'^ENDIF$', '', cleaned, flags=re.IGNORECASE)
-        
+
+        # 确保 elif 语句以冒号结尾（如果还没有）
+        if cleaned.strip().startswith('elif ') and not cleaned.strip().endswith(':'):
+            cleaned = cleaned.strip() + ':'
+
         # 增强 FOR 循环转换（支持多种格式）
         # 格式1: FOR var IN range(end)
         match = re.match(r'^FOR\s+(\w+)\s+IN\s+range\((\w+)\)\s*$', cleaned, flags=re.IGNORECASE)
@@ -655,50 +720,21 @@ class ModuleSynthesizer:
             # 尝试简化格式: FOR var IN iterable
             elif re.match(r'^FOR\s+\w+\s+IN\s+\w+\s*$', cleaned, flags=re.IGNORECASE):
                 cleaned = re.sub(r'^FOR\s+(\w+)\s+IN\s+(\w+)', r'for \1 in \2:', cleaned, flags=re.IGNORECASE)
-        
+
         cleaned = re.sub(r'^ENDFOR$', '', cleaned, flags=re.IGNORECASE)
-        
+
         # 转换逻辑运算符（DSL -> Python）
         cleaned = re.sub(r'\bAND\b', ' and ', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'\bOR\b', ' or ', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'\bNOT\b', ' not ', cleaned, flags=re.IGNORECASE)
-        
+
         # 转换 IS NOT 运算符（DSL -> Python）
         cleaned = re.sub(r'\bIS\s+NOT\b', ' is not ', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'\bIS\b', ' is ', cleaned, flags=re.IGNORECASE)
-        
+
         # 转换 IN 运算符（DSL -> Python）
         cleaned = re.sub(r'\bIN\b', ' in ', cleaned)
-        
-        # 修复 P1-1: 处理 IF CALL 语句
-        # 检查是否是 "IF CALL func(...)" 格式
-        if re.match(r'^IF\s+CALL\s+\w+', cleaned, flags=re.IGNORECASE):
-            match = re.match(r'IF\s+CALL\s+(\w+)\s*\((.*?)\)\s*$', cleaned, flags=re.IGNORECASE)
-            if match:
-                func_name = match.group(1)
-                args_str = match.group(2)
-                # 格式化参数
-                if args_str.strip():
-                    args = []
-                    for arg in args_str.split(','):
-                        arg = arg.strip()
-                        if arg:
-                            if '=' in arg:
-                                parts = arg.split('=', 1)
-                                if len(parts) == 2:
-                                    param_name = self._sanitize_identifier(parts[0].strip())
-                                    param_value = parts[1].strip()
-                                    if param_value and not (param_value.startswith('"') or param_value.startswith("'")):
-                                        param_value = self._sanitize_identifier(param_value)
-                                    args.append(f"{param_name}={param_value}")
-                            else:
-                                cleaned_arg = self._sanitize_identifier(arg)
-                                args.append(f"{cleaned_arg}={cleaned_arg}")
-                    kwargs_str = ', '.join(args)
-                    cleaned = f"if await invoke_function('{func_name}', {kwargs_str}):"
-                else:
-                    cleaned = f"if await invoke_function('{func_name}'):"
-        
+
         # 确保if语句以冒号结尾（如果还没有）
         if cleaned.strip().startswith('if ') and not cleaned.strip().endswith(':'):
             cleaned = cleaned.strip() + ':'
@@ -712,12 +748,12 @@ class ModuleSynthesizer:
         # 处理 CALL（非 IF CALL 的情况）
         if "CALL" in line:
             cleaned = self._translate_call(line)
-        
+
         # 修复 P0-2: 清理非 CALL 行中的变量引用
         # 查找所有可能的标识符（不以数字开头的字母数字下划线组合）
         # 但要跳过关键字、字符串、数字等
         cleaned = self._sanitize_line_variables(cleaned)
-        
+
         return cleaned
     
     def _sanitize_line_variables(self, line: str) -> str:
@@ -729,7 +765,7 @@ class ModuleSynthesizer:
         python_keywords = {
             'if', 'else', 'elif', 'for', 'while', 'in', 'and', 'or', 'not',
             'is', 'none', 'true', 'false', 'return', 'def', 'async', 'await',
-            'import', 'from', 'class', 'pass', 'break', 'continue'
+            'import', 'from', 'class', 'pass', 'break', 'continue', 'elif'
         }
         
         # 查找所有标识符（包括以数字开头的）
@@ -801,6 +837,7 @@ class ModuleSynthesizer:
         # 控制流状态跟踪
         control_flow_depth = 0  # 控制流嵌套深度
         control_flow_types = [BlockType.IF, BlockType.FOR, BlockType.WHILE]
+        control_flow_middle_types = [BlockType.ELIF, BlockType.ELSE]
         control_flow_end_types = [BlockType.ENDIF, BlockType.ENDFOR, BlockType.ENDWHILE]
 
         # 标记是否已经包含 RETURN 语句
@@ -810,24 +847,23 @@ class ModuleSynthesizer:
         for block in cluster:
             block_type = block.type
 
-            # 处理控制流开始
+            # 处理控制流开始（IF/FOR/WHILE）
             if block_type in control_flow_types:
                 for line in block.code_lines:
                     if line.strip():
                         cleaned = self._clean_line(line)
                         if cleaned and cleaned.strip():
+                            # 控制流语句本身与函数体同级（4个空格）
                             code_lines.append(f"    {cleaned}")
+                # 控制流深度增加，后续代码需要缩进
                 control_flow_depth += 1
 
-            # 处理控制流结束
+            # 处理控制流结束（ENDIF/ENDFOR/ENDWHILE）
             elif block_type in control_flow_end_types:
+                # 控制流结束，深度减少
                 control_flow_depth = max(0, control_flow_depth - 1)
-                for line in block.code_lines:
-                    if line.strip():
-                        cleaned = self._clean_line(line)
-                        # ENDIF/ENDFOR 等通常不需要生成代码，因为 Python 使用缩进
-                        if cleaned and cleaned.strip() and block_type != BlockType.ENDIF:
-                            code_lines.append(f"    {cleaned}")
+                # ENDIF/ENDFOR 等不生成代码（Python 使用缩进）
+                continue
 
             # 处理 ELSE 分支（特殊处理：与 IF 同级缩进）
             elif block_type == BlockType.ELSE:
@@ -835,17 +871,35 @@ class ModuleSynthesizer:
                     if line.strip():
                         cleaned = self._clean_line(line)
                         if cleaned and cleaned.strip():
-                            # ELSE 冒号与 IF 同级
+                            # ELSE 冒号与 IF 同级（4个空格）
                             if cleaned.strip() == "else:" or cleaned.strip() == "else":
                                 code_lines.append(f"    else:")
-                            # ELSE 内部代码缩进一级
+                            # ELSE 内部代码（8个空格，保持与 IF 体内相同深度）
                             else:
                                 indent = "    " + "    " * control_flow_depth
                                 code_lines.append(f"{indent}{cleaned}")
+                # ELSE 后面的代码缩进应该与 IF 体内相同
+                continue
 
-            # 处理普通代码块（CALL, ASSIGN）
+            # 处理 ELIF 分支（特殊处理：与 IF 同级缩进）
+            elif block_type == BlockType.ELIF:
+                for line in block.code_lines:
+                    if line.strip():
+                        cleaned = self._clean_line(line)
+                        if cleaned and cleaned.strip():
+                            # ELIF 冒号与 IF 同级（4个空格）
+                            if cleaned.strip().startswith("elif"):
+                                code_lines.append(f"    {cleaned.strip()}")
+                            # ELIF 内部代码（8个空格，保持与 IF 体内相同深度）
+                            else:
+                                indent = "    " + "    " * control_flow_depth
+                                code_lines.append(f"{indent}{cleaned}")
+                # ELIF 后面的代码缩进应该与 IF 体内相同
+                continue
+
+            # 处理普通代码块（CALL, ASSIGN, RETURN）
             else:
-                # 计算当前缩进级别
+                # 计算当前缩进级别：基础缩进4个空格 + 控制流深度
                 indent = "    " + "    " * control_flow_depth
 
                 # 检查是否是多行CALL block
@@ -872,7 +926,7 @@ class ModuleSynthesizer:
                                 if cleaned and cleaned.strip():
                                     code_lines.append(f"{indent}{cleaned}")
                         elif line.strip():
-                            # 其他代码行
+                            # 其他代码行（ASSIGN, RETURN等）
                             cleaned = self._clean_line(line)
                             if cleaned and cleaned.strip():
                                 code_lines.append(f"{indent}{cleaned}")
@@ -971,13 +1025,16 @@ class ModuleSynthesizer:
                 match = re.search(r'CALL\s+(\w+)', block.code_lines[0])
                 if match:
                     return f"step_{module_id}_{match.group(1)}"
-        
-        # 否则使用输出变量名
+
+        # 否则使用输出变量名（需要清理 {{}} 和确保符合 Python 标识符规范）
         for block in cluster:
             if block.outputs:
                 var_name = list(block.outputs)[0]
-                return f"step_{module_id}_compute_{var_name}"
-        
+                # 先去除 {{}}，再清理标识符
+                var_name_cleaned = var_name.replace("{{", "").replace("}}", "")
+                var_name_sanitized = self._sanitize_identifier(var_name_cleaned)
+                return f"step_{module_id}_compute_{var_name_sanitized}"
+
         return f"step_{module_id}_process"
     
     def generate_orchestrator(self, modules: List[ModuleDefinition],

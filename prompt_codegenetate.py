@@ -371,7 +371,7 @@ class DependencyAnalyzer:
         - control_flow: 控制流内聚策略
         - hybrid: 混合策略（推荐）
 
-        修复：使用行号排序而非拓扑排序，保持控制流完整性
+        修复：确保完整的 IF-ELIF-ELSE-ENDIF 保持在同一模块中
         """
         # 按源代码行号排序（而非拓扑排序），保持控制流完整
         sorted_blocks = sorted(self.blocks, key=lambda b: b.line_number)
@@ -387,6 +387,7 @@ class DependencyAnalyzer:
 
         in_control_flow = False  # 标记是否在控制流内部
         control_flow_depth = 0  # 控制流嵌套深度
+        current_control_start_depth = 0  # 当前控制流的起始深度
 
         for block in sorted_blocks:
 
@@ -398,38 +399,42 @@ class DependencyAnalyzer:
                     current_module = []
                 in_control_flow = True
                 control_flow_depth += 1
+                current_control_start_depth = control_flow_depth  # 记录当前控制流开始的深度
                 current_module.append(block)
                 continue
 
             # 如果遇到控制流结束
             if block.type in control_flow_end_types:
                 current_module.append(block)
-                # 控制流结束后切分
-                if current_module:
-                    modules.append(current_module)
-                    current_module = []
+                # 只有当控制流深度回到起始深度时才切分（确保完整的控制流在同一个模块）
+                if control_flow_depth == current_control_start_depth:
+                    if current_module:
+                        modules.append(current_module)
+                        current_module = []
                 control_flow_depth = max(0, control_flow_depth - 1)
                 if control_flow_depth == 0:
                     in_control_flow = False
                 continue
 
-            # 处理 ELIF 分支（特殊处理：与 IF 同级缩进）
+            # 处理 ELIF 分支（必须与 IF 在同一模块）
             if block.type == BlockType.ELIF:
                 # ELIF 必须在控制流内部
                 if not in_control_flow:
                     warning(f"ELIF 语句不在控制流内部，将被视为普通代码")
                     current_module.append(block)
                 else:
+                    # ELIF 自动添加到当前模块（与 IF 在一起）
                     current_module.append(block)
                 continue
 
-            # 处理 ELSE 分支（特殊处理：与 IF 同级缩进）
+            # 处理 ELSE 分支（必须与 IF 在同一模块）
             if block.type == BlockType.ELSE:
                 # ELSE 必须在控制流内部
                 if not in_control_flow:
                     warning(f"ELSE 语句不在控制流内部，将被视为普通代码")
                     current_module.append(block)
                 else:
+                    # ELSE 自动添加到当前模块（与 IF 在一起）
                     current_module.append(block)
                 continue
 
@@ -732,7 +737,11 @@ class ModuleSynthesizer:
         cleaned = re.sub(r'\bIS\s+NOT\b', ' is not ', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'\bIS\b', ' is ', cleaned, flags=re.IGNORECASE)
 
+        # 转换 CONTAINS 运算符（DSL -> Python）: a CONTAINS b -> b in a
+        cleaned = re.sub(r'(\S+)\s+CONTAINS\s+(\S+)', r'\2 in \1', cleaned, flags=re.IGNORECASE)
+
         # 转换 IN 运算符（DSL -> Python）
+        # 注意：必须在 CONTAINS 之后处理，避免误替换
         cleaned = re.sub(r'\bIN\b', ' in ', cleaned)
 
         # 确保if语句以冒号结尾（如果还没有）

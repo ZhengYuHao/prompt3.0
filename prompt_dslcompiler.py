@@ -75,7 +75,7 @@ class DSLSyntax:
     def get_syntax_documentation() -> str:
         """获取 DSL 语法文档"""
         return """
-# DSL 语法规范 v1.0
+# DSL 语法规范 v1.1
 
 ## 1. 变量声明与赋值
 DEFINE {{variable_name}}: Type [= initial_value]
@@ -97,7 +97,9 @@ ELSE
     # 代码块
 ENDIF
 
-条件支持运算符: ==, !=, >, <, >=, <=, AND, OR, NOT, IN
+重要：IF-ELIF-ELSE-ENDIF 必须成对出现，不能单独使用 ELIF 或 ELSE。
+
+条件支持运算符: ==, !=, >, <, >=, <=, AND, OR, NOT, IN, IS, IS NOT, CONTAINS
 
 示例:
 IF {{score}} >= 90
@@ -131,18 +133,65 @@ ENDFOR
 {{email_body}} = CALL generate_email({{user_name}}, {{discount}})
 {{summary}} = CALL summarize_text({{article}}, max_length=100)
 
-## 5. 返回值
+## 5. 返回值（重要约束）
 RETURN {{variable}}
+
+约束：
+- RETURN 语句只能返回一个变量或表达式
+- ❌ 禁止在 RETURN 语句中进行赋值操作
+- ❌ 禁止：RETURN {{var}}.field = value
+- ✅ 正确：RETURN {{var}}
+- ✅ 正确：{{var}}.field = value（先赋值）\n    RETURN {{var}}（后返回）
+
+示例：
+❌ 错误写法：
+RETURN {{results}}.top_n = {{limit}}
+
+✅ 正确写法：
+{{results}}.top_n = {{limit}}
+RETURN {{results}}
 
 ## 6. 注释
 # 这是注释
 
 ## 7. 约束规则
-- 所有变量必须先 DEFINE 后使用
+### 7.1 基本规则
+- 所有配置参数必须先 DEFINE 后使用
 - 控制结构必须严格闭合（IF-ENDIF, FOR-ENDFOR）
 - 禁止嵌套过深（建议最多3层）
 - 变量名使用 {{var}} 格式包裹
 - 一行一条语句，禁止分号分隔
+
+### 7.2 变量使用规则
+- 只能使用【变量定义】中列出的配置参数名称
+- 运行时变量（如 query, result, user_input 等）可以动态使用，不需要 DEFINE
+- ❌ 禁止创造新的配置参数名称（如 custom_threshold, new_limit 等）
+- 如果需要临时变量，可以使用常见运行时变量名：temp_result, intermediate_value, etc.
+
+### 7.3 控制流规则
+- ❌ 禁止单独使用 ELIF 或 ELSE（必须跟在 IF 之后）
+- ❌ 禁止 IF 不闭合（必须有对应的 ENDIF）
+- ✅ 必须保证完整的 IF-ELIF-ELSE-ENDIF 结构
+
+### 7.4 时间/持续条件规则（重要）
+- ❌ 禁止使用非标准的 FOR ... MINUTES 语法
+- ❌ 禁止：IF {{condition}} FOR {{duration}} MINUTES:
+- ✅ 正确：使用标准的 IF 条件，时间检查应该放在函数内部实现
+
+示例：
+❌ 错误写法：
+IF {{qps}} < 10 FOR {{alert_duration}} MINUTES:
+    CALL trigger_alert()
+
+✅ 正确写法：
+IF {{qps}} < 10:
+    CALL trigger_alert()
+
+### 7.5 赋值规则
+- ✅ 支持标准的赋值语法
+- ✅ 支持属性访问：{{obj}}.field = value
+- ✅ 支持字典/列表访问：{{dict}}['key'] = value, {{list}}[0] = value
+- ❌ 禁止在 RETURN 中赋值（见第5节）
 """
 
 
@@ -240,7 +289,7 @@ class ValidationResult:
     max_nesting_depth: int = 0
     
     def get_report(self) -> str:
-        """生成验证报告"""
+        """生成验证报告（更新版 - 更清晰地展示运行时变量）"""
         report = []
 
         if self.is_valid:
@@ -257,10 +306,15 @@ class ValidationResult:
 
         report.append(f"\n📊 代码统计:")
         report.append(f"  - 定义变量（配置参数）: {len(self.defined_variables)} 个")
-        report.append(f"  - 运行时变量: {len(self.runtime_variables)} 个")
+        report.append(f"  - 运行时变量（动态类型）: {len(self.runtime_variables)} 个")
         report.append(f"  - 函数调用: {len(self.function_calls)} 次")
         report.append(f"  - 控制块: {len(self.control_blocks)} 个")
         report.append(f"  - 最大嵌套深度: {self.max_nesting_depth}")
+
+        # 添加说明
+        report.append(f"\n💡 说明:")
+        report.append(f"  - 配置参数：需要在 DSL 开头用 DEFINE 声明，类型固定")
+        report.append(f"  - 运行时变量：由 Python 动态创建，类型在运行时确定")
 
         return "\n".join(report)
     
@@ -305,17 +359,100 @@ class DSLTranspiler:
 
 **核心原则：**
 1. 不要执行任务，只生成代码
-2. 将所有"如果...那么..."转换为 IF-ENDIF
+2. 将所有"如果...那么..."转换为 IF-ENDIF（必须成对出现）
 3. 将所有"对于每个..."转换为 FOR-ENDFOR
 4. 将所有"生成/写/创建"等动作转换为 CALL 函数调用
 5. 严格使用 {{{{variable}}}} 包裹所有变量
-6. 确保所有变量在使用前都已 DEFINE
+6. 确保所有配置参数在使用前都已 DEFINE
 
-**重要约束：**
-- 只使用【变量定义】中列出的变量名称
-- 绝对不要创造新的变量名称（如 user_input, query_type 等）
-- 如果逻辑描述中提到但变量列表中没有，请使用变量定义中已有的最接近的变量名
-- 每个变量在使用前必须先用 DEFINE 声明，类型必须匹配给定的类型
+**关键约束（必须遵守）：**
+
+### 约束 1：RETURN 语句规范
+- ❌ 绝对禁止在 RETURN 语句中包含赋值操作
+- ❌ 禁止示例：RETURN {{{{results}}}}.top_n = {{{{limit}}}}
+- ✅ 正确做法：先赋值，再返回
+  - {{{{results}}}}.top_n = {{{{limit}}}}
+  - RETURN {{{{results}}}}
+
+### 约束 2：控制流完整性
+- ❌ 禁止单独使用 ELIF 或 ELSE（必须跟在 IF 之后）
+- ❌ 禁止生成不完整的控制流结构
+- ✅ 必须生成完整的 IF-ELIF-ELSE-ENDIF 结构
+- ✅ 每个控制流开始（IF/FOR/WHILE）必须有对应的结束（ENDIF/ENDFOR/ENDWHILE）
+
+### 约束 3：时间/持续条件
+- ❌ 禁止使用非标准的 FOR ... MINUTES 语法
+- ❌ 禁止示例：IF {{{{qps}}}} < 10 FOR {{{{duration}}}} MINUTES:
+- ✅ 正确做法：使用标准 IF 条件，时间检查逻辑在函数内部实现
+  - IF {{{{qps}}}} < 10:
+  -     CALL trigger_alert()
+
+### 约束 4：变量使用规范
+- 配置参数：只能使用【变量定义】中列出的名称
+- ❌ 禁止创造新的配置参数名称（如 custom_threshold, new_limit 等）
+- ✅ 运行时变量（如 query, result, user_input, code 等）可以动态使用，不需要 DEFINE
+- ✅ 常见运行时变量模式：
+  - 用户输入：query, user_input, user_query, request, text
+  - 结果/输出：result, output, response, value
+  - 状态/控制：count, index, state, flag, status
+  - 中间值：similarity, score, ranking, intermediate_value
+  - 性能指标：time, latency, duration, rate
+
+### 约束 5：表达式和操作符
+- 支持的运算符：==, !=, >, <, >=, <=, AND, OR, NOT, IN, IS, IS NOT, CONTAINS
+- CONTAINS 运算符：string CONTAINS substring 等价于 substring in string
+- 属性访问：支持 {{{{obj}}}}.field 语法
+- 字典/列表访问：支持 {{{{dict}}}}['key'] 和 {{{{list}}}}[0] 语法
+
+**错误示例（绝对禁止）：**
+
+❌ 例子 1：RETURN 中赋值
+```
+RETURN {{{{results}}}}.top_n = {{{{limit}}}}
+```
+
+✅ 正确写法：
+```
+{{{{results}}}}.top_n = {{{{limit}}}}
+RETURN {{{{results}}}}
+```
+
+❌ 例子 2：不完整的控制流
+```
+ELIF {{{{query_type}}}} == "complex_reasoning"
+    ...
+```
+
+✅ 正确写法：
+```
+IF {{{{query_type}}}} == "simple_fact"
+    ...
+ELIF {{{{query_type}}}} == "complex_reasoning"
+    ...
+ELSE
+    ...
+ENDIF
+```
+
+❌ 例子 3：非标准的时间语法
+```
+IF {{{{qps}}}} < 10 FOR {{{{alert_duration}}}} MINUTES:
+    CALL trigger_alert()
+```
+
+✅ 正确写法：
+```
+IF {{{{qps}}}} < 10:
+    CALL trigger_alert()
+```
+
+❌ 例子 4：创建未定义的配置参数
+```
+DEFINE {{{{custom_threshold}}}}: Float = 0.8
+```
+（如果 custom_threshold 不在【变量定义】列表中）
+
+✅ 正确做法：使用列表中已有的变量，或使用运行时变量
 
 **输入格式：**
 你会收到包含变量定义和逻辑描述的结构化文本。
@@ -325,20 +462,31 @@ class DSLTranspiler:
 
 **代码结构模板：**
 ```
-# 变量定义（必须先定义所有变量）
-DEFINE {{variable1}}: Type1 [= value1]
-DEFINE {{variable2}}: Type2 [= value2]
+# 配置参数定义（必须先定义所有【变量定义】中列出的变量）
+DEFINE {{{{variable1}}}}: Type1 [= value1]
+DEFINE {{{{variable2}}}}: Type2 [= value2]
 ...
 
 # 逻辑实现
-IF {{condition1}}
+IF {{{{condition1}}}}
+    ...
+ELIF {{{{condition2}}}}
+    ...
+ELSE
     ...
 ENDIF
 
-FOR {{item}} IN {{collection}}
+FOR {{{{item}}}} IN {{{{collection}}}}
     ...
 ENDFOR
 ```
+
+**生成前的检查清单：**
+1. ✅ 所有 RETURN 语句都只返回变量，不包含赋值
+2. ✅ 所有 ELIF/ELSE 都跟在 IF 之后，控制流完整
+3. ✅ 没有使用 FOR ... MINUTES 这种非标准语法
+4. ✅ 只使用了【变量定义】中的配置参数名称
+5. ✅ 所有 IF/FOR/WHILE 都有对应的 ENDIF/ENDFOR/ENDWHILE
 """
     
     def transpile(self, prompt_2_0: Dict[str, Any]) -> str:
@@ -767,51 +915,40 @@ class DSLValidator:
             self.current_nesting -= 1
     
     def _parse_assignment(self, line_num: int, line: str):
-        """解析赋值语句"""
+        """解析赋值语句（简化版 - 对运行时变量更宽容）"""
         # 提取 CALL 函数
         call_matches = re.finditer(DSLSyntax.PATTERNS['CALL'], line)
         for match in call_matches:
             func_name = match.group(1)
             args_str = match.group(2)
             args = [arg.strip() for arg in args_str.split(',') if arg.strip()]
-            
+
             # 检查参数中的变量
             self._check_variables_in_args(line_num, args)
-            
+
             # 记录函数调用
             result_var = None
             if line.startswith('{{'):
                 result_match = re.match(r'\{\{(\w+)\}\}\s*=', line)
                 if result_match:
                     result_var = result_match.group(1)
-            
+
             self.function_calls.append(FunctionCall(
                 function_name=func_name,
                 arguments=args,
                 result_var=result_var,
                 line_number=line_num
             ))
-        
+
         # 检查赋值左侧的变量
         assign_match = re.match(DSLSyntax.PATTERNS['ASSIGN'], line)
         if assign_match:
             var_name = assign_match.group(1)
+            # 赋值左侧的变量：允许动态创建（Python 支持）
             if var_name not in self.defined_vars and var_name not in self.runtime_vars:
-                # 赋值左侧的变量：如果是运行时变量，允许首次赋值
-                if self._is_runtime_variable(var_name):
-                    self.runtime_vars.add(var_name)
-                    self.warnings.append(
-                        f"运行时变量 '{var_name}' 首次赋值（将在运行时动态创建）"
-                    )
-                else:
-                    # 配置参数不能作为赋值目标（应该DEFINE）
-                    self.errors.append(ValidationError(
-                        line_number=line_num,
-                        error_type="未定义变量",
-                        message=f"配置参数 {{{{{var_name}}}}} 在使用前未定义",
-                        suggestion=f"在DSL开头添加: DEFINE {{{{{var_name}}}}}: Type",
-                        severity="P1"
-                    ))
+                # 所有未定义的变量都视为运行时变量，允许首次赋值
+                self.runtime_vars.add(var_name)
+
             rhs = assign_match.group(2)
             rhs_vars = re.findall(r'\{\{(\w+)\}\}', rhs)
             self._check_variables_exist(line_num, rhs_vars)
@@ -830,58 +967,76 @@ class DSLValidator:
         self._check_variables_exist(line_num, vars_in_condition)
     
     def _check_condition_types(self, line_num: int, condition: str):
-        """检查条件中的类型安全"""
+        """
+        检查条件中的类型安全（简化版 - 仅对配置参数进行检查）
+
+        策略调整：
+        - Python 是动态语言，类型在运行时确定
+        - 只对配置参数（DEFINE 的变量）进行基础类型检查
+        - 运行时变量（ANY类型）不做类型检查，由 Python 运行时处理
+        """
         comparison_pattern = r'(.+?)\s*(==|!=|>=|<=|>|<|IN)\s*(.+)'
         match = re.match(comparison_pattern, condition.strip())
         if not match:
             return
-        
+
         left, op, right = match.groups()
         left_type = self._infer_expr_type(left.strip())
         right_type = self._infer_expr_type(right.strip())
 
+        # 如果任一侧是运行时变量（ANY类型），完全跳过类型检查
+        # Python 会处理运行时类型转换和类型错误
+        if left_type == VarType.ANY or right_type == VarType.ANY:
+            # 不做任何检查，让 Python 运行时处理
+            return
+
+        # 只有两侧都是配置参数（确定类型）时才进行检查
+        # 此时主要是为了发现明显不合理的类型使用
         if op in ('>', '<', '>=', '<='):
-            # 如果任一侧是ANY类型（运行时变量），则不检查类型（运行时可能正确）
-            if left_type == VarType.ANY or right_type == VarType.ANY:
-                # 警告：建议用户确保类型兼容
+            if left_type not in (VarType.INTEGER, VarType.FLOAT) or \
+               right_type not in (VarType.INTEGER, VarType.FLOAT):
+                # 配置参数之间的数字比较，给出轻微警告
                 self.warnings.append(
-                    f"比较运算 {op} 涉及运行时变量（类型将在运行时确定），请确保逻辑正确"
+                    f"配置参数比较 {left_type.value} {op} {right_type.value} "
+                    f"（Python 会在运行时处理，确保逻辑正确）"
                 )
-            elif left_type not in (VarType.INTEGER, VarType.FLOAT) or \
-                 right_type not in (VarType.INTEGER, VarType.FLOAT):
-                # 只有两侧都是确定类型时才检查
-                self.errors.append(ValidationError(
-                    line_number=line_num,
-                    error_type="类型错误",
-                    message=f"比较运算 {op} 仅支持数字类型，当前为 {left_type.value} 与 {right_type.value}",
-                    suggestion="将变量类型改为 Integer/Float，或改用 == / !=",
-                    severity="P1"
-                ))
 
         if op == 'IN':
-            # 如果右侧是ANY类型（运行时变量），则不检查类型
-            if right_type == VarType.ANY:
+            if right_type not in (VarType.LIST, VarType.DICT):
+                # 配置参数之间的 IN 操作，给出轻微警告
                 self.warnings.append(
-                    "IN 运算涉及运行时变量（类型将在运行时确定），请确保是集合类型"
+                    f"配置参数 IN 操作右侧为 {right_type.value} "
+                    f"（Python 会在运行时处理，确保是集合类型）"
                 )
-            elif right_type not in (VarType.LIST, VarType.DICT):
-                self.errors.append(ValidationError(
-                    line_number=line_num,
-                    error_type="类型错误",
-                    message=f"IN 运算右侧必须为 List/Dict，当前为 {right_type.value}",
-                    suggestion="确保集合类型变量为 List 或 Dict",
-                    severity="P1"
-                ))
     
     def _infer_expr_type(self, expr: str) -> VarType:
-        """推断表达式类型"""
+        """
+        推断表达式类型（简化版 - 更容易识别运行时变量）
+
+        策略：
+        - 已定义的变量返回其类型
+        - 未定义的变量视为运行时变量，返回 ANY
+        - 字面量推断其类型
+        """
         var_match = re.fullmatch(r'\{\{(\w+)\}\}', expr)
         if var_match:
             var_name = var_match.group(1)
             if var_name in self.defined_vars:
                 return self.defined_vars[var_name].var_type
+            # 未定义的变量默认视为运行时变量，返回 ANY
+            # Python 会在运行时处理类型
             return VarType.ANY
-        
+
+        # 处理属性访问，如 {{vector_results.similarity}}
+        # 这类表达式视为运行时变量，返回 ANY
+        if '.' in expr and '{{' in expr:
+            return VarType.ANY
+
+        # 处理列表/字典访问，如 {{results[0]}}
+        if '[' in expr and ']' in expr and '{{' in expr:
+            return VarType.ANY
+
+        # 其他字面量
         literal_type = self._infer_literal_type(expr)
         return literal_type
     
@@ -921,7 +1076,14 @@ class DSLValidator:
             self._check_variables_exist(line_num, vars_in_arg)
     
     def _check_variables_exist(self, line_num: int, var_names: List[str]):
-        """检查变量是否已定义 - 区分配置参数和运行时变量"""
+        """
+        检查变量是否已定义（简化版 - 对运行时变量更宽容）
+
+        策略调整：
+        - Python 是动态语言，不需要在编译时定义所有变量
+        - 只对明显的配置参数（如 threshold, max_xxx 等配置常量）进行严格检查
+        - 其他所有变量都视为运行时变量，允许动态创建
+        """
         for var_name in var_names:
             # 如果已经在运行时变量集合中，跳过检查
             if var_name in self.runtime_vars:
@@ -931,22 +1093,20 @@ class DSLValidator:
             if var_name in self.defined_vars:
                 continue
 
-            # 变量既未定义也不在运行时集合中，需要判断类型
-            if self._is_runtime_variable(var_name):
-                # 运行时变量：记录为警告，不报错
-                self.runtime_vars.add(var_name)
-                self.warnings.append(
-                    f"运行时变量 '{var_name}' 未预定义（将在运行时动态创建）"
-                )
-            else:
+            # 变量既未定义也不在运行时集合中，判断是否是配置参数
+            # 只有明显是配置参数的才报错
+            if self._is_config_parameter(var_name):
                 # 配置参数未定义：严重错误（P1）
                 self.errors.append(ValidationError(
                     line_number=line_num,
                     error_type="未定义变量",
-                    message=f"配置参数 {{{{{var_name}}}}} 未在Prompt 2.0中提取",
-                    suggestion=f"在Prompt 2.0阶段提取此参数，或在DSL开头添加: DEFINE {{{{{var_name}}}}}: Type",
+                    message=f"配置参数 {{{{{var_name}}}}} 未定义",
+                    suggestion=f"在DSL开头添加: DEFINE {{{{{var_name}}}}}: Type",
                     severity="P1"
                 ))
+            else:
+                # 其他所有变量都视为运行时变量，允许动态创建
+                self.runtime_vars.add(var_name)
 
     def _is_runtime_variable(self, var_name: str) -> bool:
         """
@@ -1040,7 +1200,73 @@ class DSLValidator:
                     user_input_keywords + output_keywords + state_keywords):
                     return True
 
-        # 如果都不匹配，认为是配置参数，需要预定义
+        # 如果都不匹配，进一步检查是否是配置参数
+        return not self._is_config_parameter(var_name)
+
+    def _is_config_parameter(self, var_name: str) -> bool:
+        """
+        判断变量是否是配置参数（需要预定义的常量）
+
+        配置参数特点：
+        1. 阈值/限制类（threshold, limit, max, min, cap）
+        2. 超时/过期类（timeout, expiration, ttl）
+        3. 数量/大小类（count, size, documents, items, records）
+        4. 比率/频率类（rate, ratio, percentage）
+        5. 时间/时长类（days, hours, seconds, duration）
+        6. 维度/度量类（dimension, metric）
+        """
+        var_name_lower = var_name.lower()
+
+        # 规则1: 阈值/限制相关
+        config_keywords_1 = [
+            'threshold', 'limit', 'max_', 'min_', 'cap', 'boundary',
+            'cutoff', 'range', 'bound'
+        ]
+        if any(kw in var_name_lower for kw in config_keywords_1):
+            return True
+
+        # 规则2: 超时/过期相关
+        config_keywords_2 = [
+            'timeout', 'expiration', 'ttl', 'expiry', 'deadline',
+            'retention', 'lifespan'
+        ]
+        if any(kw in var_name_lower for kw in config_keywords_2):
+            return True
+
+        # 规则3: 数量/大小相关
+        config_keywords_3 = [
+            '_documents', '_items', '_records', '_entries',
+            '_lines', '_requests', '_concurrent', 'buffer_size',
+            'pool_size', 'capacity', 'volume'
+        ]
+        if any(kw in var_name_lower for kw in config_keywords_3):
+            return True
+
+        # 规则4: 比率/频率相关
+        config_keywords_4 = [
+            '_rate', '_ratio', 'percentage', 'percent', 'ratio',
+            'frequency', 'interval', 'period'
+        ]
+        if any(kw in var_name_lower for kw in config_keywords_4):
+            return True
+
+        # 规则5: 时间单位相关
+        config_keywords_5 = [
+            '_days', '_hours', '_minutes', '_seconds', 'duration',
+            'time_limit', 'time_window'
+        ]
+        if any(kw in var_name_lower for kw in config_keywords_5):
+            return True
+
+        # 规则6: 维度/度量相关
+        config_keywords_6 = [
+            '_dimension', 'metric', 'parameter', 'setting',
+            'configuration', 'option', 'flag'
+        ]
+        if any(kw in var_name_lower for kw in config_keywords_6):
+            return True
+
+        # 如果都不匹配，认为是运行时变量
         return False
 
 

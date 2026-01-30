@@ -124,12 +124,93 @@ class PseudoCodeParser:
         
         while i < len(lines):
             line = lines[i].strip()
-            
+
             # 跳过空行和注释
-            if not line or line.startswith("#") or line.startswith("DEFINE"):
+            if not line or line.startswith("#"):
                 i += 1
                 continue
-            
+
+            # 处理多行 DEFINE 语句（字典、列表等）
+            # DSL 语法: DEFINE {{variable}}: Type = value
+            # 检查是否包含字典开始符 { 但没有对应的结束符 }（不包括在 {{}} 中的 }）
+            if line.startswith("DEFINE") and ":" in line and "=" in line:
+                # 检查是否有字典定义且不在同一行结束
+                # 需要找到不在 {{}} 中的 { 和 }
+                line_for_check = line
+                # 移除 {{...}} 部分
+                import re
+                line_without_vars = re.sub(r'\{\{[^}]*\}\}', '', line_for_check)
+
+                if '{' in line_without_vars and '}' not in line_without_vars:
+                    # 收集多行 DEFINE 的所有行
+                    define_lines = [line]
+                    i += 1
+                    while i < len(lines):
+                        next_line = lines[i].strip()
+                        if not next_line:
+                            i += 1
+                            continue
+                        define_lines.append(next_line)
+                        # 检查这一行是否有未匹配的 }
+                        next_line_without_vars = re.sub(r'\{\{[^}]*\}\}', '', next_line)
+                        if '}' in next_line_without_vars:
+                            i += 1
+                            break
+                        i += 1
+
+                    # 合并为单个 block
+                    full_define = '\n'.join(define_lines)
+                    block_type = BlockType.ASSIGN  # DEFINE 也是赋值类型
+
+                    # 提取变量
+                    vars_in_define = set()
+                    for dl in define_lines:
+                        vars_in_define.update(self._extract_vars(dl))
+
+                    # 提取输出（从第一行的变量名）
+                    outputs = set()
+                    inputs = vars_in_define
+                    if "=" in define_lines[0]:
+                        left, right = define_lines[0].split("=", 1)
+                        outputs = self._extract_vars(left)
+
+                    blocks.append(CodeBlock(
+                        id=f"OP_{block_counter}",
+                        type=block_type,
+                        code_lines=define_lines,
+                        inputs=inputs,
+                        outputs=outputs,
+                        line_number=i - len(define_lines) + 1,
+                        is_async=False
+                    ))
+                    block_counter += 1
+                    continue
+
+            # 处理单行 DEFINE 语句
+            if line.startswith("DEFINE") and ":" in line and "=" in line:
+                block_type = BlockType.ASSIGN
+                vars_in_line = self._extract_vars(line)
+
+                # 提取输出（从变量名）
+                outputs = set()
+                inputs = vars_in_line
+                if "=" in line:
+                    left, right = line.split("=", 1)
+                    outputs = self._extract_vars(left)
+
+                blocks.append(CodeBlock(
+                    id=f"OP_{block_counter}",
+                    type=block_type,
+                    code_lines=[line],
+                    inputs=inputs,
+                    outputs=outputs,
+                    line_number=i + 1,
+                    is_async=False
+                ))
+                block_counter += 1
+                i += 1
+                continue
+
             # 检查是否是多行CALL语句
             if "CALL" in line and "(" in line and ")" not in line:
                 # 收集多行CALL的所有行
@@ -383,84 +464,83 @@ class DependencyAnalyzer:
         control_flow_start_types = [BlockType.IF, BlockType.FOR, BlockType.WHILE]
         control_flow_middle_types = [BlockType.ELIF, BlockType.ELSE]
         control_flow_end_types = [BlockType.ENDIF, BlockType.ENDFOR, BlockType.ENDWHILE]
-        control_flow_types = control_flow_start_types + control_flow_middle_types + control_flow_end_types
 
         in_control_flow = False  # 标记是否在控制流内部
         control_flow_depth = 0  # 控制流嵌套深度
-        current_control_start_depth = 0  # 当前控制流的起始深度
 
         for block in sorted_blocks:
+            block_type = block.type
 
-            # 如果遇到控制流开始
-            if block.type in control_flow_start_types:
-                # 先保存之前的模块（如果有）
-                if current_module:
-                    modules.append(current_module)
-                    current_module = []
-                in_control_flow = True
-                control_flow_depth += 1
-                current_control_start_depth = control_flow_depth  # 记录当前控制流开始的深度
-                current_module.append(block)
-                continue
-
-            # 如果遇到控制流结束
-            if block.type in control_flow_end_types:
-                current_module.append(block)
-                # 只有当控制流深度回到起始深度时才切分（确保完整的控制流在同一个模块）
-                if control_flow_depth == current_control_start_depth:
+            # 处理控制流开始（IF/FOR/WHILE）
+            if block_type in control_flow_start_types:
+                # 只在最外层控制流开始时才保存之前的模块
+                # 这样可以确保嵌套的控制流保持在同一模块中
+                if control_flow_depth == 0:
                     if current_module:
                         modules.append(current_module)
                         current_module = []
+                # 开始新的控制流
+                in_control_flow = True
+                control_flow_depth += 1
+                current_module.append(block)
+                continue
+
+            # 处理控制流中间（ELIF/ELSE）
+            if block_type in control_flow_middle_types:
+                # ELIF/ELSE 必须在控制流内部
+                if not in_control_flow:
+                    error(f"发现独立的 {block_type.value} 语句，没有对应的 IF")
+                    # 尝试合并到前一个模块
+                    if not current_module and modules:
+                        # 检查前一个模块是否以 IF 或 ELIF 结尾
+                        last_module = modules[-1]
+                        if last_module and last_module[-1].type in [BlockType.IF, BlockType.ELIF]:
+                            # 将 ELIF/ELSE 合并到前一个模块
+                            last_module.append(block)
+                            continue
+                    # 仍然添加到当前模块，避免丢失代码
+                # 添加到当前模块
+                current_module.append(block)
+                continue
+
+            # 处理控制流结束（ENDIF/ENDFOR/ENDWHILE）
+            if block_type in control_flow_end_types:
+                current_module.append(block)
+                # 更新控制流状态
                 control_flow_depth = max(0, control_flow_depth - 1)
                 if control_flow_depth == 0:
                     in_control_flow = False
+                    # 最外层控制流结束后保存模块
+                    if current_module:
+                        modules.append(current_module)
+                        current_module = []
                 continue
 
-            # 处理 ELIF 分支（必须与 IF 在同一模块）
-            if block.type == BlockType.ELIF:
-                # ELIF 必须在控制流内部
-                if not in_control_flow:
-                    warning(f"ELIF 语句不在控制流内部，将被视为普通代码")
-                    current_module.append(block)
-                else:
-                    # ELIF 自动添加到当前模块（与 IF 在一起）
-                    current_module.append(block)
-                continue
-
-            # 处理 ELSE 分支（必须与 IF 在同一模块）
-            if block.type == BlockType.ELSE:
-                # ELSE 必须在控制流内部
-                if not in_control_flow:
-                    warning(f"ELSE 语句不在控制流内部，将被视为普通代码")
-                    current_module.append(block)
-                else:
-                    # ELSE 自动添加到当前模块（与 IF 在一起）
-                    current_module.append(block)
-                continue
-
-            # 普通代码块（CALL, ASSIGN）
+            # 处理普通代码块（CALL, ASSIGN）
+            # 添加到当前模块
             current_module.append(block)
 
-            # 切分条件
+            # 决定是否切分模块
             should_split = False
 
-            if not in_control_flow:  # 不在控制流内部时才考虑切分
+            # 只在控制流外部时考虑切分
+            if not in_control_flow:
                 if strategy == "io_isolation":
                     # 每个 CALL 都独立成模块
-                    should_split = block.type == BlockType.CALL
-
+                    should_split = block_type == BlockType.CALL
                 elif strategy == "control_flow":
                     # 控制流边界切分（已在上方处理）
-                    pass
-
+                    should_split = False
                 elif strategy == "hybrid":
                     # CALL 时切分
-                    should_split = block.type == BlockType.CALL
+                    should_split = block_type == BlockType.CALL
 
+            # 执行切分
             if should_split and current_module:
                 modules.append(current_module)
                 current_module = []
 
+        # 保存最后一个模块
         if current_module:
             modules.append(current_module)
 
@@ -638,6 +718,12 @@ class ModuleSynthesizer:
         """清理伪代码为 Python 代码（增强 FOR 循环转换）"""
         # 去除 {{}}
         cleaned = line.replace("{{", "").replace("}}", "")
+
+        # 修复：移除 IF 语句中的非法 FOR ... MINUTES 语法
+        # 例如：IF {{query_rate}} < 10 FOR {{duration}} MINUTES -> IF {{query_rate}} < 10
+        if re.match(r'^IF\s+.+\s+FOR\s+\w+\s+MINUTES\s*$', cleaned, flags=re.IGNORECASE):
+            cleaned = re.sub(r'\s+FOR\s+\w+\s+MINUTES\s*$', '', cleaned, flags=re.IGNORECASE)
+            warning(f"移除了非法的 FOR ... MINUTES 语法: {line}")
 
         # 修复 P1-1: 处理 IF CALL 语句（必须在去除 {{}} 后立即处理）
         # 检查是否是 "IF CALL func(...)" 格式
@@ -843,8 +929,8 @@ class ModuleSynthesizer:
         code_lines = [f"{async_kw}def {func_name}({', '.join(external_inputs)}):"]
         code_lines.append('    """Auto-generated module"""')
 
-        # 控制流状态跟踪
-        control_flow_depth = 0  # 控制流嵌套深度
+        # 控制流状态跟踪（使用栈来跟踪嵌套层级）
+        control_flow_stack = []  # 跟踪每个控制流的缩进层级
         control_flow_types = [BlockType.IF, BlockType.FOR, BlockType.WHILE]
         control_flow_middle_types = [BlockType.ELIF, BlockType.ELSE]
         control_flow_end_types = [BlockType.ENDIF, BlockType.ENDFOR, BlockType.ENDWHILE]
@@ -856,21 +942,29 @@ class ModuleSynthesizer:
         for block in cluster:
             block_type = block.type
 
+            # 跳过 DEFINE 语句（这些是配置参数，应该在主函数中定义）
+            # 检查第一个代码行是否以 DEFINE 开头
+            if block.code_lines and block.code_lines[0].strip().startswith("DEFINE"):
+                debug(f"跳过 DEFINE 语句: {block.code_lines[0][:50]}...")
+                continue
+
             # 处理控制流开始（IF/FOR/WHILE）
             if block_type in control_flow_types:
                 for line in block.code_lines:
                     if line.strip():
                         cleaned = self._clean_line(line)
                         if cleaned and cleaned.strip():
-                            # 控制流语句本身与函数体同级（4个空格）
-                            code_lines.append(f"    {cleaned}")
-                # 控制流深度增加，后续代码需要缩进
-                control_flow_depth += 1
+                            # 控制流语句的缩进：基础缩进4个空格 + 当前栈深度
+                            indent = "    " * (1 + len(control_flow_stack))
+                            code_lines.append(f"{indent}{cleaned}")
+                # 控制流入栈
+                control_flow_stack.append(block_type)
 
             # 处理控制流结束（ENDIF/ENDFOR/ENDWHILE）
             elif block_type in control_flow_end_types:
-                # 控制流结束，深度减少
-                control_flow_depth = max(0, control_flow_depth - 1)
+                # 控制流出栈
+                if control_flow_stack:
+                    control_flow_stack.pop()
                 # ENDIF/ENDFOR 等不生成代码（Python 使用缩进）
                 continue
 
@@ -880,12 +974,19 @@ class ModuleSynthesizer:
                     if line.strip():
                         cleaned = self._clean_line(line)
                         if cleaned and cleaned.strip():
-                            # ELSE 冒号与 IF 同级（4个空格）
+                            # ELSE 冒号与 IF 同级缩进（如果栈不为空，使用栈深度；否则使用 0）
                             if cleaned.strip() == "else:" or cleaned.strip() == "else":
-                                code_lines.append(f"    else:")
-                            # ELSE 内部代码（8个空格，保持与 IF 体内相同深度）
+                                if control_flow_stack:
+                                    indent = "    " * len(control_flow_stack)
+                                else:
+                                    indent = "    "  # 外层 ELSE，应该与 IF 同级
+                                code_lines.append(f"{indent}else:")
+                            # ELSE 内部代码（缩进比 ELSE 多一层）
                             else:
-                                indent = "    " + "    " * control_flow_depth
+                                if control_flow_stack:
+                                    indent = "    " * (1 + len(control_flow_stack))
+                                else:
+                                    indent = "        "  # 外层 ELSE 内部，应该缩进 8 个空格
                                 code_lines.append(f"{indent}{cleaned}")
                 # ELSE 后面的代码缩进应该与 IF 体内相同
                 continue
@@ -896,20 +997,27 @@ class ModuleSynthesizer:
                     if line.strip():
                         cleaned = self._clean_line(line)
                         if cleaned and cleaned.strip():
-                            # ELIF 冒号与 IF 同级（4个空格）
+                            # ELIF 冒号与 IF 同级缩进（如果栈不为空，使用栈深度；否则使用 0）
                             if cleaned.strip().startswith("elif"):
-                                code_lines.append(f"    {cleaned.strip()}")
-                            # ELIF 内部代码（8个空格，保持与 IF 体内相同深度）
+                                if control_flow_stack:
+                                    indent = "    " * len(control_flow_stack)
+                                else:
+                                    indent = "    "  # 外层 ELIF，应该与 IF 同级
+                                code_lines.append(f"{indent}{cleaned.strip()}")
+                            # ELIF 内部代码（缩进比 ELIF 多一层）
                             else:
-                                indent = "    " + "    " * control_flow_depth
+                                if control_flow_stack:
+                                    indent = "    " * (1 + len(control_flow_stack))
+                                else:
+                                    indent = "        "  # 外层 ELIF 内部，应该缩进 8 个空格
                                 code_lines.append(f"{indent}{cleaned}")
                 # ELIF 后面的代码缩进应该与 IF 体内相同
                 continue
 
             # 处理普通代码块（CALL, ASSIGN, RETURN）
             else:
-                # 计算当前缩进级别：基础缩进4个空格 + 控制流深度
-                indent = "    " + "    " * control_flow_depth
+                # 计算当前缩进级别：基础缩进4个空格 + 控制流栈深度
+                indent = "    " * (1 + len(control_flow_stack))
 
                 # 检查是否是多行CALL block
                 is_multiline_call = len(block.code_lines) > 1 and any("CALL" in line for line in block.code_lines)

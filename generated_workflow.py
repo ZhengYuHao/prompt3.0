@@ -7,64 +7,83 @@ from typing import Dict, Any
 from llm_client import invoke_function  # 需要实现 LLM 客户端
 
 
-async def step_1_create_application():
+def step_1_compute_vector_similarity_threshold(_95th_percentile_response_time, current_requests, query_rate):
     """Auto-generated module"""
-    application = await invoke_function('create_application')
-    return application
+    query_type = user_input
+    return access_log_retention_days, admin_user_priority, cache_expiry_time, code_analysis_response_time, debug_log_retention_days, error_log_retention_days, graph_database_response_time, knowledge_base_A_size, knowledge_base_B_size, knowledge_base_C_size, knowledge_graph_exploration_steps, max_code_lines_static_analysis, max_concurrent_requests, query_rate_duration_minutes, query_type, reordered_top_n_results, response_time_duration_minutes, top_n_vector_results, total_response_time_limit, vector_dimension, vector_retrieval_response_time, vector_similarity_threshold
 
 
-async def step_2_design_chain():
+async def step_2_vector_retrieval(knowledge_graph_exploration_steps, max_code_lines_static_analysis, query_type, reordered_top_n_results, top_n_vector_results, user_input, vector_similarity_threshold):
     """Auto-generated module"""
-    chain_design = await invoke_function('design_chain')
-    return chain_design
+    if query_type == "simple_fact":
+        similarity = await invoke_function('vector_retrieval', user_input=user_input)
+        if similarity >= vector_similarity_threshold:
+            return await invoke_function('get_top_n_results', top_n_vector_results=top_n_vector_results)
+        else:
+            reordered_results = await invoke_function('reorder_results')
+            return await invoke_function('get_top_n_results', reordered_top_n_results=reordered_top_n_results)
+    elif query_type == "complex_reasoning":
+        await invoke_function('intent_decomposition', user_input=user_input)
+        graph_results = await invoke_function('graph_database_retrieval', knowledge_graph_exploration_steps=knowledge_graph_exploration_steps)
+        if graph_results   is  not   NULL:
+            return graph_results
+        else:
+            return await invoke_function('full_search')
+    elif query_type == "code_analysis":
+        code_lines = await invoke_function('count_code_lines', user_input=user_input)
+        if code_lines > max_code_lines_static_analysis:
+            return await invoke_function('static_analysis', user_input=user_input)
+        else:
+            return await invoke_function('semantic_analysis', user_input=user_input)
+    else:
+        return "Invalid query type"
 
 
-async def step_3_define_retrieval_modes():
+async def step_3_cache_results(cache_expiry_time, result, user_input):
     """Auto-generated module"""
-    retrieval_modes = await invoke_function('define_retrieval_modes')
-    return retrieval_modes
+    await invoke_function('cache_results', user_input=user_input, result=result, cache_expiry_time=cache_expiry_time)
+    return None
 
 
-async def step_4_setup_tech_stack(java_developers, python_developers):
+async def step_4_queue_request(current_requests, max_concurrent_requests):
     """Auto-generated module"""
-    tech_stack = await invoke_function('setup_tech_stack', java_developers=java_developers, python_developers=python_developers)
-    return tech_stack
+    if current_requests > max_concurrent_requests:
+        await invoke_function('queue_request')
+    return None
 
 
-async def step_5_enable_dialogue_support(history_context_rounds):
+async def step_5_log_violation(user_input):
     """Auto-generated module"""
-    dialogue_support = await invoke_function('enable_dialogue_support', history_context_rounds=history_context_rounds)
-    return dialogue_support
+    if await invoke_function('contains_sensitive_words', user_input=user_input):
+        await invoke_function('log_violation', user_input=user_input)
+        return "Service denied due to sensitive content"
 
 
-async def step_6_deploy_to_kubernetes(service_count):
+async def step_6_degrade_service(total_response_time_limit, vector_retrieval_response_time):
     """Auto-generated module"""
-    deployment = await invoke_function('deploy_to_kubernetes', service_count=service_count)
-    return deployment
+    if vector_retrieval_response_time > total_response_time_limit:
+        await invoke_function('degrade_service')
+    return None
 
 
-async def step_7_create_microservices():
+async def step_7_upload_logs(access_log_retention_days, debug_log_retention_days, error_log_retention_days):
     """Auto-generated module"""
-    microservices = await invoke_function('create_microservices')
-    return microservices
+    await invoke_function('upload_logs', error_log_retention_days=error_log_retention_days, access_log_retention_days=access_log_retention_days, debug_log_retention_days=debug_log_retention_days)
+    return None
 
 
-async def step_8_setup_monitoring_logging():
+async def step_8_trigger_alert(query_rate, query_rate_duration_minutes):
     """Auto-generated module"""
-    monitoring_logging = await invoke_function('setup_monitoring_logging')
-    return monitoring_logging
+    if query_rate < 10  and  query_rate_duration_minutes >= 10:
+        await invoke_function('trigger_alert')
+    return None
 
 
-async def step_9_enable_bilingual_support(supported_languages):
+async def step_9_trigger_scaling(_95th_percentile_response_time, response_time_duration_minutes):
     """Auto-generated module"""
-    bilingual_support = await invoke_function('enable_bilingual_support', supported_languages=supported_languages)
-    return bilingual_support
-
-
-async def step_10_set_response_time_control(response_time_seconds):
-    """Auto-generated module"""
-    response_time_control = await invoke_function('set_response_time_control', response_time_seconds=response_time_seconds)
-    return response_time_control
+    if _95th_percentile_response_time > 3  and  response_time_duration_minutes >= 5:
+        await invoke_function('trigger_scaling')
+    return None
 
 
 async def main_workflow(input_params: dict):
@@ -72,7 +91,7 @@ async def main_workflow(input_params: dict):
     主工作流 - 自动生成
     
     Args:
-        input_params: 包含 ['history_context_rounds', 'java_developers', 'python_developers', 'response_time_seconds', 'service_count', 'supported_languages'] 的字典
+        input_params: 包含 ['95th_percentile_response_time', 'current_requests', 'query_rate', 'result', 'user_input'] 的字典
     
     Returns:
         执行结果上下文
@@ -80,35 +99,32 @@ async def main_workflow(input_params: dict):
     # 初始化上下文
     ctx = input_params.copy()
 
-    # Module 1: step_1_create_application
-    ctx["application"] = await step_1_create_application()
+    # Module 1: step_1_compute_vector_similarity_threshold
+    ctx["access_log_retention_days"], ctx["admin_user_priority"], ctx["cache_expiry_time"], ctx["code_analysis_response_time"], ctx["debug_log_retention_days"], ctx["error_log_retention_days"], ctx["graph_database_response_time"], ctx["knowledge_base_A_size"], ctx["knowledge_base_B_size"], ctx["knowledge_base_C_size"], ctx["knowledge_graph_exploration_steps"], ctx["max_code_lines_static_analysis"], ctx["max_concurrent_requests"], ctx["query_rate_duration_minutes"], ctx["query_type"], ctx["reordered_top_n_results"], ctx["response_time_duration_minutes"], ctx["top_n_vector_results"], ctx["total_response_time_limit"], ctx["vector_dimension"], ctx["vector_retrieval_response_time"], ctx["vector_similarity_threshold"] = step_1_compute_vector_similarity_threshold(ctx.get("_95th_percentile_response_time"), ctx.get("current_requests"), ctx.get("query_rate"))
 
-    # Module 2: step_2_design_chain
-    ctx["chain_design"] = await step_2_design_chain()
+    # Module 2: step_2_vector_retrieval
+    ctx["__graph_results__"], ctx["code_lines"], ctx["graph_results"], ctx["reordered_results"], ctx["similarity"] = await step_2_vector_retrieval(ctx.get("knowledge_graph_exploration_steps"), ctx.get("max_code_lines_static_analysis"), ctx.get("query_type"), ctx.get("reordered_top_n_results"), ctx.get("top_n_vector_results"), ctx.get("user_input"), ctx.get("vector_similarity_threshold"))
 
-    # Module 3: step_3_define_retrieval_modes
-    ctx["retrieval_modes"] = await step_3_define_retrieval_modes()
+    # Module 3: step_3_cache_results
+    await step_3_cache_results(ctx.get("cache_expiry_time"), ctx.get("result"), ctx.get("user_input"))
 
-    # Module 4: step_4_setup_tech_stack
-    ctx["tech_stack"] = await step_4_setup_tech_stack(ctx.get("java_developers"), ctx.get("python_developers"))
+    # Module 4: step_4_queue_request
+    await step_4_queue_request(ctx.get("current_requests"), ctx.get("max_concurrent_requests"))
 
-    # Module 5: step_5_enable_dialogue_support
-    ctx["dialogue_support"] = await step_5_enable_dialogue_support(ctx.get("history_context_rounds"))
+    # Module 5: step_5_log_violation
+    await step_5_log_violation(ctx.get("user_input"))
 
-    # Module 6: step_6_deploy_to_kubernetes
-    ctx["deployment"] = await step_6_deploy_to_kubernetes(ctx.get("service_count"))
+    # Module 6: step_6_degrade_service
+    await step_6_degrade_service(ctx.get("total_response_time_limit"), ctx.get("vector_retrieval_response_time"))
 
-    # Module 7: step_7_create_microservices
-    ctx["microservices"] = await step_7_create_microservices()
+    # Module 7: step_7_upload_logs
+    await step_7_upload_logs(ctx.get("access_log_retention_days"), ctx.get("debug_log_retention_days"), ctx.get("error_log_retention_days"))
 
-    # Module 8: step_8_setup_monitoring_logging
-    ctx["monitoring_logging"] = await step_8_setup_monitoring_logging()
+    # Module 8: step_8_trigger_alert
+    await step_8_trigger_alert(ctx.get("query_rate"), ctx.get("query_rate_duration_minutes"))
 
-    # Module 9: step_9_enable_bilingual_support
-    ctx["bilingual_support"] = await step_9_enable_bilingual_support(ctx.get("supported_languages"))
-
-    # Module 10: step_10_set_response_time_control
-    ctx["response_time_control"] = await step_10_set_response_time_control(ctx.get("response_time_seconds"))
+    # Module 9: step_9_trigger_scaling
+    await step_9_trigger_scaling(ctx.get("_95th_percentile_response_time"), ctx.get("response_time_duration_minutes"))
 
     return ctx
 

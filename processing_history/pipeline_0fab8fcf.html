@@ -846,31 +846,47 @@ ENDIF</pre>
                             <h5>模块详情 (前4个)</h5>
                             
                         <div class="change-item">
-                            <strong>step_1_compute_similarity_threshold</strong><br>
+                            <strong>0. step_1_compute_similarity_threshold</strong><br>
                             &nbsp;&nbsp;输入: _95th_percentile_response_time, current_requests, query_rate<br>
                             &nbsp;&nbsp;输出: access_log_retention_days, admin_user_priority, cache_expiration_time, code_analysis_response_time, debug_log_retention_days, error_log_retention_days, graph_database_response_time, graph_exploration_steps, legal_documents_count, max_code_lines_static_analysis, max_concurrent_requests, medical_documents_count, query_rate_duration_minutes, query_type, reordered_top_n_results, response_time_duration_minutes, similarity_threshold, technical_documents_count, top_n_vector_results, total_response_time_limit, vector_dimension, vector_retrieval_response_time<br>
-                            &nbsp;&nbsp;代码块数: 25
+                            &nbsp;&nbsp;<span class="badge-sync">同步</span>
+                        </div>
+                        <div style="margin-top:10px; padding:10px; background:#f9f9fa; border-left:4px solid #f093fb; border-radius:4px;">
+                            <strong style="color:#f093fb; display:block; margin-bottom:5px;">函数实现:</strong>
+                            <p style="color:#999; font-style:italic;">暂无函数体代码</p>
                         </div>
                     
                         <div class="change-item">
-                            <strong>step_2_vector_retrieval</strong><br>
+                            <strong>1. step_2_vector_retrieval</strong><br>
                             &nbsp;&nbsp;输入: graph_exploration_steps, max_code_lines_static_analysis, query_type, reordered_top_n_results, similarity_threshold, top_n_vector_results<br>
                             &nbsp;&nbsp;输出: __analysis_results__, __full_search_results__, __graph_results___entities_and_relationships, __reordered_results___top_n___reordered_top_n_results___, __vector_results___top_n___top_n_vector_results___, analysis_results, code_lines, full_search_results, graph_results, intent_decomposed, reordered_results, vector_results<br>
-                            &nbsp;&nbsp;代码块数: 28
+                            &nbsp;&nbsp;<span class="badge-async">异步</span>
+                        </div>
+                        <div style="margin-top:10px; padding:10px; background:#f9f9fa; border-left:4px solid #f093fb; border-radius:4px;">
+                            <strong style="color:#f093fb; display:block; margin-bottom:5px;">函数实现:</strong>
+                            <p style="color:#999; font-style:italic;">暂无函数体代码</p>
                         </div>
                     
                         <div class="change-item">
-                            <strong>step_3_stronger_reasoning_model</strong><br>
+                            <strong>2. step_3_stronger_reasoning_model</strong><br>
                             &nbsp;&nbsp;输入: 无<br>
                             &nbsp;&nbsp;输出: __stronger_model_results__, stronger_model_results<br>
-                            &nbsp;&nbsp;代码块数: 4
+                            &nbsp;&nbsp;<span class="badge-async">异步</span>
+                        </div>
+                        <div style="margin-top:10px; padding:10px; background:#f9f9fa; border-left:4px solid #f093fb; border-radius:4px;">
+                            <strong style="color:#f093fb; display:block; margin-bottom:5px;">函数实现:</strong>
+                            <p style="color:#999; font-style:italic;">暂无函数体代码</p>
                         </div>
                     
                         <div class="change-item">
-                            <strong>step_4_escalate_to_human_review</strong><br>
+                            <strong>3. step_4_escalate_to_human_review</strong><br>
                             &nbsp;&nbsp;输入: 无<br>
                             &nbsp;&nbsp;输出: unsatisfied_count<br>
-                            &nbsp;&nbsp;代码块数: 6
+                            &nbsp;&nbsp;<span class="badge-async">异步</span>
+                        </div>
+                        <div style="margin-top:10px; padding:10px; background:#f9f9fa; border-left:4px solid #f093fb; border-radius:4px;">
+                            <strong style="color:#f093fb; display:block; margin-bottom:5px;">函数实现:</strong>
+                            <p style="color:#999; font-style:italic;">暂无函数体代码</p>
                         </div>
                     <div class="change-item" style="color:#666;">... 还有 9 个模块</div>
                         </div>

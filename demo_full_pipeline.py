@@ -710,6 +710,7 @@ def run_full_pipeline():
     prompt40_step3_clustering = {}
     prompt40_step4_generation = {}
     prompt40_step5_orchestration = {}
+    prompt40_module_bodies = {}  # 添加模块函数体代码字典
 
     if success:
         # 转换 ModuleDefinition 对象为字典，排除不可序列化的字段
@@ -719,8 +720,11 @@ def run_full_pipeline():
                 'inputs': module.inputs,
                 'outputs': module.outputs,
                 'is_async': module.is_async,
+                'body_code': module.body_code,  # 添加函数体代码
+                'code_lines_count': len(module.body_code.split('\n')) if module.body_code else 0,
             }
             prompt40_modules_dict.append(module_dict)
+            prompt40_module_bodies[module.name] = module.body_code  # 保存到字典
         prompt40_module_count = len(modules)
         prompt40_main_code = main_code
         prompt40_time_ms = codegen_time
@@ -771,7 +775,8 @@ def run_full_pipeline():
         prompt40_modules=prompt40_modules_dict,
         prompt40_module_count=prompt40_module_count,
         prompt40_main_code=prompt40_main_code,
-        prompt40_time_ms=prompt40_time_ms,
+        prompt40_time_ms=codegen_time,
+        prompt40_module_bodies=prompt40_module_bodies,  # 添加模块函数体字典
 
         # 阶段4子步骤详情
         prompt40_step1_parsing=prompt40_step1_parsing,

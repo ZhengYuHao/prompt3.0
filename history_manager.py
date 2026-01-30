@@ -93,6 +93,7 @@ class PipelineHistory:
     prompt40_module_count: int = 0
     prompt40_main_code: str = ""
     prompt40_time_ms: int = 0
+    prompt40_module_bodies: Dict[str, str] = field(default_factory=dict)  # 添加模块函数体代码
 
     # 阶段4子步骤详情
     prompt40_step1_parsing: Dict[str, Any] = field(default_factory=dict)  # 词法解析
@@ -263,20 +264,43 @@ class HistoryManager:
             async_modules = step4.get('async_modules', 0)
             sync_modules = step4.get('sync_modules', 0)
             modules = step4.get('modules', [])
+            module_bodies = history.prompt40_module_bodies or {}  # 获取模块函数体字典
 
             modules_str = ""
             if modules:
-                for module in modules[:4]:  # 只显示前4个模块
+                for i, module in enumerate(modules[:4]):  # 只显示前4个模块
                     name = module.get('name', 'N/A')
-                    inputs = ", ".join(module.get('inputs', []))
-                    outputs = ", ".join(module.get('outputs', []))
-                    block_count = module.get('original_block_count', 0)
+                    inputs = module.get('inputs', [])
+                    outputs = module.get('outputs', [])
+                    is_async = module.get('is_async', False)
+                    body_code = module_bodies.get(name, '')  # 获取函数体代码
+                    
+                    inputs_str = ", ".join(inputs) if inputs else "无"
+                    outputs_str = ", ".join(outputs) if outputs else "无"
+                    mode_str = '<span class="badge-async">异步</span>' if is_async else '<span class="badge-sync">同步</span>'
+                    
+                    # 转义代码中的特殊字符
+                    if body_code:
+                        escaped_code = body_code.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+                        # 显示函数体的前10行
+                        code_lines = escaped_code.split('\n')
+                        code_preview = "\n".join(code_lines[:10])
+                        if len(code_lines) > 10:
+                            code_preview += "\n        ... 还有 {} 行".format(len(code_lines) - 10)
+                        code_preview_html = f'<pre style="background:#f5f5f5; padding:10px; border-radius:4px; font-size:12px; line-height:1.6; color:#333; max-height:200px; overflow-y:auto;">{code_preview}</pre>'
+                    else:
+                        code_preview_html = '<p style="color:#999; font-style:italic;">暂无函数体代码</p>'
+                    
                     modules_str += f"""
                         <div class="change-item">
-                            <strong>{name}</strong><br>
-                            &nbsp;&nbsp;输入: {inputs or '无'}<br>
-                            &nbsp;&nbsp;输出: {outputs or '无'}<br>
-                            &nbsp;&nbsp;代码块数: {block_count}
+                            <strong>{i}. {name}</strong><br>
+                            &nbsp;&nbsp;输入: {inputs_str or '无'}<br>
+                            &nbsp;&nbsp;输出: {outputs_str or '无'}<br>
+                            &nbsp;&nbsp;{mode_str}
+                        </div>
+                        <div style="margin-top:10px; padding:10px; background:#f9f9fa; border-left:4px solid #f093fb; border-radius:4px;">
+                            <strong style="color:#f093fb; display:block; margin-bottom:5px;">函数实现:</strong>
+                            {code_preview_html}
                         </div>
                     """
                 if len(modules) > 4:

@@ -1,11 +1,17 @@
 """
 完整流水线演示：prompt_preprocessor.py + prompt_structurizer.py 协同工作
 展示从口语化输入到结构化模板的完整转换过程
+
+使用方法:
+1. 使用默认输入: python3 demo_full_pipeline.py
+2. 从文件读取输入: python3 demo_full_pipeline.py <文件路径>
 """
 
 import json
 import re
 import time
+import sys
+import os
 
 # ============================================================================
 # 导入项目模块
@@ -231,27 +237,62 @@ class PipelineMockExtractor:
 # 完整流水线演示
 # ============================================================================
 
-def run_full_pipeline():
-    """执行完整流水线"""
-    
+def load_input_from_file(file_path: str) -> str:
+    """从文件读取输入内容"""
+    if not os.path.exists(file_path):
+        error(f"❌ 文件不存在: {file_path}")
+        return None
+
+    if not file_path.endswith('.txt'):
+        warning(f"⚠️  警告: 文件扩展名不是 .txt: {file_path}")
+
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        info(f"✅ 成功读取文件: {file_path}")
+        info(f"📄 文件内容长度: {len(content)} 字符")
+        return content.strip()
+    except Exception as e:
+        error(f"❌ 读取文件失败: {e}")
+        return None
+
+
+def run_full_pipeline(input_text: str = None):
+    """执行完整流水线
+
+    Args:
+        input_text: 可选的用户输入文本。如果不提供，则使用默认的 RAW_INPUT
+    """
+    # 确定使用的输入文本
+    if input_text is None:
+        input_text = RAW_INPUT
+        info("\n" + "=" * 80)
+        info("使用默认输入（可指定文件路径: python3 demo_full_pipeline.py <文件路径>）")
+        info("=" * 80)
+    else:
+        info("\n" + "=" * 80)
+        info("使用从文件读取的输入")
+        info("=" * 80)
+
     info("\n" + "█" * 80)
     info("█" + " " * 30 + "完整流水线演示" + " " * 32 + "█")
     info("█" + " " * 20 + "预处理模块 + 结构化模块 协同工作" + " " * 18 + "█")
     info("█" * 80)
-    
+
     # =========================================================================
     # 阶段 0: 展示原始输入
     # =========================================================================
     info("\n" + "=" * 80)
     info("【阶段 0: 原始用户输入】")
     info("=" * 80)
-    info("\n" + RAW_INPUT)
+    info("\n" + input_text)
     
     info("\n📝 输入特点分析:")
     info("  • 包含口语化表达: '那个'、'吧'、'嘛'、'搞'、'弄'")
     info("  • 包含非标准术语: '套壳'、'大模型'、'K8s'、'ELK'")
     info("  • 包含多种数据类型: 数字、列表、布尔值")
     info("  • 文本结构松散，需要标准化")
+    info(f"  • 输入来源: {'文件' if input_text != RAW_INPUT else '默认硬编码'}")
     
     # =========================================================================
     # 阶段 1: Prompt 1.0 预处理
@@ -282,7 +323,7 @@ def run_full_pipeline():
     
     # 执行预处理
     prompt10_result = preprocessor.process(
-        RAW_INPUT,
+        input_text,
         save_history=True,  # 保存历史记录
         show_comparison=False
     )
@@ -325,7 +366,7 @@ def run_full_pipeline():
         ("ELK那套", "ELK日志系统(Elasticsearch+Logstash+Kibana)那套"),
     ]
     for old_phrase, expected_new in comparisons:
-        if old_phrase in RAW_INPUT:
+        if old_phrase in input_text:
             info(f"    原: {old_phrase}")
             info(f"    新: {expected_new}")
             info("")
@@ -656,7 +697,7 @@ def run_full_pipeline():
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ 📊 处理统计                                                                  │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ 原始输入长度: {len(RAW_INPUT):4} 字符                                              │
+│ 原始输入长度: {len(input_text):4} 字符                                              │
 │ 标准化后长度: {len(processed_text):4} 字符                                              │
 │ 术语替换数量: {len(prompt10_result.terminology_changes):4} 处                                              │
 │ 识别变量数量: {len(variable_metas):4} 个                                              │
@@ -740,7 +781,7 @@ def run_full_pipeline():
     pipeline_history = PipelineHistory(
         pipeline_id=generate_id(),
         timestamp=get_timestamp(),
-        raw_input=RAW_INPUT,
+        raw_input=input_text,
 
         # 阶段1结果
         prompt10_id=prompt10_result.id,
@@ -808,4 +849,23 @@ def run_full_pipeline():
 
 
 if __name__ == "__main__":
-    run_full_pipeline()
+    # 检查是否有命令行参数
+    if len(sys.argv) > 1:
+        file_path = sys.argv[1]
+        info(f"📂 尝试从文件读取输入: {file_path}")
+
+        # 尝试从文件读取
+        content = load_input_from_file(file_path)
+
+        if content is None:
+            error("❌ 无法读取文件，使用默认输入")
+            run_full_pipeline()
+        elif not content.strip():
+            error("❌ 文件内容为空，使用默认输入")
+            run_full_pipeline()
+        else:
+            run_full_pipeline(content)
+    else:
+        # 没有命令行参数，使用默认输入
+        info("💡 提示: 使用 'python3 demo_full_pipeline.py <文件路径>' 从文件读取输入")
+        run_full_pipeline()

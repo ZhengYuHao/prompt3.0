@@ -7,118 +7,28 @@ from typing import Dict, Any
 from llm_client import invoke_function  # 需要实现 LLM 客户端
 
 
-def step_1_compute_similarity_threshold(_95th_percentile_response_time, current_requests, query_rate):
+def step_1_compute_judgement():
     """Auto-generated module"""
-    query_type = user_input
-    return access_log_retention_days, admin_user_priority, cache_expiration_time, code_analysis_response_time, debug_log_retention_days, error_log_retention_days, graph_database_response_time, graph_exploration_steps, knowledge_base_A_size, knowledge_base_B_size, knowledge_base_C_size, max_code_lines_static_analysis, max_concurrent_requests, query_rate_duration_minutes, query_type, reordered_top_n_results, response_time_duration_minutes, similarity_threshold, top_n_vector_results, total_response_time_limit, vector_dimension, vector_retrieval_response_time
+    return content, judgement
 
 
-async def step_2_vector_retrieval(graph_exploration_steps, max_code_lines_static_analysis, query_type, reordered_top_n_results, similarity_threshold, top_n_vector_results):
+def step_2_compute_content(judgement):
     """Auto-generated module"""
-    if query_type == "simple_fact":
-        vector_results = await invoke_function('vector_retrieval')
-        if vector_results.similarity >= similarity_threshold:
-            return vector_results.top_n[top_n_vector_results]
-        else:
-            reordered_results = await invoke_function('reorder_results', vector_results=vector_results)
-            return reordered_results.top_n[reordered_top_n_results]
-    elif query_type == "complex_reasoning":
-        intent_decomposed = await invoke_function('decompose_intent', user_input=user_input)
-        graph_results = await invoke_function('graph_database_retrieval', intent_decomposed=intent_decomposed, graph_exploration_steps=graph_exploration_steps)
-        if graph_results.found:
-            return graph_results.entities_and_relationships
-        else:
-            full_search_results = await invoke_function('full_search')
-            return full_search_results
-    elif query_type == "code_analysis":
-        code_lines = user_input.lines
-        if code_lines > max_code_lines_static_analysis:
-            analysis_results = await invoke_function('static_analysis', user_input=user_input)
-        else:
-            analysis_results = await invoke_function('semantic_analysis', user_input=user_input)
-        return analysis_results
+    if judgement == 0:
+        content = "No judgement made."
+    elif judgement > 0:
+        content = "Judgement  is  positive."
     else:
-        return "Unsupported query type"
+        content = "Judgement  is  negative."
+    return content
 
 
-async def step_3_stronger_reasoning_model():
-    """Auto-generated module"""
-    if user_feedback == "regenerate":
-        stronger_model_results = await invoke_function('stronger_reasoning_model', user_input=user_input)
-        return stronger_model_results
-
-
-async def step_4_escalate_to_human_review():
-    """Auto-generated module"""
-    if user_feedback == "not_satisfied":
-        unsatisfied_count += 1
-        if unsatisfied_count >= 3:
-            await invoke_function('escalate_to_human_review')
-    return unsatisfied_count
-
-
-def step_5_compute_knowledge_base_A(knowledge_base_A_size, knowledge_base_B_size, knowledge_base_C_size):
-    """Auto-generated module"""
-    knowledge_base_A = knowledge_base_A_size
-    knowledge_base_B = knowledge_base_B_size
-    knowledge_base_C = knowledge_base_C_size
-    return knowledge_base_A, knowledge_base_B, knowledge_base_C
-
-
-async def step_6_queue_request(current_requests, max_concurrent_requests):
-    """Auto-generated module"""
-    if current_requests > max_concurrent_requests:
-        await invoke_function('queue_request')
-    return None
-
-
-async def step_7_log_violation():
-    """Auto-generated module"""
-    if await invoke_function('contains_sensitive_words', user_input=user_input):
-        await invoke_function('log_violation', user_input=user_input)
-        return "Service denied due to sensitive content"
-
-
-async def step_8_confirm_user_identity(query_type):
-    """Auto-generated module"""
-    if query_type == "financial":
-        await invoke_function('confirm_user_identity')
-    return None
-
-
-async def step_9_degrade_service(total_response_time_limit, vector_retrieval_response_time):
-    """Auto-generated module"""
-    if vector_retrieval_response_time > total_response_time_limit:
-        await invoke_function('degrade_service')
-    return None
-
-
-async def step_10_upload_logs(access_log_retention_days, debug_log_retention_days, error_log_retention_days):
-    """Auto-generated module"""
-    await invoke_function('upload_logs', error_log_retention_days=error_log_retention_days, access_log_retention_days=access_log_retention_days, debug_log_retention_days=debug_log_retention_days)
-    return None
-
-
-async def step_11_trigger_alert(query_rate, query_rate_duration_minutes):
-    """Auto-generated module"""
-    if query_rate < 10:
-        await invoke_function('trigger_alert')
-    return None
-
-
-async def step_12_trigger_scaling(_95th_percentile_response_time, response_time_duration_minutes):
-    """Auto-generated module"""
-    if _95th_percentile_response_time > 3:
-        await invoke_function('trigger_scaling')
-    return None
-
-
-async def main_workflow(input_params: dict):
+def main_workflow(input_params: dict):
     """
     主工作流 - 自动生成
     
     Args:
-        input_params: 包含 ['95th_percentile_response_time', 'current_requests', 'query_rate'] 的字典
+        input_params: 包含 [] 的字典
     
     Returns:
         执行结果上下文
@@ -126,41 +36,11 @@ async def main_workflow(input_params: dict):
     # 初始化上下文
     ctx = input_params.copy()
 
-    # Module 1: step_1_compute_similarity_threshold
-    ctx["access_log_retention_days"], ctx["admin_user_priority"], ctx["cache_expiration_time"], ctx["code_analysis_response_time"], ctx["debug_log_retention_days"], ctx["error_log_retention_days"], ctx["graph_database_response_time"], ctx["graph_exploration_steps"], ctx["knowledge_base_A_size"], ctx["knowledge_base_B_size"], ctx["knowledge_base_C_size"], ctx["max_code_lines_static_analysis"], ctx["max_concurrent_requests"], ctx["query_rate_duration_minutes"], ctx["query_type"], ctx["reordered_top_n_results"], ctx["response_time_duration_minutes"], ctx["similarity_threshold"], ctx["top_n_vector_results"], ctx["total_response_time_limit"], ctx["vector_dimension"], ctx["vector_retrieval_response_time"] = step_1_compute_similarity_threshold(ctx.get("_95th_percentile_response_time"), ctx.get("current_requests"), ctx.get("query_rate"))
+    # Module 1: step_1_compute_judgement
+    ctx["content"], ctx["judgement"] = step_1_compute_judgement()
 
-    # Module 2: step_2_vector_retrieval
-    ctx["__analysis_results__"], ctx["__full_search_results__"], ctx["__graph_results___entities_and_relationships"], ctx["__reordered_results___top_n___reordered_top_n_results___"], ctx["__vector_results___top_n___top_n_vector_results___"], ctx["analysis_results"], ctx["code_lines"], ctx["full_search_results"], ctx["graph_results"], ctx["intent_decomposed"], ctx["reordered_results"], ctx["vector_results"] = await step_2_vector_retrieval(ctx.get("graph_exploration_steps"), ctx.get("max_code_lines_static_analysis"), ctx.get("query_type"), ctx.get("reordered_top_n_results"), ctx.get("similarity_threshold"), ctx.get("top_n_vector_results"))
-
-    # Module 3: step_3_stronger_reasoning_model
-    ctx["__stronger_model_results__"], ctx["stronger_model_results"] = await step_3_stronger_reasoning_model()
-
-    # Module 4: step_4_escalate_to_human_review
-    ctx["unsatisfied_count"] = await step_4_escalate_to_human_review()
-
-    # Module 5: step_5_compute_knowledge_base_A
-    ctx["knowledge_base_A"], ctx["knowledge_base_B"], ctx["knowledge_base_C"] = step_5_compute_knowledge_base_A(ctx.get("knowledge_base_A_size"), ctx.get("knowledge_base_B_size"), ctx.get("knowledge_base_C_size"))
-
-    # Module 6: step_6_queue_request
-    await step_6_queue_request(ctx.get("current_requests"), ctx.get("max_concurrent_requests"))
-
-    # Module 7: step_7_log_violation
-    await step_7_log_violation()
-
-    # Module 8: step_8_confirm_user_identity
-    await step_8_confirm_user_identity(ctx.get("query_type"))
-
-    # Module 9: step_9_degrade_service
-    await step_9_degrade_service(ctx.get("total_response_time_limit"), ctx.get("vector_retrieval_response_time"))
-
-    # Module 10: step_10_upload_logs
-    await step_10_upload_logs(ctx.get("access_log_retention_days"), ctx.get("debug_log_retention_days"), ctx.get("error_log_retention_days"))
-
-    # Module 11: step_11_trigger_alert
-    await step_11_trigger_alert(ctx.get("query_rate"), ctx.get("query_rate_duration_minutes"))
-
-    # Module 12: step_12_trigger_scaling
-    await step_12_trigger_scaling(ctx.get("_95th_percentile_response_time"), ctx.get("response_time_duration_minutes"))
+    # Module 2: step_2_compute_content
+    ctx["content"] = step_2_compute_content(ctx.get("judgement"))
 
     return ctx
 
@@ -171,6 +51,7 @@ if __name__ == "__main__":
     
     # 测试输入
     test_input = {
+        # TODO: 填充实际参数
     }
     
     result = asyncio.run(main_workflow(test_input))

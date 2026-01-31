@@ -264,7 +264,6 @@ class HistoryManager:
             async_modules = step4.get('async_modules', 0)
             sync_modules = step4.get('sync_modules', 0)
             modules = step4.get('modules', [])
-            module_bodies = history.prompt40_module_bodies or {}  # 获取模块函数体字典
 
             modules_str = ""
             if modules:
@@ -273,7 +272,8 @@ class HistoryManager:
                     inputs = module.get('inputs', [])
                     outputs = module.get('outputs', [])
                     is_async = module.get('is_async', False)
-                    body_code = module_bodies.get(name, '')  # 获取函数体代码
+                    # 直接从 module 对象获取 body_code
+                    body_code = module.get('body_code', '')
                     
                     inputs_str = ", ".join(inputs) if inputs else "无"
                     outputs_str = ", ".join(outputs) if outputs else "无"

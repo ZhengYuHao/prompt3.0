@@ -803,14 +803,19 @@ class ModuleSynthesizer:
             loop_var, end_var = match.groups()
             cleaned = f"for {loop_var} in range({end_var}):"
         # 格式2: FOR var IN range(start, end)
-        elif not re.search(r'for\s+\w+\s+in\s+', cleaned, flags=re.IGNORECASE):
-            # 尝试原有的 {{}} 格式
-            match = re.sub(r'^FOR\s+\{\{(\w+)\}\}\s+IN\s+\{\{(\w+)\}\}', r'for \1 in \2:', cleaned, flags=re.IGNORECASE)
-            if match != cleaned:
-                cleaned = match
-            # 尝试简化格式: FOR var IN iterable
-            elif re.match(r'^FOR\s+\w+\s+IN\s+\w+\s*$', cleaned, flags=re.IGNORECASE):
-                cleaned = re.sub(r'^FOR\s+(\w+)\s+IN\s+(\w+)', r'for \1 in \2:', cleaned, flags=re.IGNORECASE)
+        elif re.match(r'^FOR\s+(\w+)\s+IN\s+range\([^)]+\)\s*$', cleaned, flags=re.IGNORECASE):
+            # 保持原有的 range 语法，只转换关键字
+            cleaned = re.sub(r'^FOR\s+(\w+)\s+IN\s+', r'for \1 in ', cleaned, flags=re.IGNORECASE)
+            cleaned = cleaned.rstrip() + ':'
+        # 格式3: 通用 FOR var IN iterable（支持 Python 表达式）
+        elif re.match(r'^FOR\s+(\w+)\s+IN\s+', cleaned, flags=re.IGNORECASE):
+            # 提取变量名和 IN 后面的表达式
+            match = re.match(r'^FOR\s+(\w+)\s+IN\s+(.+)$', cleaned, flags=re.IGNORECASE)
+            if match:
+                loop_var, iterable = match.groups()
+                # 如果 iterable 已经是 Python 格式（包含 [、]、(、)、.、函数调用等），直接使用
+                # 如果是简单的变量名，也直接使用
+                cleaned = f"for {loop_var} in {iterable}:"
 
         cleaned = re.sub(r'^ENDFOR$', '', cleaned, flags=re.IGNORECASE)
 

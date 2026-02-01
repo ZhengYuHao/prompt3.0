@@ -404,6 +404,30 @@ class DSLTranspiler:
 - 属性访问：支持 {{{{obj}}}}.field 语法
 - 字典/列表访问：支持 {{{{dict}}}}['key'] 和 {{{{list}}}}[0] 语法
 
+### 约束 6：FOR 循环语法（重要）
+- ✅ FOR 循环必须使用 {{{{variable}}}} 格式包裹变量
+- ✅ 正确格式：FOR {{{{item}}}} IN {{{{collection}}}}
+- ❌ 禁止在 IN 后面使用 Python 列表字面量：[\"a\", \"b\", \"c\"]
+- ❌ 禁止在 IN 后面使用 Python 表达式：dict[key], func(), var1 + var2
+- ❌ 禁止混合 DSL 和 Python 语法
+- ✅ 如果需要遍历固定列表，应该先 DEFINE 一个列表变量，然后在 FOR 中使用
+
+**错误示例：**
+```
+❌ FOR {{{{scene}}}} IN [\"素材\", \"时间\", \"费用\", \"内容\", \"合规\", \"协作\"]
+❌ FOR {{{{kw}}}} IN {{{{keywords}}}}[\"material\"]
+❌ FOR {{{{item}}}} IN range(0, 10)
+```
+
+**正确写法：**
+```
+# 先定义列表
+DEFINE {{{{scene_list}}}}: List = [\"素材\", \"时间\", \"费用\", \"内容\", \"合规\", \"协作\"]
+
+# 再在 FOR 中使用变量
+FOR {{{{scene}}}} IN {{{{scene_list}}}}
+```
+
 **错误示例（绝对禁止）：**
 
 ❌ 例子 1：RETURN 中赋值
@@ -487,6 +511,7 @@ ENDFOR
 3. ✅ 没有使用 FOR ... MINUTES 这种非标准语法
 4. ✅ 只使用了【变量定义】中的配置参数名称
 5. ✅ 所有 IF/FOR/WHILE 都有对应的 ENDIF/ENDFOR/ENDWHILE
+6. ✅ 所有 FOR 循环的 IN 后面都使用 {{{{variable}}}} 格式，没有 Python 列表或表达式
 """
     
     def transpile(self, prompt_2_0: Dict[str, Any]) -> str:

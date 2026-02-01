@@ -1256,6 +1256,9 @@ class HistoryManager:
 
         # 第四步编译步骤详情 HTML
         step_details_html = self._generate_step_details_html(history)
+        
+        # 生成调用关系图的 Mermaid 代码
+        call_graph_mermaid = self._generate_call_graph_mermaid(history)
 
         # 时间百分比计算
         time1_pct = history.prompt10_time_ms / history.total_time_ms * 100 if history.total_time_ms > 0 else 0
@@ -1550,7 +1553,26 @@ class HistoryManager:
         .time-fill.stage-2 {{ background: linear-gradient(90deg, #11998e, #38ef7d); }}
         .time-fill.stage-3 {{ background: linear-gradient(90deg, #ff7e5f, #feb47b); }}
         .time-fill.stage-4 {{ background: linear-gradient(90deg, #f093fb, #f5576c); }}
+
+        /* 调用关系图样式 */
+        .call-graph-container {{
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }}
+        .mermaid {{
+            display: inline-block;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }}
     </style>
+    <!-- 引入 Mermaid.js 用于渲染架构图 -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -1636,6 +1658,13 @@ class HistoryManager:
         <div class="stage stage-4">
             <div class="stage-header">💻 阶段 4: Prompt 4.0 代码生成 (耗时 {history.prompt40_time_ms}ms)</div>
             <div class="stage-content">
+                <h4>工作流调用关系图</h4>
+                <div class="call-graph-container">
+                    <div class="mermaid">
+{call_graph_mermaid}
+                    </div>
+                </div>
+
                 <h4>编译步骤详情</h4>
                 {step_details_html}
 
@@ -1718,6 +1747,19 @@ class HistoryManager:
             </div>
         </div>
     </div>
+
+    <!-- 初始化 Mermaid.js -->
+    <script>
+        mermaid.initialize({{
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {{
+                useMaxWidth: true,
+                htmlLabels: true
+            }}
+        }});
+    </script>
 </body>
 </html>
 """
@@ -1731,3 +1773,108 @@ class HistoryManager:
             error(f"保存流水线HTML报告失败: {e}")
         
         return html
+    
+    def _generate_call_graph_mermaid(self, history: PipelineHistory) -> str:
+        """
+        生成工作流调用关系图的 Mermaid 语法
+        
+        Args:
+            history: 流水线历史记录
+            
+        Returns:
+            Mermaid graph 语法
+        """
+        mermaid_lines = ["graph TD", "    %% 工作流调用关系图", ""]
+        
+        # 添加输入节点
+        mermaid_lines.append("    Input([用户输入<br/>input_params]):::input")
+        mermaid_lines.append("")
+        
+        # 添加主工作流节点
+        mermaid_lines.append("    Main[main_workflow<br/>主控流程]:::main")
+        mermaid_lines.append("")
+        
+        # 从主工作流到输入节点的连接
+        mermaid_lines.append("    Input --> Main")
+        mermaid_lines.append("")
+        
+        # 添加模块节点
+        if history.prompt40_modules:
+            modules = history.prompt40_modules
+            step4_gen = history.prompt40_step4_generation
+            
+            # 获取模块聚类信息
+            clusters = step4_gen.get('clusters', []) if step4_gen else []
+            
+            # 按照聚类分组显示模块
+            if clusters:
+                cluster_dict = {}
+                # 为每个聚类分配模块
+                for cluster_info in clusters:
+                    cluster_id = cluster_info.get('cluster_id', 'unknown')
+                    block_ids = cluster_info.get('blocks', [])
+                    cluster_dict[cluster_id] = block_ids
+                
+                # 创建节点
+                for i, module in enumerate(modules):
+                    module_name = module.get('name', f'module_{i}')
+                    is_async = module.get('is_async', False)
+                    inputs = module.get('inputs', [])
+                    outputs = module.get('outputs', [])
+                    
+                    # 节点样式
+                    node_style = ":::async" if is_async else ":::sync"
+                    node_id = f"Step{i}"
+                    
+                    # 节点标签
+                    input_str = ", ".join(inputs[:3]) + ("..." if len(inputs) > 3 else "")
+                    output_str = ", ".join(outputs[:3]) + ("..." if len(outputs) > 3 else "")
+                    
+                    label = f"{module_name}<br/><sub>({input_str}) → ({output_str})</sub>"
+                    
+                    mermaid_lines.append(f"    {node_id}[{label}]{node_style}")
+                
+                mermaid_lines.append("")
+                
+                # 添加边：主工作流调用所有模块
+                for i, module in enumerate(modules):
+                    node_id = f"Step{i}"
+                    mermaid_lines.append(f"    Main --> {node_id}")
+                
+                mermaid_lines.append("")
+            else:
+                # 如果没有聚类信息，简单列出所有模块
+                for i, module in enumerate(modules):
+                    module_name = module.get('name', f'module_{i}')
+                    is_async = module.get('is_async', False)
+                    
+                    node_style = ":::async" if is_async else ":::sync"
+                    node_id = f"Step{i}"
+                    
+                    mermaid_lines.append(f"    {node_id}[{module_name}]{node_style}")
+                    mermaid_lines.append(f"    Main --> {node_id}")
+                
+                mermaid_lines.append("")
+        
+        # 添加输出节点
+        mermaid_lines.append("    Output([返回结果<br/>final_output]):::output")
+        mermaid_lines.append("")
+        
+        # 从最后一个模块到输出节点的连接
+        if history.prompt40_modules:
+            last_step_id = f"Step{len(history.prompt40_modules) - 1}"
+            mermaid_lines.append(f"    {last_step_id} --> Output")
+        else:
+            mermaid_lines.append("    Main --> Output")
+        
+        mermaid_lines.append("")
+        
+        # 添加图例
+        mermaid_lines.append("    %% 样式定义")
+        mermaid_lines.append("    classDef input fill:#d4edda,stroke:#28a745,stroke-width:2px;")
+        mermaid_lines.append("    classDef main fill:#e1f5ff,stroke:#007bff,stroke-width:3px;")
+        mermaid_lines.append("    classDef sync fill:#fff3cd,stroke:#ffc107,stroke-width:2px;")
+        mermaid_lines.append("    classDef async fill:#f8d7da,stroke:#dc3545,stroke-width:2px;")
+        mermaid_lines.append("    classDef output fill:#d4edda,stroke:#28a745,stroke-width:2px;")
+        
+        return "\n".join(mermaid_lines)

@@ -7,20 +7,14 @@ from typing import Dict, Any
 from llm_client import invoke_function  # 需要实现 LLM 客户端
 
 
-def step_1_compute_judgement():
+def step_1_process():
     """Auto-generated module"""
-    return content, judgement
-
-
-def step_2_compute_content(judgement):
-    """Auto-generated module"""
-    if judgement == 0:
-        content = "No judgement made."
-    elif judgement > 0:
-        content = "Judgement  is  positive."
-    else:
-        content = "Judgement  is  negative."
-    return content
+    json
+    {
+    "judgement": 0,
+    "content": ""
+    }
+    return None
 
 
 def main_workflow(input_params: dict):
@@ -36,11 +30,8 @@ def main_workflow(input_params: dict):
     # 初始化上下文
     ctx = input_params.copy()
 
-    # Module 1: step_1_compute_judgement
-    ctx["content"], ctx["judgement"] = step_1_compute_judgement()
-
-    # Module 2: step_2_compute_content
-    ctx["content"] = step_2_compute_content(ctx.get("judgement"))
+    # Module 1: step_1_process
+    step_1_process()
 
     return ctx
 

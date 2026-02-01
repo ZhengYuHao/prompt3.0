@@ -7,94 +7,22 @@ from typing import Dict, Any
 from llm_client import invoke_function  # 需要实现 LLM 客户端
 
 
-def step_1_compute_judgement(input_text):
+def step_1_process():
     """Auto-generated module"""
-    return action_keywords, content, greeting_keywords, info_keywords, internal_keywords, is_greeting, judgement, report_keywords, scene_actions, scene_keywords
-
-
-def step_2_compute_is_greeting(greeting_keywords, input_text, kw):
-    """Auto-generated module"""
-    for kw in greeting_keywords:
-        if kw in input_text:
-            is_greeting = True
-    return is_greeting
-
-
-def step_3_compute_is_report():
-    """Auto-generated module"""
-    return is_report
-
-
-def step_4_compute_is_report(input_text, kw, report_keywords):
-    """Auto-generated module"""
-    for kw in report_keywords:
-        if kw in input_text:
-            is_report = True
-    return is_report
-
-
-def step_5_compute_is_internal():
-    """Auto-generated module"""
-    return is_internal
-
-
-def step_6_compute_is_internal(input_text, internal_keywords, kw):
-    """Auto-generated module"""
-    for kw in internal_keywords:
-        if kw in input_text:
-            is_internal = True
-    return is_internal
-
-
-async def step_7_generate_relay_content(act, action_keywords, info, info_keywords, input_text, is_greeting, is_internal, is_report, kw, scene, scene_actions, scene_keywords):
-    """Auto-generated module"""
-    if is_greeting  or  is_report  or  is_internal:
-        judgement = 0
-        content = ""
-    else:
-        for scene in scene_keywords:
-            for kw in scene_kw_list:
-                if kw in input_text:
-                    kw_matched = True
-            for act in scene_action_list:
-                if act in input_text:
-                    action_matched = True
-            if kw_matched  and  action_matched:
-                scene_matched = True
-        if scene_matched:
-            judgement = 1
-            content = await invoke_function('generate_relay_content', input_text=input_text)
-        else:
-            for act in action_keywords:
-                if act in input_text:
-                    action_found = True
-            for info in info_keywords:
-                if info in input_text:
-                    info_found = True
-            if action_found  and  info_found:
-                judgement = 1
-                content = await invoke_function('generate_relay_content', input_text=input_text)
-            else:
-                judgement = 0
-                content = ""
-    return action_found, action_matched, content, info_found, judgement, kw_matched, scene_action_list, scene_kw_list, scene_matched
-
-
-def step_8_compute_result(content, judgement):
-    """Auto-generated module"""
-    result = {
-    "judgement": judgement,
-    "content": content
+    json
+    {
+    "judgement": 0,
+    "content": ""
     }
-    return result
+    return None
 
 
-async def main_workflow(input_params: dict):
+def main_workflow(input_params: dict):
     """
     主工作流 - 自动生成
     
     Args:
-        input_params: 包含 ['act', 'info', 'input_text', 'kw', 'scene'] 的字典
+        input_params: 包含 [] 的字典
     
     Returns:
         执行结果上下文
@@ -102,29 +30,8 @@ async def main_workflow(input_params: dict):
     # 初始化上下文
     ctx = input_params.copy()
 
-    # Module 1: step_1_compute_judgement
-    ctx["action_keywords"], ctx["content"], ctx["greeting_keywords"], ctx["info_keywords"], ctx["internal_keywords"], ctx["is_greeting"], ctx["judgement"], ctx["report_keywords"], ctx["scene_actions"], ctx["scene_keywords"] = step_1_compute_judgement(ctx.get("input_text"))
-
-    # Module 2: step_2_compute_is_greeting
-    ctx["is_greeting"] = step_2_compute_is_greeting(ctx.get("greeting_keywords"), ctx.get("input_text"), ctx.get("kw"))
-
-    # Module 3: step_3_compute_is_report
-    ctx["is_report"] = step_3_compute_is_report()
-
-    # Module 4: step_4_compute_is_report
-    ctx["is_report"] = step_4_compute_is_report(ctx.get("input_text"), ctx.get("kw"), ctx.get("report_keywords"))
-
-    # Module 5: step_5_compute_is_internal
-    ctx["is_internal"] = step_5_compute_is_internal()
-
-    # Module 6: step_6_compute_is_internal
-    ctx["is_internal"] = step_6_compute_is_internal(ctx.get("input_text"), ctx.get("internal_keywords"), ctx.get("kw"))
-
-    # Module 7: step_7_generate_relay_content
-    ctx["action_found"], ctx["action_matched"], ctx["content"], ctx["info_found"], ctx["judgement"], ctx["kw_matched"], ctx["scene_action_list"], ctx["scene_kw_list"], ctx["scene_matched"] = await step_7_generate_relay_content(ctx.get("act"), ctx.get("action_keywords"), ctx.get("info"), ctx.get("info_keywords"), ctx.get("input_text"), ctx.get("is_greeting"), ctx.get("is_internal"), ctx.get("is_report"), ctx.get("kw"), ctx.get("scene"), ctx.get("scene_actions"), ctx.get("scene_keywords"))
-
-    # Module 8: step_8_compute_result
-    ctx["__result__"], ctx["result"] = step_8_compute_result(ctx.get("content"), ctx.get("judgement"))
+    # Module 1: step_1_process
+    step_1_process()
 
     return ctx
 

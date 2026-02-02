@@ -1638,7 +1638,8 @@ class HistoryManager:
         }}
     </style>
     <!-- 引入 Mermaid.js 用于渲染架构图 -->
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <!-- 使用 jsDelivr CDN (lib.baomitu.com/10.6.1 不存在，jsdelivr 可用) -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -1830,19 +1831,29 @@ class HistoryManager:
 
     <!-- 初始化 Mermaid.js 和缩放功能 -->
     <script>
-        // 初始化 Mermaid
-        mermaid.initialize({{
-            startOnLoad: true,
-            theme: 'default',
-            securityLevel: 'loose',
-            flowchart: {{
-                useMaxWidth: false,  // 禁用最大宽度限制
-                htmlLabels: true
-            }},
-            // 添加更多配置选项
-            logLevel: 'error',  // 只显示错误日志
-            suppressErrorRendering: false,  // 不隐藏错误
-        }});
+        // 检查 mermaid 是否加载成功
+        if (typeof mermaid === 'undefined') {{
+            console.error('Mermaid.js 加载失败，请检查网络连接');
+            document.getElementById('mermaidWrapper').innerHTML =
+                '<div style="color: red; padding: 20px; text-align: center;">' +
+                '❌ Mermaid.js 加载失败<br>' +
+                '请检查网络连接或刷新页面' +
+                '</div>';
+        }} else {{
+            // 初始化 Mermaid
+            mermaid.initialize({{
+                startOnLoad: true,
+                theme: 'default',
+                securityLevel: 'loose',
+                flowchart: {{
+                    useMaxWidth: false,  // 禁用最大宽度限制
+                    htmlLabels: true
+                }},
+                // 添加更多配置选项
+                logLevel: 'error',  // 只显示错误日志
+                suppressErrorRendering: false,  // 不隐藏错误
+            }});
+        }}
 
         // 监听 Mermaid 渲染错误
         window.addEventListener('error', function(e) {{
@@ -2110,19 +2121,24 @@ class HistoryManager:
    - 避免使用函数名（如：step_1_compute_xxx）
    - 节点名称简洁明了（不超过 15 个字）
 
-3. **流程图结构**
+3. **类名规范（重要）**
+   - 结束节点类名使用 `endNode`，不要使用 `end`（`end` 是 Mermaid 保留关键字）
+   - 其他类名使用有意义的名称（start、decision、process 等）
+   - 示例：classDef endNode fill:#d4edda,stroke:#28a745,stroke-width:2px;
+
+4. **流程图结构**
    - graph TD: 从上到下的流程图
    - 使用菱形（{{条件}}）表示决策点
    - 使用矩形（[步骤]）表示处理步骤
    - 使用圆角（（开始/结束））表示起点和终点
 
-4. **样式要求**
+5. **样式要求**
    - 决策节点使用黄色系
    - 处理节点使用蓝色系
    - 起始/结束节点使用绿色系
    - 保持图表清晰易读
 
-5. **输出格式**
+6. **输出格式**
    - 只输出 Mermaid graph TD 代码
    - 不包含任何解释文字
    - 不使用 ```mermaid ``` 标记
@@ -2139,12 +2155,12 @@ graph TD
     Format --> End([返回结果])
 
     classDef start fill:#d4edda,stroke:#28a745,stroke-width:2px;
-    classDef end fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    classDef endNode fill:#d4edda,stroke:#28a745,stroke-width:2px;
     classDef decision fill:#fff3cd,stroke:#ffc107,stroke-width:2px;
     classDef process fill:#e1f5ff,stroke:#007bff,stroke-width:2px;
 
     class Start start;
-    class End end;
+    class End endNode;
     class Check decision;
     class Identify process;
     class Create process;
@@ -2173,10 +2189,40 @@ graph TD
             # 更安全的 markdown 标记移除
             # 使用正则表达式移除 markdown 代码块标记
             import re
-            # 移除开头的 ```mermaid 或 ``` 
-            mermaid_code = re.sub(r'^```(?:mermaid)?\s*\n?', '', mermaid_code)
+            # 移除开头的 ```mermaid 或 ```（更彻底）
+            mermaid_code = re.sub(r'^[\s\S]*?```(?:mermaid)?\s*\n?', '', mermaid_code)
             # 移除结尾的 ```
-            mermaid_code = re.sub(r'\n?```$', '', mermaid_code)
+            mermaid_code = re.sub(r'\n?```[\s\S]*?$', '', mermaid_code)
+
+            # 确保第一行就是 graph TD，移除所有前面的无效内容
+            lines = mermaid_code.split('\n')
+            # 找到包含 "graph TD" 的行
+            graph_idx = -1
+            for i, line in enumerate(lines):
+                if 'graph TD' in line:
+                    graph_idx = i
+                    break
+
+            if graph_idx >= 0:
+                # 从包含 "graph TD" 的行开始，不要 strip，保持原有的换行
+                mermaid_code = '\n'.join(lines[graph_idx:])
+
+            # 最后再 strip 一次，确保没有前后空白
+            mermaid_code = mermaid_code.strip()
+
+            # 清理 Mermaid 不支持的特殊字符
+            # 将特殊符号替换为 ASCII 等价符号
+            mermaid_code = mermaid_code.replace('≤', '<=')  # 小于等于
+            mermaid_code = mermaid_code.replace('≥', '>=')  # 大于等于
+            mermaid_code = mermaid_code.replace('≠', '!=')  # 不等于
+            mermaid_code = mermaid_code.replace('→', '->')   # 箭头符号
+
+            # 修复 Mermaid 保留关键字冲突
+            # 'end' 是 Mermaid 的保留关键字，需要替换为 endNode
+            # 替换 classDef end 为 classDef endNode
+            mermaid_code = re.sub(r'classDef\s+end\b', 'classDef endNode', mermaid_code)
+            # 替换 class ... end; 为 class ... endNode;
+            mermaid_code = re.sub(r'class\s+(\w+)\s+end\b', r'class \1 endNode', mermaid_code)
 
             mermaid_code = mermaid_code.strip()
 

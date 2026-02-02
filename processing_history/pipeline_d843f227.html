@@ -364,7 +364,8 @@
         }
     </style>
     <!-- 引入 Mermaid.js 用于渲染架构图 -->
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <!-- 使用 jsDelivr CDN (lib.baomitu.com/10.6.1 不存在，jsdelivr 可用) -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -794,59 +795,96 @@ RETURN {{result}}</pre>
                     </div>
                     <div class="mermaid-wrapper" id="mermaidWrapper">
                         <div class="mermaid" id="mermaidDiagram">
-<think>
-
-</think>
-
 graph TD
-    Start([用户输入]) --> CheckQueryType{判断查询类型}
-    CheckQueryType -->|简单事实| VectorSearch[向量检索]
-    CheckQueryType -->|复杂推理| GraphSearch[图数据库检索]
-    CheckQueryType -->|代码相关| CodeAnalysis[代码分析]
+    Start([用户输入]) --> CheckType{判断查询类型}
+    CheckType -->|简单事实| VectorSearch[向量检索]
+    CheckType -->|复杂推理| GraphSearch[图数据库检索]
+    CheckType -->|代码问题| CodeAnalysis[代码分析]
 
     VectorSearch --> CheckSimilarity{相似度判断}
-    CheckSimilarity -->|>0.85| ReturnTop3[返回前3结果]
-    CheckSimilarity -->|≤0.85| RerankSearch[重排序评分]
-    RerankSearch --> ReturnTop5[返回前5结果]
+    CheckSimilarity -->|>0.85| Top3[返回前3结果]
+    CheckSimilarity -->|<=0.85| Rerank[重排序评分]
+    Rerank --> Top5[返回前5结果]
 
-    GraphSearch --> TwoHopSearch[2跳邻居探索]
-    TwoHopSearch -->|找到匹配| ReturnEntities[返回实体关系]
-    TwoHopSearch -->|未找到| FullSearch[全量搜索]
+    GraphSearch --> TwoHops[2跳邻居探索]
+    TwoHops -->|找到匹配| ReturnEntity[返回实体关系]
+    TwoHops -->|未找到| FullSearch[全量搜索]
 
-    CodeAnalysis --> CheckCodeLines{代码行数判断}
-    CheckCodeLines -->|>500行| StaticAnalysis[静态分析]
-    CheckCodeLines -->|≤500行| SemanticAnalysis[语义分析]
+    CodeAnalysis --> CheckLines{代码行数判断}
+    CheckLines -->|>500行| StaticAnalysis[静态分析]
+    CheckLines -->|<=500行| SemanticAnalysis[语义分析]
 
-    ReturnTop3 --> FinalOutput[生成响应]
-    ReturnTop5 --> FinalOutput
-    ReturnEntities --> FinalOutput
-    FullSearch --> FinalOutput
-    StaticAnalysis --> FinalOutput
-    SemanticAnalysis --> FinalOutput
+    Top3 --> CacheResult[缓存结果]
+    Top5 --> CacheResult
+    ReturnEntity --> CacheResult
+    FullSearch --> CacheResult
+    StaticAnalysis --> GenerateDoc[生成解释文档]
+    SemanticAnalysis --> GenerateDoc
+
+    CacheResult --> FinalOutput[生成响应]
+    GenerateDoc --> FinalOutput
 
     FinalOutput --> End([返回结果])
+    FinalOutput --> LogPerformance[记录性能]
+    LogPerformance --> End
+
+    End --> Feedback{用户反馈}
+    Feedback -->|不满意| CheckCount{连续次数}
+    CheckCount -->|<3次| StrongModel[启用强模型]
+    CheckCount -->|>=3次| ManualReview[人工审核]
+
+    Start --> SecurityCheck{敏感词过滤}
+    SecurityCheck -->|违规内容| RejectService[拒绝服务]
+    SecurityCheck -->|金融类| VerifyIdentity[身份二次确认]
+    VerifyIdentity --> FinalOutput
+
+    Start --> QueueCheck{并发控制}
+    QueueCheck -->|超出限制| WaitQueue[排队等待]
+    WaitQueue --> FinalOutput
+
+    FinalOutput --> Monitor[监控指标]
+    Monitor -->|超时| DegradedService[降级服务]
+    Monitor -->|QPS异常| TriggerAlert[触发扩容告警]
+    Monitor --> End
 
     classDef start fill:#d4edda,stroke:#28a745,stroke-width:2px;
-    classDef end fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    classDef endNode fill:#d4edda,stroke:#28a745,stroke-width:2px;
     classDef decision fill:#fff3cd,stroke:#ffc107,stroke-width:2px;
     classDef process fill:#e1f5ff,stroke:#007bff,stroke-width:2px;
 
     class Start start;
-    class End end;
-    class CheckQueryType decision;
+    class End endNode;
+    class CheckType decision;
     class CheckSimilarity decision;
-    class TwoHopSearch decision;
-    class CheckCodeLines decision;
+    class TwoHops decision;
+    class CheckLines decision;
+    class Feedback decision;
+    class CheckCount decision;
+    class SecurityCheck decision;
+    class QueueCheck decision;
+    class Monitor decision;
     class VectorSearch process;
     class GraphSearch process;
     class CodeAnalysis process;
-    class ReturnTop3 process;
-    class RerankSearch process;
-    class ReturnTop5 process;
+    class Rerank process;
+    class Top3 process;
+    class Top5 process;
+    class TwoHops process;
+    class ReturnEntity process;
     class FullSearch process;
     class StaticAnalysis process;
     class SemanticAnalysis process;
+    class GenerateDoc process;
+    class CacheResult process;
     class FinalOutput process;
+    class StrongModel process;
+    class ManualReview process;
+    class RejectService process;
+    class VerifyIdentity process;
+    class WaitQueue process;
+    class DegradedService process;
+    class TriggerAlert process;
+    class LogPerformance process;
                         </div>
                     </div>
                     <div class="zoom-hint">
@@ -1317,19 +1355,29 @@ graph TD
 
     <!-- 初始化 Mermaid.js 和缩放功能 -->
     <script>
-        // 初始化 Mermaid
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: 'default',
-            securityLevel: 'loose',
-            flowchart: {
-                useMaxWidth: false,  // 禁用最大宽度限制
-                htmlLabels: true
-            },
-            // 添加更多配置选项
-            logLevel: 'error',  // 只显示错误日志
-            suppressErrorRendering: false,  // 不隐藏错误
-        });
+        // 检查 mermaid 是否加载成功
+        if (typeof mermaid === 'undefined') {
+            console.error('Mermaid.js 加载失败，请检查网络连接');
+            document.getElementById('mermaidWrapper').innerHTML =
+                '<div style="color: red; padding: 20px; text-align: center;">' +
+                '❌ Mermaid.js 加载失败<br>' +
+                '请检查网络连接或刷新页面' +
+                '</div>';
+        } else {
+            // 初始化 Mermaid
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'default',
+                securityLevel: 'loose',
+                flowchart: {
+                    useMaxWidth: false,  // 禁用最大宽度限制
+                    htmlLabels: true
+                },
+                // 添加更多配置选项
+                logLevel: 'error',  // 只显示错误日志
+                suppressErrorRendering: false,  // 不隐藏错误
+            });
+        }
 
         // 监听 Mermaid 渲染错误
         window.addEventListener('error', function(e) {

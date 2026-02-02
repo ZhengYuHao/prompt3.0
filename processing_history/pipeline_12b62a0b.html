@@ -282,21 +282,85 @@
         .time-fill.stage-3 { background: linear-gradient(90deg, #ff7e5f, #feb47b); }
         .time-fill.stage-4 { background: linear-gradient(90deg, #f093fb, #f5576c); }
 
-        /* 调用关系图样式 */
+        /* 调用关系图样式 - 优化显示空间 */
         .call-graph-container {
             background: #f8f9fa;
             border: 2px solid #e0e0e0;
             border-radius: 12px;
-            padding: 30px;
-            margin: 20px 0;
+            padding: 20px;
+            margin: 30px 0;
+            overflow: hidden;
+            position: relative;
+            min-height: 600px;
+        }
+        .call-graph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .call-graph-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .control-btn {
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        .control-btn:hover {
+            background: #0056b3;
+        }
+        .control-btn.reset {
+            background: #6c757d;
+        }
+        .control-btn.reset:hover {
+            background: #545b62;
+        }
+        .zoom-level {
+            background: #e9ecef;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 80px;
             text-align: center;
         }
+        .mermaid-wrapper {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: grab;
+        }
+        .mermaid-wrapper:active {
+            cursor: grabbing;
+        }
         .mermaid {
-            display: inline-block;
+            display: block;
             background: white;
             border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: transform 0.1s ease;
+            transform-origin: center center;
+            min-width: 1000px;
+        }
+        .zoom-hint {
+            text-align: center;
+            color: #6c757d;
+            font-size: 12px;
+            margin-top: 10px;
+            font-style: italic;
         }
     </style>
     <!-- 引入 Mermaid.js 用于渲染架构图 -->
@@ -1130,7 +1194,17 @@
             <div class="stage-content">
                 <h4>工作流调用关系图</h4>
                 <div class="call-graph-container">
-                    <div class="mermaid">
+                    <div class="call-graph-header">
+                        <span><strong>交互控制</strong></span>
+                        <div class="call-graph-controls">
+                            <button class="control-btn" onclick="zoomIn()">🔍 放大 (+)</button>
+                            <button class="control-btn" onclick="zoomOut()">🔍 缩小 (-)</button>
+                            <button class="control-btn reset" onclick="resetZoom()">↺ 重置</button>
+                            <span class="zoom-level" id="zoomLevel">100%</span>
+                        </div>
+                    </div>
+                    <div class="mermaid-wrapper" id="mermaidWrapper">
+                        <div class="mermaid" id="mermaidDiagram">
 graph TD
     %% 工作流调用关系图
 
@@ -1153,6 +1227,10 @@ graph TD
     classDef sync fill:#fff3cd,stroke:#ffc107,stroke-width:2px;
     classDef async fill:#f8d7da,stroke:#dc3545,stroke-width:2px;
     classDef output fill:#d4edda,stroke:#28a745,stroke-width:2px;
+                        </div>
+                    </div>
+                    <div class="zoom-hint">
+                        💡 提示：可以使用鼠标滚轮缩放，或拖拽移动图片
                     </div>
                 </div>
 
@@ -1414,16 +1492,93 @@ graph TD
         </div>
     </div>
 
-    <!-- 初始化 Mermaid.js -->
+    <!-- 初始化 Mermaid.js 和缩放功能 -->
     <script>
+        // 初始化 Mermaid
         mermaid.initialize({
             startOnLoad: true,
             theme: 'default',
             securityLevel: 'loose',
             flowchart: {
-                useMaxWidth: true,
+                useMaxWidth: false,  // 禁用最大宽度限制
                 htmlLabels: true
             }
+        });
+
+        // 缩放和平移功能
+        let currentZoom = 1;
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
+        const mermaidDiagram = document.getElementById('mermaidDiagram');
+        const mermaidWrapper = document.getElementById('mermaidWrapper');
+        const zoomLevelDisplay = document.getElementById('zoomLevel');
+
+        function updateZoom() {
+            // 限制缩放范围: 0.3x - 3.0x
+            currentZoom = Math.max(0.3, Math.min(3.0, currentZoom));
+            mermaidDiagram.style.transform = `scale(${currentZoom})`;
+            zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+        }
+
+        function zoomIn() {
+            currentZoom += 0.1;
+            updateZoom();
+        }
+
+        function zoomOut() {
+            currentZoom -= 0.1;
+            updateZoom();
+        }
+
+        function resetZoom() {
+            currentZoom = 1;
+            updateZoom();
+            mermaidWrapper.scrollTo({
+                left: 0,
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // 鼠标滚轮缩放
+        mermaidWrapper.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            currentZoom += delta;
+            updateZoom();
+        });
+
+        // 鼠标拖拽平移
+        mermaidWrapper.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            startX = e.pageX - mermaidWrapper.offsetLeft;
+            startY = e.pageY - mermaidWrapper.offsetTop;
+            scrollLeft = mermaidWrapper.scrollLeft;
+            scrollTop = mermaidWrapper.scrollTop;
+        });
+
+        mermaidWrapper.addEventListener('mouseleave', function() {
+            isDragging = false;
+        });
+
+        mermaidWrapper.addEventListener('mouseup', function() {
+            isDragging = false;
+        });
+
+        mermaidWrapper.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            const x = e.pageX - mermaidWrapper.offsetLeft;
+            const y = e.pageY - mermaidWrapper.offsetTop;
+            const walkX = (x - startX) * 1.5;  // 平滑系数
+            const walkY = (y - startY) * 1.5;
+            mermaidWrapper.scrollLeft = scrollLeft - walkX;
+            mermaidWrapper.scrollTop = scrollTop - walkY;
+        });
+
+        // 双击重置缩放
+        mermaidWrapper.addEventListener('dblclick', function() {
+            resetZoom();
         });
     </script>
 </body>

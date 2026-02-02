@@ -1192,7 +1192,7 @@
         <div class="stage stage-4">
             <div class="stage-header">💻 阶段 4: Prompt 4.0 代码生成 (耗时 2ms)</div>
             <div class="stage-content">
-                <h4>工作流调用关系图</h4>
+                <h4>业务流程图（Approach 图）</h4>
                 <div class="call-graph-container">
                     <div class="call-graph-header">
                         <span><strong>交互控制</strong></span>
@@ -1206,31 +1206,25 @@
                     <div class="mermaid-wrapper" id="mermaidWrapper">
                         <div class="mermaid" id="mermaidDiagram">
 graph TD
-    %% 工作流调用关系图
+    %% 业务流程图（默认生成）
 
-    Input([用户输入<br/>input_params]):::input
+    Start([用户输入])
 
-    Main[main_workflow<br/>主控流程]:::main
+    Process1[处理输入数据]
+    Start --> Process1
 
-    Input --> Main
 
-    Step0[step_1_process]:::sync
-    Main --> Step0
-
-    Output([返回结果<br/>final_output]):::output
-
-    Step0 --> Output
+    End([返回结果])
+    Process1 --> End
 
     %% 样式定义
-    classDef input fill:#d4edda,stroke:#28a745,stroke-width:2px;
-    classDef main fill:#e1f5ff,stroke:#007bff,stroke-width:3px;
-    classDef sync fill:#fff3cd,stroke:#ffc107,stroke-width:2px;
-    classDef async fill:#f8d7da,stroke:#dc3545,stroke-width:2px;
-    classDef output fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    style Start fill:#d4edda,stroke:#28a745,stroke-width:2px
+    style End fill:#d4edda,stroke:#28a745,stroke-width:2px
+    style Process1 fill:#e1f5ff,stroke:#007bff,stroke-width:2px
                         </div>
                     </div>
                     <div class="zoom-hint">
-                        💡 提示：可以使用鼠标滚轮缩放，或拖拽移动图片
+                        💡 提示：此图展示业务逻辑和处理流程，使用鼠标滚轮缩放，或拖拽移动图片
                     </div>
                 </div>
 
@@ -1502,6 +1496,16 @@ graph TD
             flowchart: {
                 useMaxWidth: false,  // 禁用最大宽度限制
                 htmlLabels: true
+            },
+            // 添加更多配置选项
+            logLevel: 'error',  // 只显示错误日志
+            suppressErrorRendering: false,  // 不隐藏错误
+        });
+
+        // 监听 Mermaid 渲染错误
+        window.addEventListener('error', function(e) {
+            if (e.message && e.message.includes('mermaid')) {
+                console.error('Mermaid 渲染错误:', e);
             }
         });
 

@@ -1257,8 +1257,10 @@ class HistoryManager:
         # 第四步编译步骤详情 HTML
         step_details_html = self._generate_step_details_html(history)
         
-        # 生成调用关系图的 Mermaid 代码
-        call_graph_mermaid = self._generate_call_graph_mermaid(history)
+        # 生成业务流程图（Approach 图）的 Mermaid 代码
+        info("正在生成业务流程图...")
+        approach_diagram_mermaid = self._generate_approach_diagram_mermaid(history)
+        info(f"业务流程图生成完成 ({len(approach_diagram_mermaid)} 字符)")
 
         # 时间百分比计算
         time1_pct = history.prompt10_time_ms / history.total_time_ms * 100 if history.total_time_ms > 0 else 0
@@ -1722,7 +1724,7 @@ class HistoryManager:
         <div class="stage stage-4">
             <div class="stage-header">💻 阶段 4: Prompt 4.0 代码生成 (耗时 {history.prompt40_time_ms}ms)</div>
             <div class="stage-content">
-                <h4>工作流调用关系图</h4>
+                <h4>业务流程图（Approach 图）</h4>
                 <div class="call-graph-container">
                     <div class="call-graph-header">
                         <span><strong>交互控制</strong></span>
@@ -1735,11 +1737,11 @@ class HistoryManager:
                     </div>
                     <div class="mermaid-wrapper" id="mermaidWrapper">
                         <div class="mermaid" id="mermaidDiagram">
-{call_graph_mermaid}
+{approach_diagram_mermaid}
                         </div>
                     </div>
                     <div class="zoom-hint">
-                        💡 提示：可以使用鼠标滚轮缩放，或拖拽移动图片
+                        💡 提示：此图展示业务逻辑和处理流程，使用鼠标滚轮缩放，或拖拽移动图片
                     </div>
                 </div>
 
@@ -1836,6 +1838,16 @@ class HistoryManager:
             flowchart: {{
                 useMaxWidth: false,  // 禁用最大宽度限制
                 htmlLabels: true
+            }},
+            // 添加更多配置选项
+            logLevel: 'error',  // 只显示错误日志
+            suppressErrorRendering: false,  // 不隐藏错误
+        }});
+
+        // 监听 Mermaid 渲染错误
+        window.addEventListener('error', function(e) {{
+            if (e.message && e.message.includes('mermaid')) {{
+                console.error('Mermaid 渲染错误:', e);
             }}
         }});
 
@@ -2032,4 +2044,211 @@ class HistoryManager:
         mermaid_lines.append("    classDef async fill:#f8d7da,stroke:#dc3545,stroke-width:2px;")
         mermaid_lines.append("    classDef output fill:#d4edda,stroke:#28a745,stroke-width:2px;")
         
+        return "\n".join(mermaid_lines)
+    
+    def _generate_approach_diagram_mermaid(self, history: PipelineHistory) -> str:
+        """
+        生成业务流程图（Approach 图）的 Mermaid 语法
+        
+        使用 LLM 分析代码和需求，生成展示业务逻辑的流程图
+        
+        Args:
+            history: 流水线历史记录
+            
+        Returns:
+            Mermaid graph TD 语法
+        """
+        # 导入 LLM 客户端
+        from llm_client import UnifiedLLMClient
+        import json
+        
+        llm_client = UnifiedLLMClient()
+        
+        # 准备上下文信息
+        context = {
+            'business_requirement': history.prompt10_processed or "无需求描述",
+            'module_count': len(history.prompt40_modules) if history.prompt40_modules else 0,
+            'modules': [],
+        }
+        
+        # 提取模块信息
+        if history.prompt40_modules:
+            for i, module in enumerate(history.prompt40_modules):
+                context['modules'].append({
+                    'index': i,
+                    'name': module.get('name', f'module_{i}'),
+                    'description': module.get('description', '无描述'),
+                    'inputs': module.get('inputs', []),
+                    'outputs': module.get('outputs', []),
+                    'is_async': module.get('is_async', False),
+                })
+        
+        # 获取 DSL 代码
+        dsl_code = history.prompt30_dsl_code or ""
+        
+        # 构建 LLM Prompt
+        prompt = f"""你是一个业务架构分析师。请基于以下信息，生成一个展示业务流程的 Mermaid 流程图。
+
+## 业务需求
+{context['business_requirement']}
+
+## 模块信息（{context['module_count']} 个）
+{json.dumps(context['modules'], indent=2, ensure_ascii=False)}
+
+## DSL 代码
+{dsl_code[:2000] if len(dsl_code) > 2000 else dsl_code}
+
+## 要求
+
+1. **重点展示业务逻辑，而非函数调用**
+   - 体现数据处理的主要步骤
+   - 展示决策点和分支逻辑
+   - 使用业务术语，避免技术细节
+
+2. **节点命名规范**
+   - 使用业务术语（如：判断场景类型、生成响应内容）
+   - 避免使用函数名（如：step_1_compute_xxx）
+   - 节点名称简洁明了（不超过 15 个字）
+
+3. **流程图结构**
+   - graph TD: 从上到下的流程图
+   - 使用菱形（{{条件}}）表示决策点
+   - 使用矩形（[步骤]）表示处理步骤
+   - 使用圆角（（开始/结束））表示起点和终点
+
+4. **样式要求**
+   - 决策节点使用黄色系
+   - 处理节点使用蓝色系
+   - 起始/结束节点使用绿色系
+   - 保持图表清晰易读
+
+5. **输出格式**
+   - 只输出 Mermaid graph TD 代码
+   - 不包含任何解释文字
+   - 不使用 ```mermaid ``` 标记
+
+## 输出示例
+
+graph TD
+    Start([用户输入]) --> Check{{是否需要特殊处理?}}
+    Check -->|是| Identify[识别场景类型]
+    Check -->|否| Generate[直接生成]
+    Identify --> Create[创建响应内容]
+    Generate --> Format[格式化输出]
+    Create --> Format
+    Format --> End([返回结果])
+
+    classDef start fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    classDef end fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    classDef decision fill:#fff3cd,stroke:#ffc107,stroke-width:2px;
+    classDef process fill:#e1f5ff,stroke:#007bff,stroke-width:2px;
+
+    class Start start;
+    class End end;
+    class Check decision;
+    class Identify process;
+    class Create process;
+    class Generate process;
+    class Format process;
+
+请根据上述信息生成业务流程图："""
+        
+        try:
+            # 调用 LLM 生成 Mermaid 代码
+            system_prompt = """你是一个业务架构分析师，擅长将代码和技术实现转换为清晰的业务流程图。"""
+            response = llm_client.call(
+                system_prompt=system_prompt,
+                user_content=prompt,
+                temperature=0.3  # 使用较低的温度以获得更稳定的输出
+            )
+            mermaid_code = response.content.strip()
+
+            # 清理输出
+            mermaid_code = mermaid_code.strip()
+
+            # 移除可能的 markdown 标记
+            if mermaid_code.startswith('```'):
+                mermaid_code = mermaid_code.split('```')[1]
+                if mermaid_code.startswith('mermaid'):
+                    mermaid_code = mermaid_code[7:]
+            if mermaid_code.endswith('```'):
+                mermaid_code = mermaid_code[:-3]
+
+            mermaid_code = mermaid_code.strip()
+
+            # 清理不兼容的 Mermaid 10.x 语法
+            # 移除 :::className 语法，替换为正确的 class 定义
+            import re
+            # 提取所有节点和它们的类
+            node_class_map = {}
+            class_pattern = r'(\w+)\([^\)]+\)|(\w+)\[[^\]]+\)|(\w+)\{\{[^}]+\}\}\s*:::(\w+)'
+
+            # 查找所有使用 :::className 的节点
+            for match in re.finditer(r'(\w+)\([^\)]+\)|(\w+)\[[^\]]+\)|(\w+)\{\{[^}]+\}\}):::(\w+)', mermaid_code):
+                node_def = match.group(1)
+                class_name = match.group(4)
+                node_class_map[node_def] = class_name
+
+            # 移除 :::className 语法
+            mermaid_code = re.sub(r':::\w+', '', mermaid_code)
+
+            # 验证是否包含 graph TD
+            if 'graph TD' not in mermaid_code:
+                # 如果 LLM 返回的不是 Mermaid 代码，使用默认模板
+                return self._get_default_approach_diagram(context)
+            
+            return mermaid_code
+            
+        except Exception as e:
+            error(f"生成 Approach 图失败: {e}")
+            # 返回默认的流程图
+            return self._get_default_approach_diagram(context)
+    
+    def _get_default_approach_diagram(self, context: dict) -> str:
+        """
+        生成默认的业务流程图（当 LLM 调用失败时使用）
+
+        Args:
+            context: 上下文信息
+
+        Returns:
+            Mermaid graph TD 语法
+        """
+        mermaid_lines = ["graph TD", "    %% 业务流程图（默认生成）", ""]
+
+        # 添加起始节点
+        mermaid_lines.append("    Start([用户输入])")
+        mermaid_lines.append("")
+
+        # 根据模块数量生成处理步骤
+        if context['module_count'] > 0:
+            # 添加判断节点
+            mermaid_lines.append("    Process1[处理输入数据]")
+            mermaid_lines.append("    Start --> Process1")
+            mermaid_lines.append("")
+
+            # 添加中间处理步骤
+            for i in range(1, context['module_count']):
+                mermaid_lines.append(f"    Process{i+1}[处理步骤 {i+1}]")
+                mermaid_lines.append(f"    Process{i} --> Process{i+1}")
+
+            mermaid_lines.append("")
+
+        # 添加结束节点
+        mermaid_lines.append("    End([返回结果])")
+
+        if context['module_count'] > 0:
+            mermaid_lines.append(f"    Process{context['module_count']} --> End")
+        else:
+            mermaid_lines.append("    Start --> End")
+
+        mermaid_lines.append("")
+
+        # 添加样式定义（使用 style 语法，更稳定）
+        mermaid_lines.append("    %% 样式定义")
+        mermaid_lines.append("    style Start fill:#d4edda,stroke:#28a745,stroke-width:2px")
+        mermaid_lines.append("    style End fill:#d4edda,stroke:#28a745,stroke-width:2px")
+        for i in range(1, context['module_count'] + 1):
+            mermaid_lines.append(f"    style Process{i} fill:#e1f5ff,stroke:#007bff,stroke-width:2px")
+
         return "\n".join(mermaid_lines)

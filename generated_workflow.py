@@ -7,22 +7,95 @@ from typing import Dict, Any
 from llm_client import invoke_function  # 需要实现 LLM 客户端
 
 
-def step_1_process():
+def step_1_compute_max_concurrent(cache_hit, cache_result, code_lines, current_requests, qps, query_type, response_time, similarity, user_priority):
     """Auto-generated module"""
-    json
-    {
-    "judgement": 0,
-    "content": ""
-    }
+    return cache_duration, duration_threshold, feedback_count, log_retention, max_concurrent, qps_threshold, sensitive_words
+
+
+async def step_2_vector_search(cache_hit, code_lines, query_type, similarity):
+    """Auto-generated module"""
+    if query_type == "simple_fact":
+        if similarity > 0.85:
+            results = await invoke_function('vector_search', top_n=_3)
+        elif similarity < 0.85:
+            results = await invoke_function('rerank_search', top_n=_5)
+        if  not  cache_hit:
+            cache_result = await invoke_function('generate_cache', results=results)
+    elif query_type == "complex_reasoning":
+        kg_results = await invoke_function('kg_search', max_hops=_2)
+        if kg_results.empty:
+            kg_results = await invoke_function('full_graph_search')
+        cache_result = kg_results
+    elif query_type == "code_related":
+        if code_lines > 500:
+            analysis = await invoke_function('static_analysis')
+        elif code_lines < 500:
+            analysis = await invoke_function('semantic_analysis')
+            doc = await invoke_function('generate_explanation', analysis=analysis)
+    else:
+        response = "无法识别的查询类型"
+    return analysis, cache_result, doc, kg_results, response, results
+
+
+async def step_3_strong_model_analysis(user_click_regen):
+    """Auto-generated module"""
+    if user_click_regen:
+        response = await invoke_function('strong_model_analysis')
+        feedback_count = feedback_count + 1
+        if feedback_count >= 3:
+            await invoke_function('escalate_to_human')
+    return feedback_count, response
+
+
+def step_4_compute_process(current_requests, max_concurrent, queue, request, user_priority):
+    """Auto-generated module"""
+    if current_requests >= max_concurrent:
+        queue.append(request)
+    else:
+        process = True
+        if user_priority > 5:
+            queue.insert(0, request)
+    return process
+
+
+async def step_5_log_to_security(query, sensitive_words):
+    """Auto-generated module"""
+    if sensitive_words in query:
+        await invoke_function('log_to_security')
+        return "服务拒绝"
+
+
+async def step_6_degrade_service(response_time):
+    """Auto-generated module"""
+    if response_time > 3.0:
+        await invoke_function('degrade_service')
     return None
 
 
-def main_workflow(input_params: dict):
+async def step_7_upload_logs(log_retention):
+    """Auto-generated module"""
+    await invoke_function('upload_logs', log_retention=log_retention)
+    return None
+
+
+async def step_8_check_duration_and_alert(qps, qps_threshold):
+    """Auto-generated module"""
+    if qps < qps_threshold:
+        await invoke_function('check_duration_and_alert')
+    return None
+
+
+def step_9_compute_response(response):
+    """Auto-generated module"""
+    return response
+
+
+async def main_workflow(input_params: dict):
     """
     主工作流 - 自动生成
     
     Args:
-        input_params: 包含 [] 的字典
+        input_params: 包含 ['cache_hit', 'code_lines', 'current_requests', 'qps', 'query', 'query_type', 'queue', 'request', 'response_time', 'similarity', 'user_click_regen', 'user_priority'] 的字典
     
     Returns:
         执行结果上下文
@@ -30,8 +103,32 @@ def main_workflow(input_params: dict):
     # 初始化上下文
     ctx = input_params.copy()
 
-    # Module 1: step_1_process
-    step_1_process()
+    # Module 1: step_1_compute_max_concurrent
+    ctx["cache_duration"], ctx["duration_threshold"], ctx["feedback_count"], ctx["log_retention"], ctx["max_concurrent"], ctx["qps_threshold"], ctx["sensitive_words"] = step_1_compute_max_concurrent(ctx.get("cache_hit"), ctx.get("cache_result"), ctx.get("code_lines"), ctx.get("current_requests"), ctx.get("qps"), ctx.get("query_type"), ctx.get("response_time"), ctx.get("similarity"), ctx.get("user_priority"))
+
+    # Module 2: step_2_vector_search
+    ctx["analysis"], ctx["cache_result"], ctx["doc"], ctx["kg_results"], ctx["response"], ctx["results"] = await step_2_vector_search(ctx.get("cache_hit"), ctx.get("code_lines"), ctx.get("query_type"), ctx.get("similarity"))
+
+    # Module 3: step_3_strong_model_analysis
+    ctx["feedback_count"], ctx["response"] = await step_3_strong_model_analysis(ctx.get("user_click_regen"))
+
+    # Module 4: step_4_compute_process
+    ctx["process"] = step_4_compute_process(ctx.get("current_requests"), ctx.get("max_concurrent"), ctx.get("queue"), ctx.get("request"), ctx.get("user_priority"))
+
+    # Module 5: step_5_log_to_security
+    ctx["______"] = await step_5_log_to_security(ctx.get("query"), ctx.get("sensitive_words"))
+
+    # Module 6: step_6_degrade_service
+    await step_6_degrade_service(ctx.get("response_time"))
+
+    # Module 7: step_7_upload_logs
+    await step_7_upload_logs(ctx.get("log_retention"))
+
+    # Module 8: step_8_check_duration_and_alert
+    await step_8_check_duration_and_alert(ctx.get("qps"), ctx.get("qps_threshold"))
+
+    # Module 9: step_9_compute_response
+    ctx["__response__"] = step_9_compute_response(ctx.get("response"))
 
     return ctx
 

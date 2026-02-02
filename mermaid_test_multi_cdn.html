@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Mermaid 测试（多CDN备选）</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 50px auto; padding: 20px; }
+        .mermaid { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; min-height: 300px; }
+        pre { background: #f8f9fa; padding: 20px; border-radius: 8px; overflow-x: auto; }
+        .status { padding: 15px; margin: 20px 0; border-radius: 8px; }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.warning { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <h1>Mermaid 测试（多 CDN 备选方案）</h1>
+
+    <div id="loading-status" class="status warning">
+        ⏳ 正在加载 Mermaid 库...
+    </div>
+
+    <div class="mermaid">
+graph TD
+    %% 业务流程图（默认生成）
+
+    Start([用户输入])
+
+    Process1[处理输入数据]
+    Start --> Process1
+
+
+    End([返回结果])
+    Process1 --> End
+
+    %% 样式定义
+    style Start fill:#d4edda,stroke:#28a745,stroke-width:2px
+    style End fill:#d4edda,stroke:#28a745,stroke-width:2px
+    style Process1 fill:#e1f5ff,stroke:#007bff,stroke-width:2px
+    </div>
+
+    <hr>
+    <h2>原始代码</h2>
+    <pre>
+graph TD
+    %% 业务流程图（默认生成）
+
+    Start([用户输入])
+
+    Process1[处理输入数据]
+    Start --> Process1
+
+
+    End([返回结果])
+    Process1 --> End
+
+    %% 样式定义
+    style Start fill:#d4edda,stroke:#28a745,stroke-width:2px
+    style End fill:#d4edda,stroke:#28a745,stroke-width:2px
+    style Process1 fill:#e1f5ff,stroke:#007bff,stroke-width:2px
+    </pre>
+
+    <hr>
+    <h2>诊断信息</h2>
+    <div id="diagnostic"></div>
+
+    <!-- CDN 加载策略：按优先级尝试多个源 -->
+    <script>
+        const cdnList = [
+            {
+                name: 'jsDelivr (国际)',
+                url: 'https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js'
+            },
+            {
+                name: 'unpkg (国际)',
+                url: 'https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js'
+            },
+            {
+                name: 'cdnjs (国际)',
+                url: 'https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js'
+            }
+        ];
+
+        let currentCdnIndex = 0;
+
+        function loadMermaid() {
+            if (currentCdnIndex >= cdnList.length) {
+                document.getElementById('loading-status').innerHTML =
+                    '❌ 所有 CDN 都加载失败，请检查网络连接';
+                document.getElementById('loading-status').className = 'status error';
+                return;
+            }
+
+            const cdn = cdnList[currentCdnIndex];
+            document.getElementById('loading-status').innerHTML =
+                `⏳ 尝试加载 CDN ${currentCdnIndex + 1}/${cdnList.length}: ${cdn.name}...`;
+
+            const script = document.createElement('script');
+            script.src = cdn.url;
+            script.onload = function() {
+                if (typeof mermaid !== 'undefined') {
+                    // Mermaid 加载成功
+                    document.getElementById('loading-status').innerHTML =
+                        `✅ Mermaid 加载成功（来源：${cdn.name}）`;
+                    document.getElementById('loading-status').className = 'status success';
+
+                    // 初始化 Mermaid
+                    mermaid.initialize({
+                        startOnLoad: true,
+                        theme: 'default',
+                        securityLevel: 'loose',
+                        flowchart: {
+                            useMaxWidth: false,
+                            htmlLabels: true
+                        },
+                        logLevel: 'error'
+                    });
+
+                    // 显示诊断信息
+                    document.getElementById('diagnostic').innerHTML = `
+                        <pre>
+✅ Mermaid 库加载成功
+版本: ${mermaid.version || '10.6.1'}
+CDN 来源: ${cdn.name}
+CDN URL: ${cdn.url}
+当前时间: ${new Date().toLocaleString()}
+                        </pre>
+                    `;
+                } else {
+                    currentCdnIndex++;
+                    loadMermaid();
+                }
+            };
+
+            script.onerror = function() {
+                console.warn(`CDN ${cdn.name} 加载失败，尝试下一个...`);
+                currentCdnIndex++;
+                loadMermaid();
+            };
+
+            document.head.appendChild(script);
+        }
+
+        // 开始加载
+        loadMermaid();
+
+        // 设置超时检测（30秒）
+        setTimeout(() => {
+            if (typeof mermaid === 'undefined') {
+                document.getElementById('loading-status').innerHTML =
+                    '❌ 加载超时，请检查网络连接或使用离线模式';
+                document.getElementById('loading-status').className = 'status error';
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

@@ -2179,18 +2179,52 @@ graph TD
             # 清理不兼容的 Mermaid 10.x 语法
             # 移除 :::className 语法，替换为正确的 class 定义
             import re
+
+            # 基本语法验证：检查括号是否匹配
+            def validate_parentheses(code: str) -> tuple:
+                """验证括号是否匹配"""
+                stack = []
+                brackets = {'(': ')', '[': ']', '{': '}'}
+                position = 0
+
+                for char in code:
+                    position += 1
+                    if char in brackets:
+                        stack.append(char)
+                    elif char in brackets.values():
+                        if not stack:
+                            return False, f"Unexpected closing bracket '{char}' at position {position}"
+                        if brackets[stack[-1]] != char:
+                            return False, f"Mismatched bracket at position {position}"
+                        stack.pop()
+
+                if stack:
+                    return False, f"Unclosed brackets: {stack}"
+                return True, ""
+
+            # 验证基本语法
+            is_valid, error_msg = validate_parentheses(mermaid_code)
+            if not is_valid:
+                error(f"LLM 返回的 Mermaid 代码语法错误: {error_msg}")
+                error(f"原始代码: {mermaid_code[:200]}...")
+                return self._get_default_approach_diagram(context)
+
             # 提取所有节点和它们的类
             node_class_map = {}
             class_pattern = r'(\w+)\([^\)]+\)|(\w+)\[[^\]]+\)|(\w+)\{\{[^}]+\}\}\s*:::(\w+)'
 
             # 查找所有使用 :::className 的节点
-            for match in re.finditer(r'(\w+)\([^\)]+\)|(\w+)\[[^\]]+\)|(\w+)\{\{[^}]+\}\}):::(\w+)', mermaid_code):
-                node_def = match.group(1)
-                class_name = match.group(4)
-                node_class_map[node_def] = class_name
+            try:
+                for match in re.finditer(r'(\w+)\([^\)]+\)|(\w+)\[[^\]]+\)|(\w+)\{\{[^}]+\}\}):::(\w+)', mermaid_code):
+                    node_def = match.group(1)
+                    class_name = match.group(4)
+                    node_class_map[node_def] = class_name
 
-            # 移除 :::className 语法
-            mermaid_code = re.sub(r':::\w+', '', mermaid_code)
+                # 移除 :::className 语法
+                mermaid_code = re.sub(r':::\w+', '', mermaid_code)
+            except Exception as regex_error:
+                error(f"正则表达式清理失败: {regex_error}")
+                return self._get_default_approach_diagram(context)
 
             # 验证是否包含 graph TD
             if 'graph TD' not in mermaid_code:

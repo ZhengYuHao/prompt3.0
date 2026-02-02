@@ -40,6 +40,40 @@ class LLMModel(Enum):
     GPT_35_TURBO = "gpt-3.5-turbo"
     GPT_4 = "gpt-4"
     GPT_4_TURBO = "gpt-4-turbo"
+    QWEN3_32B = "qwen3-32b-lb-pv"
+
+
+# ============================================================================
+# 预定义模型配置
+# ============================================================================
+
+MODEL_CONFIGS = {
+    "default": {
+        "model": LLMModel.GPT_35_TURBO.value,
+        "base_url": os.getenv("LLM_BASE_URL", "https://api.rcouyi.com/v1"),
+        "api_key": os.getenv("LLM_API_KEY", ""),
+    },
+    "gpt-3.5": {
+        "model": LLMModel.GPT_35_TURBO.value,
+        "base_url": os.getenv("LLM_BASE_URL", "https://api.rcouyi.com/v1"),
+        "api_key": os.getenv("LLM_API_KEY", ""),
+    },
+    "gpt-4": {
+        "model": LLMModel.GPT_4.value,
+        "base_url": os.getenv("LLM_BASE_URL", "https://api.rcouyi.com/v1"),
+        "api_key": os.getenv("LLM_API_KEY", ""),
+    },
+    "qwen3-32b": {
+        "model": LLMModel.QWEN3_32B.value,
+        "base_url": os.getenv("QWEN_BASE_URL", "http://10.9.42.174:3000/v1"),
+        "api_key": os.getenv("QWEN_API_KEY", "sk-GdqVnpIJe597WlgwvjkY2kTARinXx8RzJ0T0Vq0h6TsSMj7A"),
+    },
+    "qwen3-custom": {
+        "model": LLMModel.QWEN3_32B.value,
+        "base_url": os.getenv("QWEN_BASE_URL", "http://10.9.42.174:3000/v1"),
+        "api_key": os.getenv("QWEN_API_KEY", "sk-GdqVnpIJe597WlgwvjkY2kTARinXx8RzJ0T0Vq0h6TsSMj7A"),
+    },
+}
 
 
 @dataclass
@@ -67,7 +101,7 @@ class UnifiedLLMClient:
     
     def __init__(
         self,
-        model: str = LLMModel.GPT_35_TURBO.value,
+        model: str = LLMModel.QWEN3_32B.value,
         temperature: float = 0.1,
         base_url: Optional[str] = None,
         api_key: Optional[str] = None,
@@ -595,6 +629,7 @@ class MockLLMClient(UnifiedLLMClient):
 
 def create_llm_client(
     use_mock: bool = False,
+    config_name: Optional[str] = None,
     **kwargs
 ) -> UnifiedLLMClient:
     """
@@ -602,16 +637,42 @@ def create_llm_client(
     
     Args:
         use_mock: 是否使用模拟客户端
-        **kwargs: 传递给客户端的其他参数
+        config_name: 预定义配置名称，可选值: "default", "gpt-3.5", "gpt-4", "qwen3-32b"
+        **kwargs: 传递给客户端的其他参数（可覆盖配置中的值）
         
     Returns:
         LLM 客户端实例
+        
+    Examples:
+        # 使用默认配置
+        client = create_llm_client()
+        
+        # 使用预定义的 Qwen3 配置
+        client = create_llm_client(config_name="qwen3-32b")
+        
+        # 使用配置但覆盖部分参数
+        client = create_llm_client(config_name="qwen3-32b", temperature=0.5)
     """
     if use_mock:
         info("[LLM] 使用模拟客户端")
         return MockLLMClient(**kwargs)
+    
+    # 如果指定了配置名称，则应用配置
+    if config_name:
+        if config_name not in MODEL_CONFIGS:
+            available = ", ".join(MODEL_CONFIGS.keys())
+            raise ValueError(f"未知的配置名称: {config_name}, 可用配置: {available}")
+        
+        config = MODEL_CONFIGS[config_name]
+        info(f"[LLM] 使用预定义配置: {config_name}")
+        info(f"[LLM]  模型: {config['model']}")
+        info(f"[LLM]  地址: {config['base_url']}")
+        
+        # 合并配置：预定义配置 + kwargs（kwargs优先级更高）
+        merged_kwargs = {**config, **kwargs}
+        return UnifiedLLMClient(**merged_kwargs)
     else:
-        info("[LLM] 使用真实客户端")
+        info("[LLM] 使用真实客户端（自定义配置）")
         return UnifiedLLMClient(**kwargs)
 
 
@@ -645,19 +706,52 @@ async def invoke_function(func_name: str, **kwargs) -> Any:
 # ============================================================================
 
 if __name__ == "__main__":
-    # 测试真实LLM客户端
-    client = create_llm_client(use_mock=False)  # 使用真实LLM
+    # 方式1: 使用预定义配置（推荐）
+    print("=" * 60)
+    print("方式1: 使用预定义配置")
+    print("=" * 60)
+    
+    # 使用 Qwen3-32B 配置
+    qwen_client = create_llm_client(config_name="qwen3-32b")
+    response = qwen_client.call_simple("你是一个助手", "你好，你是谁？")
+    info(f"Qwen3 响应: {response[:100]}...")
+    
+    # 方式2: 使用默认配置
+    print("\n" + "=" * 60)
+    print("方式2: 使用默认配置")
+    print("=" * 60)
+    
+    default_client = create_llm_client()
     
     # 测试实体抽取
-    entities = client.extract_entities(
+    entities = default_client.extract_entities(
         "请为一位有3年经验的Java程序员生成一个为期2周的Python学习计划"
     )
     info(f"抽取到的实体: {json.dumps(entities, ensure_ascii=False, indent=2)}")
     
     # 测试歧义检测
-    ambiguity = client.detect_ambiguity("这个需求没啥意思,你看着办")
+    ambiguity = default_client.detect_ambiguity("这个需求没啥意思,你看着办")
     info(f"歧义检测结果: {ambiguity}")
     
     # 测试文本标准化
-    standardized = client.standardize_text("那个,帮我搞一个RAG的应用吧")
+    standardized = default_client.standardize_text("那个,帮我搞一个RAG的应用吧")
     info(f"标准化结果: {standardized}")
+    
+    # 方式3: 使用配置并覆盖参数
+    print("\n" + "=" * 60)
+    print("方式3: 使用配置并覆盖参数")
+    print("=" * 60)
+    
+    custom_client = create_llm_client(
+        config_name="qwen3-32b",
+        temperature=0.8,
+        timeout=120
+    )
+    info("已创建自定义 Qwen3 客户端（temperature=0.8, timeout=120）")
+    
+    # 显示可用的配置列表
+    print("\n" + "=" * 60)
+    print("可用的预定义配置:")
+    print("=" * 60)
+    for name, config in MODEL_CONFIGS.items():
+        print(f"- {name}: {config['model']} @ {config['base_url']}")

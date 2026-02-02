@@ -14335,5 +14335,1874 @@
     "overall_status": "success",
     "total_time_ms": 23973,
     "error_message": null
+  },
+  "cc2a387c": {
+    "pipeline_id": "cc2a387c",
+    "timestamp": "2026-02-02 16:09:40",
+    "raw_input": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+    "prompt10_id": "3d7ddf79",
+    "prompt10_original": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+    "prompt10_processed": "<think>\n好的，我现在需要处理用户提供的这个智能问答系统的设计文档。首先，我得确定这是属于哪种类型。用户提到的文档里有很多结构化的部分，比如系统流程、数据源配置、并发控制等，看起来像是一个规范文档，也就是类型1。所以按照处理规则，我需要保持结构完整，只对术语进行标准化，比如将“RAG”改为“检索增强生成”，但这里用户文档里没有提到RAG，所以可能不需要。不过文档里提到了知识图谱(KG)，可能需要标准化为“知识图谱（KG）”，但用户已经用了KG的缩写，所以可能不需要改动。\n\n接下来，检查是否有需要标准化的术语。例如，“向量索引(VI)”中的VI可能需要全称，但用户已经写成VI，所以保持原样。其他如“QPS”、“CRH”等缩写是否需要展开？根据通用原则，可能不需要，除非有明确的全称要求。用户文档里已经使用了这些缩写，所以保持原样。\n\n然后，检查是否有口语化表达或需要修正的语法错误。用户文档看起来已经很规范，没有明显的口语化词汇，所以可能不需要修改。但需要确保所有技术术语正确，比如“向量检索通道”是否正确，是否需要调整为“向量检索路径”？不过用户原文是“通道”，所以保持原样。\n\n接下来，处理结构部分。用户文档分为多个部分，如查询类型判断、向量检索模式、图数据库检索、代码分析引擎、用户反馈环节、数据源配置、并发控制、安全策略、响应时间要求、日志级别、监控指标等。每个部分都有详细的规则和流程，需要确保这些结构在标准化后保持不变。\n\n检查是否有重复或冗余的内容。例如，在向量检索模式下，用户提到“直接返回前3个结果结果”，这里“结果”重复了，需要修正为“前3个结果”。另外，用户提到“如果相似度超过0.85，直接返回前3个结果结果”，这里明显是笔误，需要修正为“前3个结果”。\n\n另外，用户提到“缓存有效期30分钟”，是否需要标准化为“缓存有效期为30分钟”？根据规则，修正语法错误，所以应该调整为“缓存有效期为30分钟”。\n\n在代码分析引擎部分，用户提到“如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。”这里“少于”是否正确？应该是“少于”还是“小于”？根据中文习惯，“少于”是正确的，所以保持原样。\n\n安全策略部分，“拒绝服务并记录日志”是否需要调整为“拒绝服务并记录日志信息”？可能不需要，保持原样即可。\n\n响应时间要求部分，“总响应时间不超过3秒，否则降级服务。”是否需要调整为“总响应时间不得超过3秒，否则降级服务。”？根据语法修正，可能需要调整，但用户原文已经比较规范，所以可能不需要。\n\n最后，确保所有示例和规则都保留，没有遗漏。例如，用户反馈环节中的“重新生成”按钮触发更强的推理模型，这部分需要保持原样。\n\n总结需要修改的地方：修正重复的“结果结果”为“结果”，调整“缓存有效期30分钟”为“缓存有效期为30分钟”，以及可能的其他语法错误。其他部分保持原结构，术语标准化如KG可能需要全称，但用户已经使用KG，所以无需改动。最终输出标准化后的文档，保持所有结构和示例不变。\n</think>\n\n你是一个智能问答系统设计规范文档。\n系统需要处理多领域知识库的检索与推理。\n\n【查询类型判断】\n1. 用户输入查询后，系统需判断查询类型：\n   - 简单事实查询：走向量检索通道\n   - 复杂推理查询：先进行意图分解，再走图数据库检索\n   - 代码相关问题：调用代码分析引擎\n\n【向量检索模式】\n1. 相似度阈值：\n   - 超过0.85：直接返回前3个结果\n   - 低于0.85：结合重排序模型重新评分，返回前5个结果\n2. 检索失败处理：自动切换到混合检索模式\n\n【图数据库检索】\n1. 知识图谱(KG)探索：\n   - 进行2跳邻居探索\n   - 匹配节点：返回相关实体和关系\n   - 未匹配：回退到全量搜索\n2. 缓存机制：\n   - 每次查询缓存结果\n   - 缓存有效期为30分钟\n\n【代码分析引擎】\n1. 支持语言：Python和Java\n2. 分析策略：\n   - 代码行数＞500行：仅进行静态分析\n   - 代码行数＜500行：进行完整语义分析并生成解释文档\n\n【用户反馈机制】\n1. 重新生成触发：\n   - 用户点击\"重新生成\"时启用更强的推理模型\n2. 升级机制：\n   - 连续3次不满意：自动升级到人工审核队列\n\n【数据源配置】\n1. 知识库配置：\n   - 知识库A：2000个医学文档\n   - 知识库B：3000个技术文档\n   - 知识库C：1500个法律文档\n2. 向量索引(VI)：\n   - 每个知识库独立索引\n   - 向量维度统一为1536\n\n【并发控制】\n1. 请求处理：\n   - 最大支持50个并发请求\n   - 超出时排队等待\n2. 优先级设置：\n   - 普通用户：1\n   - VIP用户：5\n   - 管理员：10\n\n【安全策略】\n1. 内容过滤：\n   - 所有查询内容经过敏感词过滤\n   - 检测到违规内容：拒绝服务并记录日志\n2. 金融类查询：\n   - 需要二次确认用户身份\n\n【响应时间要求】\n1. 模块响应时间：\n   - 向量检索：≤500ms\n   - 图数据库检索：≤1秒\n   - 代码分析：≤2秒\n2. 总响应时间：≤3秒（否则降级服务）\n\n【日志管理】\n1. 保留周期：\n   - 错误日志：90天\n   - 访问日志：30天\n   - 调试日志：7天\n2. 存储要求：所有日志上传到中央日志系统\n\n【监控指标】\n1. 核心指标：\n   - 每秒查询率(QPS)\n   - 平均响应时间\n   - 95分位响应时间\n   - 缓存命中率(CRH)\n   - 检索准确率\n2. 告警规则：\n   - QPS＜10持续10分钟：触发告警\n   - 95分位响应时间＞3秒持续5分钟：触发扩容",
+    "prompt10_mode": "dictionary",
+    "prompt10_steps": [
+      {
+        "step_name": "术语对齐",
+        "step_index": 1,
+        "input_text": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "changes": {
+          "帮我": "请",
+          "top-3": "前3个结果",
+          "top-5": "前5个结果",
+          "知识图谱": "知识图谱(KG)",
+          "向量索引": "向量索引(VI)",
+          "QPS": "每秒查询率(QPS)",
+          "缓存命中率": "缓存命中率(CRH)"
+        },
+        "duration_ms": 0,
+        "notes": [
+          "替换 8 处"
+        ]
+      },
+      {
+        "step_name": "术语对齐",
+        "step_index": 2,
+        "input_text": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "changes": {
+          "帮我": "请",
+          "top-3": "前3个结果",
+          "top-5": "前5个结果",
+          "知识图谱": "知识图谱(KG)",
+          "向量索引": "向量索引(VI)",
+          "QPS": "每秒查询率(QPS)",
+          "缓存命中率": "缓存命中率(CRH)"
+        },
+        "duration_ms": 0,
+        "notes": []
+      },
+      {
+        "step_name": "LLM语义重构",
+        "step_index": 3,
+        "input_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "<think>\n好的，我现在需要处理用户提供的这个智能问答系统的设计文档。首先，我得确定这是属于哪种类型。用户提到的文档里有很多结构化的部分，比如系统流程、数据源配置、并发控制等，看起来像是一个规范文档，也就是类型1。所以按照处理规则，我需要保持结构完整，只对术语进行标准化，比如将“RAG”改为“检索增强生成”，但这里用户文档里没有提到RAG，所以可能不需要。不过文档里提到了知识图谱(KG)，可能需要标准化为“知识图谱（KG）”，但用户已经用了KG的缩写，所以可能不需要改动。\n\n接下来，检查是否有需要标准化的术语。例如，“向量索引(VI)”中的VI可能需要全称，但用户已经写成VI，所以保持原样。其他如“QPS”、“CRH”等缩写是否需要展开？根据通用原则，可能不需要，除非有明确的全称要求。用户文档里已经使用了这些缩写，所以保持原样。\n\n然后，检查是否有口语化表达或需要修正的语法错误。用户文档看起来已经很规范，没有明显的口语化词汇，所以可能不需要修改。但需要确保所有技术术语正确，比如“向量检索通道”是否正确，是否需要调整为“向量检索路径”？不过用户原文是“通道”，所以保持原样。\n\n接下来，处理结构部分。用户文档分为多个部分，如查询类型判断、向量检索模式、图数据库检索、代码分析引擎、用户反馈环节、数据源配置、并发控制、安全策略、响应时间要求、日志级别、监控指标等。每个部分都有详细的规则和流程，需要确保这些结构在标准化后保持不变。\n\n检查是否有重复或冗余的内容。例如，在向量检索模式下，用户提到“直接返回前3个结果结果”，这里“结果”重复了，需要修正为“前3个结果”。另外，用户提到“如果相似度超过0.85，直接返回前3个结果结果”，这里明显是笔误，需要修正为“前3个结果”。\n\n另外，用户提到“缓存有效期30分钟”，是否需要标准化为“缓存有效期为30分钟”？根据规则，修正语法错误，所以应该调整为“缓存有效期为30分钟”。\n\n在代码分析引擎部分，用户提到“如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。”这里“少于”是否正确？应该是“少于”还是“小于”？根据中文习惯，“少于”是正确的，所以保持原样。\n\n安全策略部分，“拒绝服务并记录日志”是否需要调整为“拒绝服务并记录日志信息”？可能不需要，保持原样即可。\n\n响应时间要求部分，“总响应时间不超过3秒，否则降级服务。”是否需要调整为“总响应时间不得超过3秒，否则降级服务。”？根据语法修正，可能需要调整，但用户原文已经比较规范，所以可能不需要。\n\n最后，确保所有示例和规则都保留，没有遗漏。例如，用户反馈环节中的“重新生成”按钮触发更强的推理模型，这部分需要保持原样。\n\n总结需要修改的地方：修正重复的“结果结果”为“结果”，调整“缓存有效期30分钟”为“缓存有效期为30分钟”，以及可能的其他语法错误。其他部分保持原结构，术语标准化如KG可能需要全称，但用户已经使用KG，所以无需改动。最终输出标准化后的文档，保持所有结构和示例不变。\n</think>\n\n你是一个智能问答系统设计规范文档。\n系统需要处理多领域知识库的检索与推理。\n\n【查询类型判断】\n1. 用户输入查询后，系统需判断查询类型：\n   - 简单事实查询：走向量检索通道\n   - 复杂推理查询：先进行意图分解，再走图数据库检索\n   - 代码相关问题：调用代码分析引擎\n\n【向量检索模式】\n1. 相似度阈值：\n   - 超过0.85：直接返回前3个结果\n   - 低于0.85：结合重排序模型重新评分，返回前5个结果\n2. 检索失败处理：自动切换到混合检索模式\n\n【图数据库检索】\n1. 知识图谱(KG)探索：\n   - 进行2跳邻居探索\n   - 匹配节点：返回相关实体和关系\n   - 未匹配：回退到全量搜索\n2. 缓存机制：\n   - 每次查询缓存结果\n   - 缓存有效期为30分钟\n\n【代码分析引擎】\n1. 支持语言：Python和Java\n2. 分析策略：\n   - 代码行数＞500行：仅进行静态分析\n   - 代码行数＜500行：进行完整语义分析并生成解释文档\n\n【用户反馈机制】\n1. 重新生成触发：\n   - 用户点击\"重新生成\"时启用更强的推理模型\n2. 升级机制：\n   - 连续3次不满意：自动升级到人工审核队列\n\n【数据源配置】\n1. 知识库配置：\n   - 知识库A：2000个医学文档\n   - 知识库B：3000个技术文档\n   - 知识库C：1500个法律文档\n2. 向量索引(VI)：\n   - 每个知识库独立索引\n   - 向量维度统一为1536\n\n【并发控制】\n1. 请求处理：\n   - 最大支持50个并发请求\n   - 超出时排队等待\n2. 优先级设置：\n   - 普通用户：1\n   - VIP用户：5\n   - 管理员：10\n\n【安全策略】\n1. 内容过滤：\n   - 所有查询内容经过敏感词过滤\n   - 检测到违规内容：拒绝服务并记录日志\n2. 金融类查询：\n   - 需要二次确认用户身份\n\n【响应时间要求】\n1. 模块响应时间：\n   - 向量检索：≤500ms\n   - 图数据库检索：≤1秒\n   - 代码分析：≤2秒\n2. 总响应时间：≤3秒（否则降级服务）\n\n【日志管理】\n1. 保留周期：\n   - 错误日志：90天\n   - 访问日志：30天\n   - 调试日志：7天\n2. 存储要求：所有日志上传到中央日志系统\n\n【监控指标】\n1. 核心指标：\n   - 每秒查询率(QPS)\n   - 平均响应时间\n   - 95分位响应时间\n   - 缓存命中率(CRH)\n   - 检索准确率\n2. 告警规则：\n   - QPS＜10持续10分钟：触发告警\n   - 95分位响应时间＞3秒持续5分钟：触发扩容",
+        "changes": {
+          "标准化": "840字 → 2428字"
+        },
+        "duration_ms": 30989,
+        "notes": []
+      }
+    ],
+    "prompt10_terminology_changes": {
+      "帮我": "请",
+      "top-3": "前3个结果",
+      "top-5": "前5个结果",
+      "知识图谱": "知识图谱(KG)",
+      "向量索引": "向量索引(VI)",
+      "QPS": "每秒查询率(QPS)",
+      "缓存命中率": "缓存命中率(CRH)"
+    },
+    "prompt10_ambiguity_detected": false,
+    "prompt10_status": "success",
+    "prompt10_time_ms": 30990,
+    "prompt20_id": "36d8c819",
+    "prompt20_template": "<think>\n好的，我现在需要处理用户提供的这个智能问答系统的设计文档。首先，我得确定这是属于哪种类型。用户提到的文档里有很多结构化的部分，比如系统流程、数据源配置、并发控制等，看起来像是一个规范文档，也就是类型1。所以按照处理规则，我需要保持结构完整，只对术语进行标准化，比如将“RAG”改为“检索增强生成”，但这里用户文档里没有提到RAG，所以可能不需要。不过文档里提到了知识图谱(KG)，可能需要标准化为“知识图谱（KG）”，但用户已经用了KG的缩写，所以可能不需要改动。\n\n接下来，检查是否有需要标准化的术语。例如，“向量索引(VI)”中的VI可能需要全称，但用户已经写成VI，所以保持原样。其他如“QPS”、“CRH”等缩写是否需要展开？根据通用原则，可能不需要，除非有明确的全称要求。用户文档里已经使用了这些缩写，所以保持原样。\n\n然后，检查是否有口语化表达或需要修正的语法错误。用户文档看起来已经很规范，没有明显的口语化词汇，所以可能不需要修改。但需要确保所有技术术语正确，比如“向量检索通道”是否正确，是否需要调整为“向量检索路径”？不过用户原文是“通道”，所以保持原样。\n\n接下来，处理结构部分。用户文档分为多个部分，如查询类型判断、向量检索模式、图数据库检索、代码分析引擎、用户反馈环节、数据源配置、并发控制、安全策略、响应时间要求、日志级别、监控指标等。每个部分都有详细的规则和流程，需要确保这些结构在标准化后保持不变。\n\n检查是否有重复或冗余的内容。例如，在向量检索模式下，用户提到“直接返回前3个结果结果”，这里“结果”重复了，需要修正为“前3个结果”。另外，用户提到“如果相似度超过0.85，直接返回前3个结果结果”，这里明显是笔误，需要修正为“前3个结果”。\n\n另外，用户提到“缓存有效期30分钟”，是否需要标准化为“缓存有效期为30分钟”？根据规则，修正语法错误，所以应该调整为“缓存有效期为30分钟”。\n\n在代码分析引擎部分，用户提到“如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。”这里“少于”是否正确？应该是“少于”还是“小于”？根据中文习惯，“少于”是正确的，所以保持原样。\n\n安全策略部分，“拒绝服务并记录日志”是否需要调整为“拒绝服务并记录日志信息”？可能不需要，保持原样即可。\n\n响应时间要求部分，“总响应时间不超过3秒，否则降级服务。”是否需要调整为“总响应时间不得超过3秒，否则降级服务。”？根据语法修正，可能需要调整，但用户原文已经比较规范，所以可能不需要。\n\n最后，确保所有示例和规则都保留，没有遗漏。例如，用户反馈环节中的“重新生成”按钮触发更强的推理模型，这部分需要保持原样。\n\n总结需要修改的地方：修正重复的“结果结果”为“结果”，调整“缓存有效期30分钟”为“缓存有效期为30分钟”，以及可能的其他语法错误。其他部分保持原结构，术语标准化如KG可能需要全称，但用户已经使用KG，所以无需改动。最终输出标准化后的文档，保持所有结构和示例不变。\n</think>\n\n你是一个智能问答系统设计规范文档。\n系统需要处理多领域知识库的检索与推理。\n\n【查询类型判断】\n1. 用户输入查询后，系统需判断查询类型：\n   - 简单事实查询：走向量检索通道\n   - 复杂推理查询：先进行意图分解，再走图数据库检索\n   - 代码相关问题：调用代码分析引擎\n\n【向量检索模式】\n1. 相似度阈值：\n   - 超过0.85：直接返回前3个结果\n   - 低于0.85：结合重排序模型重新评分，返回前5个结果\n2. 检索失败处理：自动切换到混合检索模式\n\n【图数据库检索】\n1. 知识图谱(KG)探索：\n   - 进行2跳邻居探索\n   - 匹配节点：返回相关实体和关系\n   - 未匹配：回退到全量搜索\n2. 缓存机制：\n   - 每次查询缓存结果\n   - 缓存有效期为30分钟\n\n【代码分析引擎】\n1. 支持语言：Python和Java\n2. 分析策略：\n   - 代码行数＞500行：仅进行静态分析\n   - 代码行数＜500行：进行完整语义分析并生成解释文档\n\n【用户反馈机制】\n1. 重新生成触发：\n   - 用户点击\"重新生成\"时启用更强的推理模型\n2. 升级机制：\n   - 连续3次不满意：自动升级到人工审核队列\n\n【数据源配置】\n1. 知识库配置：\n   - 知识库A：2000个医学文档\n   - 知识库B：3000个技术文档\n   - 知识库C：1500个法律文档\n2. 向量索引(VI)：\n   - 每个知识库独立索引\n   - 向量维度统一为1536\n\n【并发控制】\n1. 请求处理：\n   - 最大支持50个并发请求\n   - 超出时排队等待\n2. 优先级设置：\n   - 普通用户：1\n   - VIP用户：5\n   - 管理员：10\n\n【安全策略】\n1. 内容过滤：\n   - 所有查询内容经过敏感词过滤\n   - 检测到违规内容：拒绝服务并记录日志\n2. 金融类查询：\n   - 需要二次确认用户身份\n\n【响应时间要求】\n1. 模块响应时间：\n   - 向量检索：≤500ms\n   - 图数据库检索：≤1秒\n   - 代码分析：≤2秒\n2. 总响应时间：≤3秒（否则降级服务）\n\n【日志管理】\n1. 保留周期：\n   - 错误日志：90天\n   - 访问日志：30天\n   - 调试日志：7天\n2. 存储要求：所有日志上传到中央日志系统\n\n【监控指标】\n1. 核心指标：\n   - 每秒查询率(QPS)\n   - 平均响应时间\n   - 95分位响应时间\n   - 缓存命中率(CRH)\n   - 检索准确率\n2. 告警规则：\n   - QPS＜10持续10分钟：触发告警\n   - 95分位响应时间＞3秒持续5分钟：触发扩容",
+    "prompt20_variables": [],
+    "prompt20_variable_count": 0,
+    "prompt20_type_stats": {},
+    "prompt20_extraction_log": [],
+    "prompt20_time_ms": 0,
+    "prompt30_id": "2dce51cc",
+    "prompt30_dsl_code": "DEFINE {{query_type}}: String\nDEFINE {{similarity}}: Float\nDEFINE {{cache_hit}}: Boolean\nDEFINE {{cache_result}}: Any\nDEFINE {{code_lines}}: Integer\nDEFINE {{user_priority}}: Integer\nDEFINE {{current_requests}}: Integer\nDEFINE {{max_concurrent}}: Integer = 50\nDEFINE {{qps}}: Integer\nDEFINE {{response_time}}: Float\nDEFINE {{feedback_count}}: Integer = 0\nDEFINE {{cache_duration}}: Integer = 30  # 分钟\nDEFINE {{sensitive_words}}: List = [\"违规内容1\", \"违规内容2\"]\nDEFINE {{log_retention}}: Dict = {\n    \"error\": 90,\n    \"access\": 30,\n    \"debug\": 7\n}\nDEFINE {{qps_threshold}}: Integer = 10\nDEFINE {{duration_threshold}}: Integer = 10  # 分钟\nIF {{query_type}} == \"simple_fact\"\n    IF {{similarity}} > 0.85\n        {{results}} = CALL vector_search(top_n=3)\n    ELIF {{similarity}} < 0.85\n        {{results}} = CALL rerank_search(top_n=5)\n    ENDIF\n    IF NOT {{cache_hit}}\n        {{cache_result}} = CALL generate_cache({{results}})\n    ENDIF\nELIF {{query_type}} == \"complex_reasoning\"\n    {{kg_results}} = CALL kg_search(max_hops=2)\n    IF {{kg_results}}.empty\n        {{kg_results}} = CALL full_graph_search()\n    ENDIF\n    {{cache_result}} = {{kg_results}}\nELIF {{query_type}} == \"code_related\"\n    IF {{code_lines}} > 500\n        {{analysis}} = CALL static_analysis()\n    ELIF {{code_lines}} < 500\n        {{analysis}} = CALL semantic_analysis()\n        {{doc}} = CALL generate_explanation({{analysis}})\n    ENDIF\nELSE\n    {{response}} = \"无法识别的查询类型\"\nENDIF\nIF {{user_click_regen}}\n    {{response}} = CALL strong_model_analysis()\n    {{feedback_count}} = {{feedback_count}} + 1\n    IF {{feedback_count}} >= 3\n        CALL escalate_to_human()\n    ENDIF\nENDIF\nIF {{current_requests}} >= {{max_concurrent}}\n    {{queue}}.append({{request}})\nELSE\n    {{process}} = True\n    IF {{user_priority}} > 5\n        {{queue}}.insert(0, {{request}})\n    ENDIF\nENDIF\nIF {{query}} CONTAINS {{sensitive_words}}\n    CALL log_to_security()\n    RETURN \"服务拒绝\"\nENDIF\nIF {{response_time}} > 3.0\n    CALL degrade_service()\nENDIF\nCALL upload_logs({{log_retention}})\nIF {{qps}} < {{qps_threshold}}\n    CALL check_duration_and_alert()\nENDIF\nRETURN {{response}}",
+    "prompt30_validation_result": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "defined_variables": {
+        "query_type": {
+          "name": "query_type",
+          "var_type": "String",
+          "initial_value": null,
+          "line_number": 1
+        },
+        "similarity": {
+          "name": "similarity",
+          "var_type": "Float",
+          "initial_value": null,
+          "line_number": 2
+        },
+        "cache_hit": {
+          "name": "cache_hit",
+          "var_type": "Boolean",
+          "initial_value": null,
+          "line_number": 3
+        },
+        "cache_result": {
+          "name": "cache_result",
+          "var_type": "Any",
+          "initial_value": null,
+          "line_number": 4
+        },
+        "code_lines": {
+          "name": "code_lines",
+          "var_type": "Integer",
+          "initial_value": null,
+          "line_number": 5
+        },
+        "user_priority": {
+          "name": "user_priority",
+          "var_type": "Integer",
+          "initial_value": null,
+          "line_number": 6
+        },
+        "current_requests": {
+          "name": "current_requests",
+          "var_type": "Integer",
+          "initial_value": null,
+          "line_number": 7
+        },
+        "max_concurrent": {
+          "name": "max_concurrent",
+          "var_type": "Integer",
+          "initial_value": "50",
+          "line_number": 8
+        },
+        "qps": {
+          "name": "qps",
+          "var_type": "Integer",
+          "initial_value": null,
+          "line_number": 9
+        },
+        "response_time": {
+          "name": "response_time",
+          "var_type": "Float",
+          "initial_value": null,
+          "line_number": 10
+        },
+        "feedback_count": {
+          "name": "feedback_count",
+          "var_type": "Integer",
+          "initial_value": "0",
+          "line_number": 11
+        },
+        "cache_duration": {
+          "name": "cache_duration",
+          "var_type": "Integer",
+          "initial_value": "30  # 分钟",
+          "line_number": 12
+        },
+        "sensitive_words": {
+          "name": "sensitive_words",
+          "var_type": "List",
+          "initial_value": "[\"违规内容1\", \"违规内容2\"]",
+          "line_number": 13
+        },
+        "log_retention": {
+          "name": "log_retention",
+          "var_type": "Dict",
+          "initial_value": "{",
+          "line_number": 14
+        },
+        "qps_threshold": {
+          "name": "qps_threshold",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 19
+        },
+        "duration_threshold": {
+          "name": "duration_threshold",
+          "var_type": "Integer",
+          "initial_value": "10  # 分钟",
+          "line_number": 20
+        }
+      },
+      "runtime_variables": [
+        "user_click_regen",
+        "process",
+        "kg_results",
+        "doc",
+        "results",
+        "query",
+        "analysis",
+        "response"
+      ],
+      "function_calls": [
+        {
+          "function_name": "vector_search",
+          "arguments": [
+            "top_n=3"
+          ],
+          "result_var": "results",
+          "line_number": 23
+        },
+        {
+          "function_name": "rerank_search",
+          "arguments": [
+            "top_n=5"
+          ],
+          "result_var": "results",
+          "line_number": 25
+        },
+        {
+          "function_name": "generate_cache",
+          "arguments": [
+            "{{results}}"
+          ],
+          "result_var": "cache_result",
+          "line_number": 28
+        },
+        {
+          "function_name": "kg_search",
+          "arguments": [
+            "max_hops=2"
+          ],
+          "result_var": "kg_results",
+          "line_number": 31
+        },
+        {
+          "function_name": "full_graph_search",
+          "arguments": [],
+          "result_var": "kg_results",
+          "line_number": 33
+        },
+        {
+          "function_name": "static_analysis",
+          "arguments": [],
+          "result_var": "analysis",
+          "line_number": 38
+        },
+        {
+          "function_name": "semantic_analysis",
+          "arguments": [],
+          "result_var": "analysis",
+          "line_number": 40
+        },
+        {
+          "function_name": "generate_explanation",
+          "arguments": [
+            "{{analysis}}"
+          ],
+          "result_var": "doc",
+          "line_number": 41
+        },
+        {
+          "function_name": "strong_model_analysis",
+          "arguments": [],
+          "result_var": "response",
+          "line_number": 47
+        }
+      ],
+      "control_blocks": [],
+      "max_nesting_depth": 2
+    },
+    "prompt30_time_ms": 237659,
+    "prompt30_compile_history": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "dsl_code": "DEFINE {{query_type}}: String\nDEFINE {{similarity_threshold}}: Float = 0.85\nDEFINE {{vector_results_top_n}}: Integer = 3\nDEFINE {{rerank_results_top_n}}: Integer = 5\nDEFINE {{kg_search_depth}}: Integer = 2\nDEFINE {{cache_ttl}}: Integer = 30  # minutes\nDEFINE {{max_code_lines}}: Integer = 500\nDEFINE {{max_concurrent_requests}}: Integer = 50\nDEFINE {{response_timeout}}: Float = 3.0  # seconds\nDEFINE {{alert_qps_threshold}}: Integer = 10\nDEFINE {{alert_duration}}: Integer = 10  # minutes\nIF {{query_type}} == \"simple_fact\"\n    CALL vector_retrieval()\nELIF {{query_type}} == \"complex_reasoning\"\n    CALL intent_decomposition()\n    CALL graph_database_retrieval()\nELIF {{query_type}} == \"code_analysis\"\n    CALL code_analysis_engine()\nELSE\n    CALL default_handler()\nENDIF\nDEFINE {{vector_results}}: List\nIF {{similarity_threshold}} > 0.85\n    {{vector_results}} = get_top_n_results({{vector_results_top_n}})\nELSE\n    {{vector_results}} = rerank_and_get_top_n({{rerank_results_top_n}})\nENDIF\nDEFINE {{kg_results}}: List\nFOR {{depth}} IN 1 TO {{kg_search_depth}}\n    {{kg_results}} = expand_knowledge_graph({{depth}})\nENDFOR\nIF {{kg_results}} IS NOT NULL\n    RETURN {{kg_results}}\nELSE\n    CALL full_graph_search()\nENDIF\nDEFINE {{code_analysis_result}}: Dict\nIF {{code_lines_count}} > {{max_code_lines}}\n    {{code_analysis_result}} = static_analysis()\nELSE\n    {{code_analysis_result}} = semantic_analysis()\n    {{code_analysis_result}}.explanation = generate_code_explanation()\nENDIF\nIF {{user_feedback}} == \"regenerate\"\n    CALL enhanced_reasoning_model()\nENDIF\nIF {{concurrent_requests}} > {{max_concurrent_requests}}\n    WAIT until queue_available()\nENDIF\nIF {{query_contains_sensitive_words}}\n    REJECT request\n    LOG security_event\nENDIF\nIF {{response_time}} > {{response_timeout}}\n    DEGRADE service\nENDIF\nIF {{qps}} < {{alert_qps_threshold}} FOR {{alert_duration}} MINUTES\n    CALL trigger_alert()\nENDIF",
+          "total_errors": 6,
+          "error_analysis": {
+            "p0_count": 0,
+            "p1_count": 2,
+            "p2_count": 4,
+            "total": 6
+          }
+        },
+        {
+          "attempt": 2,
+          "dsl_code": "DEFINE {{similarity_threshold}}: Float = 0.85\nDEFINE {{cache_ttl}}: Integer = 30  # 缓存有效期（分钟）\nDEFINE {{max_vector_results}}: Integer = 3\nDEFINE {{re_ranked_results}}: Integer = 5\nDEFINE {{kg_search_depth}}: Integer = 2\nDEFINE {{code_lines_count}}: Integer\nDEFINE {{concurrent_requests}}: Integer = 50\nDEFINE {{vip_priority}}: Integer = 5\nDEFINE {{admin_priority}}: Integer = 10\nDEFINE {{response_timeout}}: Integer = 3  # 总响应时间（秒）\nDEFINE {{vector_search_timeout}}: Integer = 500  # 向量检索时间（毫秒）\nDEFINE {{kg_search_timeout}}: Integer = 1000  # 图数据库检索时间（毫秒）\nDEFINE {{code_analysis_timeout}}: Integer = 2000  # 代码分析时间（毫秒）\nIF {{query_type}} == \"simple_fact\"\n    CALL vector_search()\nELIF {{query_type}} == \"complex_reasoning\"\n    CALL intent_decomposition()\n    CALL kg_search()\nELIF {{query_type}} == \"code_analysis\"\n    CALL code_analysis_engine()\nELSE\n    CALL default_handler()\nENDIF\nFUNCTION vector_search()\n    {{similarity}} = CALL calculate_similarity({{query}}, {{knowledge_base}})\n    IF {{similarity}} > {{similarity_threshold}}\n        {{results}} = CALL get_top_n_results({{similarity}}, n={{max_vector_results}})\n    ELIF {{similarity}} < {{similarity_threshold}}\n        {{results}} = CALL re_ranking({{query}}, {{knowledge_base}})\n        {{results}} = CALL get_top_n_results({{results}}, n={{re_ranked_results}})\n    ELSE\n        {{results}} = CALL hybrid_search()\n    ENDIF\n    RETURN {{results}}\nFUNCTION kg_search()\n    {{entities}} = CALL entity_extraction({{query}})\n    IF {{entities}} IS NOT NULL\n        {{kg_results}} = CALL kg_traversal({{entities}}, depth={{kg_search_depth}})\n    ELSE\n        {{kg_results}} = CALL full_kg_search()\n    ENDIF\n    CALL cache_results({{kg_results}}, ttl={{cache_ttl}})\n    RETURN {{kg_results}}\nFUNCTION code_analysis_engine()\n    {{code_lines_count}} = CALL count_code_lines({{code}})\n    IF {{code_lines_count}} > 500\n        {{analysis_result}} = CALL static_analysis({{code}})\n    ELIF {{code_lines_count}} < 500\n        {{analysis_result}} = CALL semantic_analysis({{code}})\n        {{analysis_result}}.explanation = CALL generate_explanation({{code}})\n    ENDIF\n    RETURN {{analysis_result}}\nFUNCTION handle_concurrency()\n    {{current_requests}} = CALL get_current_requests()\n    IF {{current_requests}} < {{concurrent_requests}}\n        CALL process_request()\n    ELSE\n        CALL queue_request()\n    ENDIF\n    {{user_type}} = CALL get_user_type()\n    IF {{user_type}} == \"vip\"\n        {{priority}} = {{vip_priority}}\n    ELIF {{user_type}} == \"admin\"\n        {{priority}} = {{admin_priority}}\n    ELSE\n        {{priority}} = 1\n    ENDIF\n    RETURN {{priority}}\nFUNCTION security_check()\n    {{sensitive_content}} = CALL detect_sensitive_words({{query}})\n    IF {{sensitive_content}} IS NOT NULL\n        CALL log_security_event()\n        RETURN False\n    ENDIF\n    IF {{query_type}} == \"financial\"\n        {{verified}} = CALL verify_user_identity()\n        IF NOT {{verified}}\n            RETURN False\n        ENDIF\n    ENDIF\n    RETURN True\nFUNCTION check_response_time()\n    {{start_time}} = CALL get_timestamp()\n    {{vector_time}} = CALL measure_time(vector_search())\n    IF {{vector_time}} > {{vector_search_timeout}}\n        CALL log_performance_issue()\n    ENDIF\n    {{total_time}} = CALL get_timestamp() - {{start_time}}\n    IF {{total_time}} > {{response_timeout}}\n        CALL degrade_service()\n    ENDIF\n    RETURN {{total_time}}\nFUNCTION manage_logs()\n    {{log_type}} = CALL determine_log_type()\n    IF {{log_type}} == \"error\"\n        CALL store_log(90)  # 保留90天\n    ELIF {{log_type}} == \"access\"\n        CALL store_log(30)  # 保留30天\n    ELIF {{log_type}} == \"debug\"\n        CALL store_log(7)   # 保留7天\n    ENDIF\n    CALL send_to_central_logging()\n    RETURN True\nFUNCTION monitor_system()\n    {{qps}} = CALL calculate_qps()\n    {{p95_latency}} = CALL calculate_p95_latency()\n    {{cache_hit_rate}} = CALL calculate_cache_hit_rate()\n    {{accuracy}} = CALL calculate_retrieval_accuracy()\n    IF {{qps}} < 10\n        {{duration}} = CALL check_duration({{qps}} < 10)\n        IF {{duration}} >= 10  # 持续10分钟\n            CALL trigger_alert()\n        ENDIF\n    ENDIF\n    IF {{p95_latency}} > 3000  # 3秒\n        {{duration}} = CALL check_duration({{p95_latency}} > 3000)\n        IF {{duration}} >= 5  # 持续5分钟\n            CALL scale_out()\n        ENDIF\n    ENDIF\n    RETURN {\n        \"qps\": {{qps}},\n        \"p95_latency\": {{p95_latency}},\n        \"cache_hit_rate\": {{cache_hit_rate}},\n        \"accuracy\": {{accuracy}}\n    }",
+          "total_errors": 8,
+          "error_analysis": {
+            "p0_count": 0,
+            "p1_count": 0,
+            "p2_count": 8,
+            "total": 8
+          }
+        },
+        {
+          "attempt": 3,
+          "dsl_code": "DEFINE {{query_type}}: String\nDEFINE {{similarity}}: Float\nDEFINE {{cache_hit}}: Boolean\nDEFINE {{cache_result}}: Any\nDEFINE {{code_lines}}: Integer\nDEFINE {{user_priority}}: Integer\nDEFINE {{current_requests}}: Integer\nDEFINE {{max_concurrent}}: Integer = 50\nDEFINE {{qps}}: Integer\nDEFINE {{response_time}}: Float\nDEFINE {{feedback_count}}: Integer = 0\nDEFINE {{cache_duration}}: Integer = 30  # 分钟\nDEFINE {{sensitive_words}}: List = [\"违规内容1\", \"违规内容2\"]\nDEFINE {{log_retention}}: Dict = {\n    \"error\": 90,\n    \"access\": 30,\n    \"debug\": 7\n}\nDEFINE {{qps_threshold}}: Integer = 10\nDEFINE {{duration_threshold}}: Integer = 10  # 分钟\nIF {{query_type}} == \"simple_fact\"\n    IF {{similarity}} > 0.85\n        {{results}} = CALL vector_search(top_n=3)\n    ELIF {{similarity}} < 0.85\n        {{results}} = CALL rerank_search(top_n=5)\n    ENDIF\n    IF NOT {{cache_hit}}\n        {{cache_result}} = CALL generate_cache({{results}})\n    ENDIF\nELIF {{query_type}} == \"complex_reasoning\"\n    {{kg_results}} = CALL kg_search(max_hops=2)\n    IF {{kg_results}}.empty\n        {{kg_results}} = CALL full_graph_search()\n    ENDIF\n    {{cache_result}} = {{kg_results}}\nELIF {{query_type}} == \"code_related\"\n    IF {{code_lines}} > 500\n        {{analysis}} = CALL static_analysis()\n    ELIF {{code_lines}} < 500\n        {{analysis}} = CALL semantic_analysis()\n        {{doc}} = CALL generate_explanation({{analysis}})\n    ENDIF\nELSE\n    {{response}} = \"无法识别的查询类型\"\nENDIF\nIF {{user_click_regen}}\n    {{response}} = CALL strong_model_analysis()\n    {{feedback_count}} = {{feedback_count}} + 1\n    IF {{feedback_count}} >= 3\n        CALL escalate_to_human()\n    ENDIF\nENDIF\nIF {{current_requests}} >= {{max_concurrent}}\n    {{queue}}.append({{request}})\nELSE\n    {{process}} = True\n    IF {{user_priority}} > 5\n        {{queue}}.insert(0, {{request}})\n    ENDIF\nENDIF\nIF {{query}} CONTAINS {{sensitive_words}}\n    CALL log_to_security()\n    RETURN \"服务拒绝\"\nENDIF\nIF {{response_time}} > 3.0\n    CALL degrade_service()\nENDIF\nCALL upload_logs({{log_retention}})\nIF {{qps}} < {{qps_threshold}}\n    CALL check_duration_and_alert()\nENDIF\nRETURN {{response}}",
+          "total_errors": 0,
+          "error_analysis": {
+            "p0_count": 0,
+            "p1_count": 0,
+            "p2_count": 0,
+            "total": 0
+          }
+        }
+      ],
+      "final_decision": "success",
+      "error_summary": {},
+      "auto_fix_applied": true
+    },
+    "prompt30_success": true,
+    "prompt40_id": "99f0ce27",
+    "prompt40_modules": [
+      {
+        "name": "step_1_compute_max_concurrent",
+        "inputs": [
+          "cache_hit",
+          "cache_result",
+          "code_lines",
+          "current_requests",
+          "qps",
+          "query_type",
+          "response_time",
+          "similarity",
+          "user_priority"
+        ],
+        "outputs": [
+          "cache_duration",
+          "duration_threshold",
+          "feedback_count",
+          "log_retention",
+          "max_concurrent",
+          "qps_threshold",
+          "sensitive_words"
+        ],
+        "is_async": false,
+        "body_code": "def step_1_compute_max_concurrent(cache_hit, cache_result, code_lines, current_requests, qps, query_type, response_time, similarity, user_priority):\n    \"\"\"Auto-generated module\"\"\"\n    return cache_duration, duration_threshold, feedback_count, log_retention, max_concurrent, qps_threshold, sensitive_words",
+        "code_lines_count": 3
+      },
+      {
+        "name": "step_2_vector_search",
+        "inputs": [
+          "cache_hit",
+          "code_lines",
+          "query_type",
+          "similarity"
+        ],
+        "outputs": [
+          "analysis",
+          "cache_result",
+          "doc",
+          "kg_results",
+          "response",
+          "results"
+        ],
+        "is_async": true,
+        "body_code": "async def step_2_vector_search(cache_hit, code_lines, query_type, similarity):\n    \"\"\"Auto-generated module\"\"\"\n    if query_type == \"simple_fact\":\n        if similarity > 0.85:\n            results = await invoke_function('vector_search', top_n=_3)\n        elif similarity < 0.85:\n            results = await invoke_function('rerank_search', top_n=_5)\n        if  not  cache_hit:\n            cache_result = await invoke_function('generate_cache', results=results)\n    elif query_type == \"complex_reasoning\":\n        kg_results = await invoke_function('kg_search', max_hops=_2)\n        if kg_results.empty:\n            kg_results = await invoke_function('full_graph_search')\n        cache_result = kg_results\n    elif query_type == \"code_related\":\n        if code_lines > 500:\n            analysis = await invoke_function('static_analysis')\n        elif code_lines < 500:\n            analysis = await invoke_function('semantic_analysis')\n            doc = await invoke_function('generate_explanation', analysis=analysis)\n    else:\n        response = \"无法识别的查询类型\"\n    return analysis, cache_result, doc, kg_results, response, results",
+        "code_lines_count": 23
+      },
+      {
+        "name": "step_3_strong_model_analysis",
+        "inputs": [
+          "user_click_regen"
+        ],
+        "outputs": [
+          "feedback_count",
+          "response"
+        ],
+        "is_async": true,
+        "body_code": "async def step_3_strong_model_analysis(user_click_regen):\n    \"\"\"Auto-generated module\"\"\"\n    if user_click_regen:\n        response = await invoke_function('strong_model_analysis')\n        feedback_count = feedback_count + 1\n        if feedback_count >= 3:\n            await invoke_function('escalate_to_human')\n    return feedback_count, response",
+        "code_lines_count": 8
+      },
+      {
+        "name": "step_4_compute_process",
+        "inputs": [
+          "current_requests",
+          "max_concurrent",
+          "queue",
+          "request",
+          "user_priority"
+        ],
+        "outputs": [
+          "process"
+        ],
+        "is_async": false,
+        "body_code": "def step_4_compute_process(current_requests, max_concurrent, queue, request, user_priority):\n    \"\"\"Auto-generated module\"\"\"\n    if current_requests >= max_concurrent:\n        queue.append(request)\n    else:\n        process = True\n        if user_priority > 5:\n            queue.insert(0, request)\n    return process",
+        "code_lines_count": 9
+      },
+      {
+        "name": "step_5_log_to_security",
+        "inputs": [
+          "query",
+          "sensitive_words"
+        ],
+        "outputs": [
+          "______"
+        ],
+        "is_async": true,
+        "body_code": "async def step_5_log_to_security(query, sensitive_words):\n    \"\"\"Auto-generated module\"\"\"\n    if sensitive_words in query:\n        await invoke_function('log_to_security')\n        return \"服务拒绝\"",
+        "code_lines_count": 5
+      },
+      {
+        "name": "step_6_degrade_service",
+        "inputs": [
+          "response_time"
+        ],
+        "outputs": [],
+        "is_async": true,
+        "body_code": "async def step_6_degrade_service(response_time):\n    \"\"\"Auto-generated module\"\"\"\n    if response_time > 3.0:\n        await invoke_function('degrade_service')\n    return None",
+        "code_lines_count": 5
+      },
+      {
+        "name": "step_7_upload_logs",
+        "inputs": [
+          "log_retention"
+        ],
+        "outputs": [],
+        "is_async": true,
+        "body_code": "async def step_7_upload_logs(log_retention):\n    \"\"\"Auto-generated module\"\"\"\n    await invoke_function('upload_logs', log_retention=log_retention)\n    return None",
+        "code_lines_count": 4
+      },
+      {
+        "name": "step_8_check_duration_and_alert",
+        "inputs": [
+          "qps",
+          "qps_threshold"
+        ],
+        "outputs": [],
+        "is_async": true,
+        "body_code": "async def step_8_check_duration_and_alert(qps, qps_threshold):\n    \"\"\"Auto-generated module\"\"\"\n    if qps < qps_threshold:\n        await invoke_function('check_duration_and_alert')\n    return None",
+        "code_lines_count": 5
+      },
+      {
+        "name": "step_9_compute_response",
+        "inputs": [
+          "response"
+        ],
+        "outputs": [
+          "__response__"
+        ],
+        "is_async": false,
+        "body_code": "def step_9_compute_response(response):\n    \"\"\"Auto-generated module\"\"\"\n    return response",
+        "code_lines_count": 3
+      }
+    ],
+    "prompt40_module_count": 9,
+    "prompt40_main_code": "async def main_workflow(input_params: dict):\n    \"\"\"\n    主工作流 - 自动生成\n    \n    Args:\n        input_params: 包含 ['cache_hit', 'code_lines', 'current_requests', 'qps', 'query', 'query_type', 'queue', 'request', 'response_time', 'similarity', 'user_click_regen', 'user_priority'] 的字典\n    \n    Returns:\n        执行结果上下文\n    \"\"\"\n    # 初始化上下文\n    ctx = input_params.copy()\n\n    # Module 1: step_1_compute_max_concurrent\n    ctx[\"cache_duration\"], ctx[\"duration_threshold\"], ctx[\"feedback_count\"], ctx[\"log_retention\"], ctx[\"max_concurrent\"], ctx[\"qps_threshold\"], ctx[\"sensitive_words\"] = step_1_compute_max_concurrent(ctx.get(\"cache_hit\"), ctx.get(\"cache_result\"), ctx.get(\"code_lines\"), ctx.get(\"current_requests\"), ctx.get(\"qps\"), ctx.get(\"query_type\"), ctx.get(\"response_time\"), ctx.get(\"similarity\"), ctx.get(\"user_priority\"))\n\n    # Module 2: step_2_vector_search\n    ctx[\"analysis\"], ctx[\"cache_result\"], ctx[\"doc\"], ctx[\"kg_results\"], ctx[\"response\"], ctx[\"results\"] = await step_2_vector_search(ctx.get(\"cache_hit\"), ctx.get(\"code_lines\"), ctx.get(\"query_type\"), ctx.get(\"similarity\"))\n\n    # Module 3: step_3_strong_model_analysis\n    ctx[\"feedback_count\"], ctx[\"response\"] = await step_3_strong_model_analysis(ctx.get(\"user_click_regen\"))\n\n    # Module 4: step_4_compute_process\n    ctx[\"process\"] = step_4_compute_process(ctx.get(\"current_requests\"), ctx.get(\"max_concurrent\"), ctx.get(\"queue\"), ctx.get(\"request\"), ctx.get(\"user_priority\"))\n\n    # Module 5: step_5_log_to_security\n    ctx[\"______\"] = await step_5_log_to_security(ctx.get(\"query\"), ctx.get(\"sensitive_words\"))\n\n    # Module 6: step_6_degrade_service\n    await step_6_degrade_service(ctx.get(\"response_time\"))\n\n    # Module 7: step_7_upload_logs\n    await step_7_upload_logs(ctx.get(\"log_retention\"))\n\n    # Module 8: step_8_check_duration_and_alert\n    await step_8_check_duration_and_alert(ctx.get(\"qps\"), ctx.get(\"qps_threshold\"))\n\n    # Module 9: step_9_compute_response\n    ctx[\"__response__\"] = step_9_compute_response(ctx.get(\"response\"))\n\n    return ctx",
+    "prompt40_time_ms": 6,
+    "prompt40_module_bodies": {
+      "step_1_compute_max_concurrent": "def step_1_compute_max_concurrent(cache_hit, cache_result, code_lines, current_requests, qps, query_type, response_time, similarity, user_priority):\n    \"\"\"Auto-generated module\"\"\"\n    return cache_duration, duration_threshold, feedback_count, log_retention, max_concurrent, qps_threshold, sensitive_words",
+      "step_2_vector_search": "async def step_2_vector_search(cache_hit, code_lines, query_type, similarity):\n    \"\"\"Auto-generated module\"\"\"\n    if query_type == \"simple_fact\":\n        if similarity > 0.85:\n            results = await invoke_function('vector_search', top_n=_3)\n        elif similarity < 0.85:\n            results = await invoke_function('rerank_search', top_n=_5)\n        if  not  cache_hit:\n            cache_result = await invoke_function('generate_cache', results=results)\n    elif query_type == \"complex_reasoning\":\n        kg_results = await invoke_function('kg_search', max_hops=_2)\n        if kg_results.empty:\n            kg_results = await invoke_function('full_graph_search')\n        cache_result = kg_results\n    elif query_type == \"code_related\":\n        if code_lines > 500:\n            analysis = await invoke_function('static_analysis')\n        elif code_lines < 500:\n            analysis = await invoke_function('semantic_analysis')\n            doc = await invoke_function('generate_explanation', analysis=analysis)\n    else:\n        response = \"无法识别的查询类型\"\n    return analysis, cache_result, doc, kg_results, response, results",
+      "step_3_strong_model_analysis": "async def step_3_strong_model_analysis(user_click_regen):\n    \"\"\"Auto-generated module\"\"\"\n    if user_click_regen:\n        response = await invoke_function('strong_model_analysis')\n        feedback_count = feedback_count + 1\n        if feedback_count >= 3:\n            await invoke_function('escalate_to_human')\n    return feedback_count, response",
+      "step_4_compute_process": "def step_4_compute_process(current_requests, max_concurrent, queue, request, user_priority):\n    \"\"\"Auto-generated module\"\"\"\n    if current_requests >= max_concurrent:\n        queue.append(request)\n    else:\n        process = True\n        if user_priority > 5:\n            queue.insert(0, request)\n    return process",
+      "step_5_log_to_security": "async def step_5_log_to_security(query, sensitive_words):\n    \"\"\"Auto-generated module\"\"\"\n    if sensitive_words in query:\n        await invoke_function('log_to_security')\n        return \"服务拒绝\"",
+      "step_6_degrade_service": "async def step_6_degrade_service(response_time):\n    \"\"\"Auto-generated module\"\"\"\n    if response_time > 3.0:\n        await invoke_function('degrade_service')\n    return None",
+      "step_7_upload_logs": "async def step_7_upload_logs(log_retention):\n    \"\"\"Auto-generated module\"\"\"\n    await invoke_function('upload_logs', log_retention=log_retention)\n    return None",
+      "step_8_check_duration_and_alert": "async def step_8_check_duration_and_alert(qps, qps_threshold):\n    \"\"\"Auto-generated module\"\"\"\n    if qps < qps_threshold:\n        await invoke_function('check_duration_and_alert')\n    return None",
+      "step_9_compute_response": "def step_9_compute_response(response):\n    \"\"\"Auto-generated module\"\"\"\n    return response"
+    },
+    "prompt40_step1_parsing": {
+      "total_blocks": 68,
+      "block_types": {
+        "ASSIGN": 24,
+        "IF": 12,
+        "CALL": 14,
+        "ELIF": 4,
+        "ENDIF": 12,
+        "ELSE": 2
+      },
+      "blocks": [
+        {
+          "id": "OP_0",
+          "type": "ASSIGN",
+          "line_number": 1,
+          "is_async": false,
+          "inputs": [
+            "query_type"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "DEFINE {{query_type}}: String"
+          ]
+        },
+        {
+          "id": "OP_1",
+          "type": "ASSIGN",
+          "line_number": 2,
+          "is_async": false,
+          "inputs": [
+            "similarity"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "DEFINE {{similarity}}: Float"
+          ]
+        },
+        {
+          "id": "OP_2",
+          "type": "ASSIGN",
+          "line_number": 3,
+          "is_async": false,
+          "inputs": [
+            "cache_hit"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "DEFINE {{cache_hit}}: Boolean"
+          ]
+        },
+        {
+          "id": "OP_3",
+          "type": "ASSIGN",
+          "line_number": 4,
+          "is_async": false,
+          "inputs": [
+            "cache_result"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "DEFINE {{cache_result}}: Any"
+          ]
+        },
+        {
+          "id": "OP_4",
+          "type": "ASSIGN",
+          "line_number": 5,
+          "is_async": false,
+          "inputs": [
+            "code_lines"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "DEFINE {{code_lines}}: Integer"
+          ]
+        },
+        {
+          "id": "OP_5",
+          "type": "ASSIGN",
+          "line_number": 6,
+          "is_async": false,
+          "inputs": [
+            "user_priority"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "DEFINE {{user_priority}}: Integer"
+          ]
+        },
+        {
+          "id": "OP_6",
+          "type": "ASSIGN",
+          "line_number": 7,
+          "is_async": false,
+          "inputs": [
+            "current_requests"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "DEFINE {{current_requests}}: Integer"
+          ]
+        },
+        {
+          "id": "OP_7",
+          "type": "ASSIGN",
+          "line_number": 8,
+          "is_async": false,
+          "inputs": [
+            "max_concurrent"
+          ],
+          "outputs": [
+            "max_concurrent"
+          ],
+          "code_lines": [
+            "DEFINE {{max_concurrent}}: Integer = 50"
+          ]
+        },
+        {
+          "id": "OP_8",
+          "type": "ASSIGN",
+          "line_number": 9,
+          "is_async": false,
+          "inputs": [
+            "qps"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "DEFINE {{qps}}: Integer"
+          ]
+        },
+        {
+          "id": "OP_9",
+          "type": "ASSIGN",
+          "line_number": 10,
+          "is_async": false,
+          "inputs": [
+            "response_time"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "DEFINE {{response_time}}: Float"
+          ]
+        },
+        {
+          "id": "OP_10",
+          "type": "ASSIGN",
+          "line_number": 11,
+          "is_async": false,
+          "inputs": [
+            "feedback_count"
+          ],
+          "outputs": [
+            "feedback_count"
+          ],
+          "code_lines": [
+            "DEFINE {{feedback_count}}: Integer = 0"
+          ]
+        },
+        {
+          "id": "OP_11",
+          "type": "ASSIGN",
+          "line_number": 12,
+          "is_async": false,
+          "inputs": [
+            "cache_duration"
+          ],
+          "outputs": [
+            "cache_duration"
+          ],
+          "code_lines": [
+            "DEFINE {{cache_duration}}: Integer = 30  # 分钟"
+          ]
+        },
+        {
+          "id": "OP_12",
+          "type": "ASSIGN",
+          "line_number": 13,
+          "is_async": false,
+          "inputs": [
+            "sensitive_words"
+          ],
+          "outputs": [
+            "sensitive_words"
+          ],
+          "code_lines": [
+            "DEFINE {{sensitive_words}}: List = [\"违规内容1\", \"违规内容2\"]"
+          ]
+        },
+        {
+          "id": "OP_13",
+          "type": "ASSIGN",
+          "line_number": 14,
+          "is_async": false,
+          "inputs": [
+            "log_retention"
+          ],
+          "outputs": [
+            "log_retention"
+          ],
+          "code_lines": [
+            "DEFINE {{log_retention}}: Dict = {",
+            "\"error\": 90,",
+            "\"access\": 30,",
+            "\"debug\": 7",
+            "}"
+          ]
+        },
+        {
+          "id": "OP_14",
+          "type": "ASSIGN",
+          "line_number": 19,
+          "is_async": false,
+          "inputs": [
+            "qps_threshold"
+          ],
+          "outputs": [
+            "qps_threshold"
+          ],
+          "code_lines": [
+            "DEFINE {{qps_threshold}}: Integer = 10"
+          ]
+        },
+        {
+          "id": "OP_15",
+          "type": "ASSIGN",
+          "line_number": 20,
+          "is_async": false,
+          "inputs": [
+            "duration_threshold"
+          ],
+          "outputs": [
+            "duration_threshold"
+          ],
+          "code_lines": [
+            "DEFINE {{duration_threshold}}: Integer = 10  # 分钟"
+          ]
+        },
+        {
+          "id": "CTRL_16",
+          "type": "IF",
+          "line_number": 21,
+          "is_async": false,
+          "inputs": [
+            "query_type"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{query_type}} == \"simple_fact\""
+          ]
+        },
+        {
+          "id": "CTRL_17",
+          "type": "IF",
+          "line_number": 22,
+          "is_async": false,
+          "inputs": [
+            "similarity"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{similarity}} > 0.85"
+          ]
+        },
+        {
+          "id": "OP_18",
+          "type": "CALL",
+          "line_number": 23,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [
+            "results"
+          ],
+          "code_lines": [
+            "{{results}} = CALL vector_search(top_n=3)"
+          ]
+        },
+        {
+          "id": "CTRL_19",
+          "type": "ELIF",
+          "line_number": 24,
+          "is_async": false,
+          "inputs": [
+            "similarity"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "ELIF {{similarity}} < 0.85"
+          ]
+        },
+        {
+          "id": "OP_20",
+          "type": "CALL",
+          "line_number": 25,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [
+            "results"
+          ],
+          "code_lines": [
+            "{{results}} = CALL rerank_search(top_n=5)"
+          ]
+        },
+        {
+          "id": "CTRL_21",
+          "type": "ENDIF",
+          "line_number": 26,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_22",
+          "type": "IF",
+          "line_number": 27,
+          "is_async": false,
+          "inputs": [
+            "cache_hit"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF NOT {{cache_hit}}"
+          ]
+        },
+        {
+          "id": "OP_23",
+          "type": "CALL",
+          "line_number": 28,
+          "is_async": true,
+          "inputs": [
+            "results"
+          ],
+          "outputs": [
+            "cache_result"
+          ],
+          "code_lines": [
+            "{{cache_result}} = CALL generate_cache({{results}})"
+          ]
+        },
+        {
+          "id": "CTRL_24",
+          "type": "ENDIF",
+          "line_number": 29,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_25",
+          "type": "ELIF",
+          "line_number": 30,
+          "is_async": false,
+          "inputs": [
+            "query_type"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "ELIF {{query_type}} == \"complex_reasoning\""
+          ]
+        },
+        {
+          "id": "OP_26",
+          "type": "CALL",
+          "line_number": 31,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [
+            "kg_results"
+          ],
+          "code_lines": [
+            "{{kg_results}} = CALL kg_search(max_hops=2)"
+          ]
+        },
+        {
+          "id": "CTRL_27",
+          "type": "IF",
+          "line_number": 32,
+          "is_async": false,
+          "inputs": [
+            "kg_results"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{kg_results}}.empty"
+          ]
+        },
+        {
+          "id": "OP_28",
+          "type": "CALL",
+          "line_number": 33,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [
+            "kg_results"
+          ],
+          "code_lines": [
+            "{{kg_results}} = CALL full_graph_search()"
+          ]
+        },
+        {
+          "id": "CTRL_29",
+          "type": "ENDIF",
+          "line_number": 34,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "OP_30",
+          "type": "ASSIGN",
+          "line_number": 35,
+          "is_async": false,
+          "inputs": [
+            "kg_results"
+          ],
+          "outputs": [
+            "cache_result"
+          ],
+          "code_lines": [
+            "{{cache_result}} = {{kg_results}}"
+          ]
+        },
+        {
+          "id": "CTRL_31",
+          "type": "ELIF",
+          "line_number": 36,
+          "is_async": false,
+          "inputs": [
+            "query_type"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "ELIF {{query_type}} == \"code_related\""
+          ]
+        },
+        {
+          "id": "CTRL_32",
+          "type": "IF",
+          "line_number": 37,
+          "is_async": false,
+          "inputs": [
+            "code_lines"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{code_lines}} > 500"
+          ]
+        },
+        {
+          "id": "OP_33",
+          "type": "CALL",
+          "line_number": 38,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [
+            "analysis"
+          ],
+          "code_lines": [
+            "{{analysis}} = CALL static_analysis()"
+          ]
+        },
+        {
+          "id": "CTRL_34",
+          "type": "ELIF",
+          "line_number": 39,
+          "is_async": false,
+          "inputs": [
+            "code_lines"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "ELIF {{code_lines}} < 500"
+          ]
+        },
+        {
+          "id": "OP_35",
+          "type": "CALL",
+          "line_number": 40,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [
+            "analysis"
+          ],
+          "code_lines": [
+            "{{analysis}} = CALL semantic_analysis()"
+          ]
+        },
+        {
+          "id": "OP_36",
+          "type": "CALL",
+          "line_number": 41,
+          "is_async": true,
+          "inputs": [
+            "analysis"
+          ],
+          "outputs": [
+            "doc"
+          ],
+          "code_lines": [
+            "{{doc}} = CALL generate_explanation({{analysis}})"
+          ]
+        },
+        {
+          "id": "CTRL_37",
+          "type": "ENDIF",
+          "line_number": 42,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_38",
+          "type": "ELSE",
+          "line_number": 43,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ELSE"
+          ]
+        },
+        {
+          "id": "OP_39",
+          "type": "ASSIGN",
+          "line_number": 44,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [
+            "response"
+          ],
+          "code_lines": [
+            "{{response}} = \"无法识别的查询类型\""
+          ]
+        },
+        {
+          "id": "CTRL_40",
+          "type": "ENDIF",
+          "line_number": 45,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_41",
+          "type": "IF",
+          "line_number": 46,
+          "is_async": false,
+          "inputs": [
+            "user_click_regen"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{user_click_regen}}"
+          ]
+        },
+        {
+          "id": "OP_42",
+          "type": "CALL",
+          "line_number": 47,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [
+            "response"
+          ],
+          "code_lines": [
+            "{{response}} = CALL strong_model_analysis()"
+          ]
+        },
+        {
+          "id": "OP_43",
+          "type": "ASSIGN",
+          "line_number": 48,
+          "is_async": false,
+          "inputs": [
+            "feedback_count"
+          ],
+          "outputs": [
+            "feedback_count"
+          ],
+          "code_lines": [
+            "{{feedback_count}} = {{feedback_count}} + 1"
+          ]
+        },
+        {
+          "id": "CTRL_44",
+          "type": "IF",
+          "line_number": 49,
+          "is_async": false,
+          "inputs": [
+            "feedback_count"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{feedback_count}} >= 3"
+          ]
+        },
+        {
+          "id": "OP_45",
+          "type": "CALL",
+          "line_number": 50,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "CALL escalate_to_human()"
+          ]
+        },
+        {
+          "id": "CTRL_46",
+          "type": "ENDIF",
+          "line_number": 51,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_47",
+          "type": "ENDIF",
+          "line_number": 52,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_48",
+          "type": "IF",
+          "line_number": 53,
+          "is_async": false,
+          "inputs": [
+            "max_concurrent",
+            "current_requests"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{current_requests}} >= {{max_concurrent}}"
+          ]
+        },
+        {
+          "id": "OP_49",
+          "type": "ASSIGN",
+          "line_number": 54,
+          "is_async": false,
+          "inputs": [
+            "queue",
+            "request"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "{{queue}}.append({{request}})"
+          ]
+        },
+        {
+          "id": "CTRL_50",
+          "type": "ELSE",
+          "line_number": 55,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ELSE"
+          ]
+        },
+        {
+          "id": "OP_51",
+          "type": "ASSIGN",
+          "line_number": 56,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [
+            "process"
+          ],
+          "code_lines": [
+            "{{process}} = True"
+          ]
+        },
+        {
+          "id": "CTRL_52",
+          "type": "IF",
+          "line_number": 57,
+          "is_async": false,
+          "inputs": [
+            "user_priority"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{user_priority}} > 5"
+          ]
+        },
+        {
+          "id": "OP_53",
+          "type": "ASSIGN",
+          "line_number": 58,
+          "is_async": false,
+          "inputs": [
+            "queue",
+            "request"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "{{queue}}.insert(0, {{request}})"
+          ]
+        },
+        {
+          "id": "CTRL_54",
+          "type": "ENDIF",
+          "line_number": 59,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_55",
+          "type": "ENDIF",
+          "line_number": 60,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_56",
+          "type": "IF",
+          "line_number": 61,
+          "is_async": false,
+          "inputs": [
+            "sensitive_words",
+            "query"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{query}} CONTAINS {{sensitive_words}}"
+          ]
+        },
+        {
+          "id": "OP_57",
+          "type": "CALL",
+          "line_number": 62,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "CALL log_to_security()"
+          ]
+        },
+        {
+          "id": "OP_58",
+          "type": "ASSIGN",
+          "line_number": 63,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [
+            "\"服务拒绝\""
+          ],
+          "code_lines": [
+            "RETURN \"服务拒绝\""
+          ]
+        },
+        {
+          "id": "CTRL_59",
+          "type": "ENDIF",
+          "line_number": 64,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_60",
+          "type": "IF",
+          "line_number": 65,
+          "is_async": false,
+          "inputs": [
+            "response_time"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{response_time}} > 3.0"
+          ]
+        },
+        {
+          "id": "OP_61",
+          "type": "CALL",
+          "line_number": 66,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "CALL degrade_service()"
+          ]
+        },
+        {
+          "id": "CTRL_62",
+          "type": "ENDIF",
+          "line_number": 67,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "OP_63",
+          "type": "CALL",
+          "line_number": 68,
+          "is_async": true,
+          "inputs": [
+            "log_retention"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "CALL upload_logs({{log_retention}})"
+          ]
+        },
+        {
+          "id": "CTRL_64",
+          "type": "IF",
+          "line_number": 69,
+          "is_async": false,
+          "inputs": [
+            "qps",
+            "qps_threshold"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{qps}} < {{qps_threshold}}"
+          ]
+        },
+        {
+          "id": "OP_65",
+          "type": "CALL",
+          "line_number": 70,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "CALL check_duration_and_alert()"
+          ]
+        },
+        {
+          "id": "CTRL_66",
+          "type": "ENDIF",
+          "line_number": 71,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "OP_67",
+          "type": "ASSIGN",
+          "line_number": 72,
+          "is_async": false,
+          "inputs": [
+            "response"
+          ],
+          "outputs": [
+            "{{response}}"
+          ],
+          "code_lines": [
+            "RETURN {{response}}"
+          ]
+        }
+      ]
+    },
+    "prompt40_step2_dependency": {
+      "has_cycles": false,
+      "dead_code_count": 22,
+      "dead_code_blocks": [
+        "OP_0",
+        "OP_1",
+        "OP_2",
+        "OP_4",
+        "OP_5",
+        "OP_6",
+        "OP_8",
+        "OP_9",
+        "OP_11",
+        "OP_15",
+        "OP_18",
+        "OP_26",
+        "OP_33",
+        "OP_39",
+        "OP_45",
+        "OP_49",
+        "OP_51",
+        "OP_53",
+        "OP_57",
+        "OP_58",
+        "OP_61",
+        "OP_65"
+      ],
+      "topological_order": [
+        "OP_0",
+        "OP_1",
+        "OP_2",
+        "OP_4",
+        "OP_5",
+        "OP_6",
+        "OP_7",
+        "OP_8",
+        "OP_9",
+        "OP_11",
+        "OP_12",
+        "OP_13",
+        "OP_14",
+        "OP_15",
+        "CTRL_16",
+        "CTRL_17",
+        "OP_18",
+        "CTRL_19",
+        "OP_20",
+        "CTRL_21",
+        "CTRL_22",
+        "CTRL_24",
+        "CTRL_25",
+        "OP_26",
+        "OP_28",
+        "CTRL_29",
+        "CTRL_31",
+        "CTRL_32",
+        "OP_33",
+        "CTRL_34",
+        "OP_35",
+        "CTRL_37",
+        "CTRL_38",
+        "OP_39",
+        "CTRL_40",
+        "CTRL_41",
+        "OP_42",
+        "OP_43",
+        "OP_45",
+        "CTRL_46",
+        "CTRL_47",
+        "OP_49",
+        "CTRL_50",
+        "OP_51",
+        "CTRL_52",
+        "OP_53",
+        "CTRL_54",
+        "CTRL_55",
+        "OP_57",
+        "OP_58",
+        "CTRL_59",
+        "CTRL_60",
+        "OP_61",
+        "CTRL_62",
+        "OP_65",
+        "CTRL_66",
+        "CTRL_48",
+        "CTRL_56",
+        "OP_63",
+        "CTRL_64",
+        "OP_23",
+        "CTRL_27",
+        "OP_30",
+        "OP_36",
+        "OP_67",
+        "OP_10",
+        "CTRL_44",
+        "OP_3"
+      ],
+      "edge_count": 12,
+      "node_count": 68
+    },
+    "prompt40_step3_clustering": {
+      "strategy": "hybrid",
+      "total_clusters": 9,
+      "clusters": [
+        {
+          "cluster_id": 1,
+          "block_count": 16,
+          "blocks": [
+            "OP_0",
+            "OP_1",
+            "OP_2",
+            "OP_3",
+            "OP_4",
+            "OP_5",
+            "OP_6",
+            "OP_7",
+            "OP_8",
+            "OP_9",
+            "OP_10",
+            "OP_11",
+            "OP_12",
+            "OP_13",
+            "OP_14",
+            "OP_15"
+          ]
+        },
+        {
+          "cluster_id": 2,
+          "block_count": 25,
+          "blocks": [
+            "CTRL_16",
+            "CTRL_17",
+            "OP_18",
+            "CTRL_19",
+            "OP_20",
+            "CTRL_21",
+            "CTRL_22",
+            "OP_23",
+            "CTRL_24",
+            "CTRL_25",
+            "OP_26",
+            "CTRL_27",
+            "OP_28",
+            "CTRL_29",
+            "OP_30",
+            "CTRL_31",
+            "CTRL_32",
+            "OP_33",
+            "CTRL_34",
+            "OP_35",
+            "OP_36",
+            "CTRL_37",
+            "CTRL_38",
+            "OP_39",
+            "CTRL_40"
+          ]
+        },
+        {
+          "cluster_id": 3,
+          "block_count": 7,
+          "blocks": [
+            "CTRL_41",
+            "OP_42",
+            "OP_43",
+            "CTRL_44",
+            "OP_45",
+            "CTRL_46",
+            "CTRL_47"
+          ]
+        },
+        {
+          "cluster_id": 4,
+          "block_count": 8,
+          "blocks": [
+            "CTRL_48",
+            "OP_49",
+            "CTRL_50",
+            "OP_51",
+            "CTRL_52",
+            "OP_53",
+            "CTRL_54",
+            "CTRL_55"
+          ]
+        },
+        {
+          "cluster_id": 5,
+          "block_count": 4,
+          "blocks": [
+            "CTRL_56",
+            "OP_57",
+            "OP_58",
+            "CTRL_59"
+          ]
+        },
+        {
+          "cluster_id": 6,
+          "block_count": 3,
+          "blocks": [
+            "CTRL_60",
+            "OP_61",
+            "CTRL_62"
+          ]
+        },
+        {
+          "cluster_id": 7,
+          "block_count": 1,
+          "blocks": [
+            "OP_63"
+          ]
+        },
+        {
+          "cluster_id": 8,
+          "block_count": 3,
+          "blocks": [
+            "CTRL_64",
+            "OP_65",
+            "CTRL_66"
+          ]
+        },
+        {
+          "cluster_id": 9,
+          "block_count": 1,
+          "blocks": [
+            "OP_67"
+          ]
+        }
+      ]
+    },
+    "prompt40_step4_generation": {
+      "total_modules": 9,
+      "async_modules": 6,
+      "sync_modules": 3,
+      "modules": [
+        {
+          "name": "step_1_compute_max_concurrent",
+          "inputs": [
+            "cache_hit",
+            "cache_result",
+            "code_lines",
+            "current_requests",
+            "qps",
+            "query_type",
+            "response_time",
+            "similarity",
+            "user_priority"
+          ],
+          "outputs": [
+            "cache_duration",
+            "duration_threshold",
+            "feedback_count",
+            "log_retention",
+            "max_concurrent",
+            "qps_threshold",
+            "sensitive_words"
+          ],
+          "is_async": false,
+          "body_code": "def step_1_compute_max_concurrent(cache_hit, cache_result, code_lines, current_requests, qps, query_type, response_time, similarity, user_priority):\n    \"\"\"Auto-generated module\"\"\"\n    return cache_duration, duration_threshold, feedback_count, log_retention, max_concurrent, qps_threshold, sensitive_words",
+          "original_block_count": 16
+        },
+        {
+          "name": "step_2_vector_search",
+          "inputs": [
+            "cache_hit",
+            "code_lines",
+            "query_type",
+            "similarity"
+          ],
+          "outputs": [
+            "analysis",
+            "cache_result",
+            "doc",
+            "kg_results",
+            "response",
+            "results"
+          ],
+          "is_async": true,
+          "body_code": "async def step_2_vector_search(cache_hit, code_lines, query_type, similarity):\n    \"\"\"Auto-generated module\"\"\"\n    if query_type == \"simple_fact\":\n        if similarity > 0.85:\n            results = await invoke_function('vector_search', top_n=_3)\n        elif similarity < 0.85:\n            results = await invoke_function('rerank_search', top_n=_5)\n        if  not  cache_hit:\n            cache_result = await invoke_function('generate_cache', results=results)\n    elif query_type == \"complex_reasoning\":\n        kg_results = await invoke_function('kg_search', max_hops=_2)\n        if kg_results.empty:\n            kg_results = await invoke_function('full_graph_search')\n        cache_result = kg_results\n    elif query_type == \"code_related\":\n        if code_lines > 500:\n            analysis = await invoke_function('static_analysis')\n        elif code_lines < 500:\n            analysis = await invoke_function('semantic_analysis')\n            doc = await invoke_function('generate_explanation', analysis=analysis)\n    else:\n        response = \"无法识别的查询类型\"\n    return analysis, cache_result, doc, kg_results, response, results",
+          "original_block_count": 25
+        },
+        {
+          "name": "step_3_strong_model_analysis",
+          "inputs": [
+            "user_click_regen"
+          ],
+          "outputs": [
+            "feedback_count",
+            "response"
+          ],
+          "is_async": true,
+          "body_code": "async def step_3_strong_model_analysis(user_click_regen):\n    \"\"\"Auto-generated module\"\"\"\n    if user_click_regen:\n        response = await invoke_function('strong_model_analysis')\n        feedback_count = feedback_count + 1\n        if feedback_count >= 3:\n            await invoke_function('escalate_to_human')\n    return feedback_count, response",
+          "original_block_count": 7
+        },
+        {
+          "name": "step_4_compute_process",
+          "inputs": [
+            "current_requests",
+            "max_concurrent",
+            "queue",
+            "request",
+            "user_priority"
+          ],
+          "outputs": [
+            "process"
+          ],
+          "is_async": false,
+          "body_code": "def step_4_compute_process(current_requests, max_concurrent, queue, request, user_priority):\n    \"\"\"Auto-generated module\"\"\"\n    if current_requests >= max_concurrent:\n        queue.append(request)\n    else:\n        process = True\n        if user_priority > 5:\n            queue.insert(0, request)\n    return process",
+          "original_block_count": 8
+        },
+        {
+          "name": "step_5_log_to_security",
+          "inputs": [
+            "query",
+            "sensitive_words"
+          ],
+          "outputs": [
+            "______"
+          ],
+          "is_async": true,
+          "body_code": "async def step_5_log_to_security(query, sensitive_words):\n    \"\"\"Auto-generated module\"\"\"\n    if sensitive_words in query:\n        await invoke_function('log_to_security')\n        return \"服务拒绝\"",
+          "original_block_count": 4
+        },
+        {
+          "name": "step_6_degrade_service",
+          "inputs": [
+            "response_time"
+          ],
+          "outputs": [],
+          "is_async": true,
+          "body_code": "async def step_6_degrade_service(response_time):\n    \"\"\"Auto-generated module\"\"\"\n    if response_time > 3.0:\n        await invoke_function('degrade_service')\n    return None",
+          "original_block_count": 3
+        },
+        {
+          "name": "step_7_upload_logs",
+          "inputs": [
+            "log_retention"
+          ],
+          "outputs": [],
+          "is_async": true,
+          "body_code": "async def step_7_upload_logs(log_retention):\n    \"\"\"Auto-generated module\"\"\"\n    await invoke_function('upload_logs', log_retention=log_retention)\n    return None",
+          "original_block_count": 1
+        },
+        {
+          "name": "step_8_check_duration_and_alert",
+          "inputs": [
+            "qps",
+            "qps_threshold"
+          ],
+          "outputs": [],
+          "is_async": true,
+          "body_code": "async def step_8_check_duration_and_alert(qps, qps_threshold):\n    \"\"\"Auto-generated module\"\"\"\n    if qps < qps_threshold:\n        await invoke_function('check_duration_and_alert')\n    return None",
+          "original_block_count": 3
+        },
+        {
+          "name": "step_9_compute_response",
+          "inputs": [
+            "response"
+          ],
+          "outputs": [
+            "__response__"
+          ],
+          "is_async": false,
+          "body_code": "def step_9_compute_response(response):\n    \"\"\"Auto-generated module\"\"\"\n    return response",
+          "original_block_count": 1
+        }
+      ]
+    },
+    "prompt40_step5_orchestration": {
+      "main_inputs": [
+        "cache_hit",
+        "code_lines",
+        "current_requests",
+        "qps",
+        "query",
+        "query_type",
+        "queue",
+        "request",
+        "response_time",
+        "similarity",
+        "user_click_regen",
+        "user_priority"
+      ],
+      "input_count": 12,
+      "main_code": "async def main_workflow(input_params: dict):\n    \"\"\"\n    主工作流 - 自动生成\n    \n    Args:\n        input_params: 包含 ['cache_hit', 'code_lines', 'current_requests', 'qps', 'query', 'query_type', 'queue', 'request', 'response_time', 'similarity', 'user_click_regen', 'user_priority'] 的字典\n    \n    Returns:\n        执行结果上下文\n    \"\"\"\n    # 初始化上下文\n    ctx = input_params.copy()\n\n    # Module 1: step_1_compute_max_concurrent\n    ctx[\"cache_duration\"], ctx[\"duration_threshold\"], ctx[\"feedback_count\"], ctx[\"log_retention\"], ctx[\"max_concurrent\"], ctx[\"qps_threshold\"], ctx[\"sensitive_words\"] = step_1_compute_max_concurrent(ctx.get(\"cache_hit\"), ctx.get(\"cache_result\"), ctx.get(\"code_lines\"), ctx.get(\"current_requests\"), ctx.get(\"qps\"), ctx.get(\"query_type\"), ctx.get(\"response_time\"), ctx.get(\"similarity\"), ctx.get(\"user_priority\"))\n\n    # Module 2: step_2_vector_search\n    ctx[\"analysis\"], ctx[\"cache_result\"], ctx[\"doc\"], ctx[\"kg_results\"], ctx[\"response\"], ctx[\"results\"] = await step_2_vector_search(ctx.get(\"cache_hit\"), ctx.get(\"code_lines\"), ctx.get(\"query_type\"), ctx.get(\"similarity\"))\n\n    # Module 3: step_3_strong_model_analysis\n    ctx[\"feedback_count\"], ctx[\"response\"] = await step_3_strong_model_analysis(ctx.get(\"user_click_regen\"))\n\n    # Module 4: step_4_compute_process\n    ctx[\"process\"] = step_4_compute_process(ctx.get(\"current_requests\"), ctx.get(\"max_concurrent\"), ctx.get(\"queue\"), ctx.get(\"request\"), ctx.get(\"user_priority\"))\n\n    # Module 5: step_5_log_to_security\n    ctx[\"______\"] = await step_5_log_to_security(ctx.get(\"query\"), ctx.get(\"sensitive_words\"))\n\n    # Module 6: step_6_degrade_service\n    await step_6_degrade_service(ctx.get(\"response_time\"))\n\n    # Module 7: step_7_upload_logs\n    await step_7_upload_logs(ctx.get(\"log_retention\"))\n\n    # Module 8: step_8_check_duration_and_alert\n    await step_8_check_duration_and_alert(ctx.get(\"qps\"), ctx.get(\"qps_threshold\"))\n\n    # Module 9: step_9_compute_response\n    ctx[\"__response__\"] = step_9_compute_response(ctx.get(\"response\"))\n\n    return ctx"
+    },
+    "overall_status": "success",
+    "total_time_ms": 268655,
+    "error_message": null
+  },
+  "f9c0c177": {
+    "pipeline_id": "f9c0c177",
+    "timestamp": "2026-02-02 19:53:00",
+    "raw_input": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+    "prompt10_id": "358b91aa",
+    "prompt10_original": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+    "prompt10_processed": "<think>\n好的，我现在需要处理用户提供的这个智能问答系统的设计文档。首先，我得确定这是属于类型1还是类型2。用户给出的内容看起来像是一个详细的系统设计规范，包含多个部分，比如查询类型判断、检索模式、代码分析引擎、用户反馈、数据源配置等。里面有很多结构化的描述，比如“向量检索模式下...”，“图数据库检索时...”，还有具体的数值和规则，比如相似度阈值0.85，缓存有效期30分钟等。这些特征符合类型1：Prompt 规范文档，因为它详细说明了系统的各个模块和处理流程，而不是一个具体的用户需求描述。\n\n接下来，根据处理规则，如果是类型1，我需要保持文档的完整结构和所有示例，仅对术语进行标准化，比如将“RAG”改为“检索增强生成”，但在这个文档中并没有出现RAG，所以可能不需要替换。不过文档中提到了“知识图谱(KG)”，这里可能需要标准化为“知识图谱（KG）”，但用户可能已经正确使用了括号，所以可能不需要改动。另外，检查是否有其他术语需要标准化，比如“VI”是否指“向量索引”，但用户已经写成“向量索引(VI)”，所以可能已经正确。\n\n然后，我需要确保不简化、不压缩、不修改逻辑结构，保留所有示例、规则和说明。用户提供的文档中没有示例，但有很多规则和步骤，所以需要保持原样。同时，输出必须是纯文本，不包含任何额外解释，所以处理后的结果应该直接是标准化后的文档，没有其他内容。\n\n现在检查是否有需要修正的地方。例如，用户提到“向量检索通道”和“图数据库检索”，这些术语是否需要调整？可能不需要，因为它们已经是标准术语。另外，用户提到“混合检索模式”，是否需要更明确的术语？可能不需要，因为上下文已经清楚。还有“代码分析引擎支持Python和Java代码”，这里是否需要标准化为“代码分析引擎支持Python和Java语言”？可能更准确，但用户原文是“代码”，所以保持原样。\n\n接下来，检查是否有语法错误或口语化表达。用户文档中的描述比较正式，没有明显的口语化词汇，所以可能不需要修改。例如，“搞”、“那个”等词不存在，所以符合类型1的处理规则。\n\n最后，确保所有部分都被正确保留，没有遗漏。例如，并发控制、安全策略、响应时间要求、日志级别、监控指标等部分都需要完整保留。同时，检查标点符号是否正确，比如中文引号是否使用正确，逗号、句号是否合适。例如，用户原文中的“结果结果”可能是笔误，需要修正为“结果”；还有“2跳邻居探索”是否正确，应该是“两跳邻居探索”，但用户可能使用数字更简洁，所以保持原样。\n\n总结处理步骤：保持结构，标准化术语，修正明显笔误，确保所有规则和描述准确无误，输出纯文本。\n</think>\n\n智能问答系统设计规范\n\n一、查询类型判断机制\n1. 系统需实时识别用户输入查询类型：\n   - 简单事实查询 → 向量检索通道\n   - 复杂推理查询 → 意图分解后图数据库检索\n   - 代码相关问题 → 调用代码分析引擎\n\n二、检索处理流程\n（一）向量检索模式\n1. 相似度阈值判定：\n   - ≥0.85：直接返回前3个结果\n   - ＜0.85：启用重排序模型重新评分，返回前5个结果\n2. 检索失败处理：自动切换混合检索模式\n\n（二）图数据库检索\n1. 知识图谱(KG)探索规则：\n   - 执行2跳邻居探索\n   - 匹配节点存在：返回实体及关系\n   - 未匹配：启动全量搜索\n2. 缓存策略：\n   - 所有查询结果缓存\n   - 缓存有效期：30分钟\n\n三、代码分析引擎\n1. 支持语言：Python、Java\n2. 分析策略：\n   - 行数＞500：仅执行静态分析\n   - 行数≤500：执行完整语义分析并生成解释文档\n\n四、用户反馈机制\n1. 重生成触发：\n   - 用户点击\"重新生成\" → 启用强推理模型\n2. 人工审核触发：\n   - 连续3次不满意 → 自动升级人工审核队列\n\n五、数据源配置\n1. 知识库架构：\n   - 医学知识库A：2000文档\n   - 技术知识库B：3000文档\n   - 法律知识库C：1500文档\n2. 索引配置：\n   - 独立向量索引(VI)\n   - 统一向量维度：1536\n\n六、系统控制策略\n（一）并发控制\n1. 最大并发数：50\n2. 优先级配置：\n   - 普通用户：1\n   - VIP用户：5\n   - 管理员：10\n\n（二）安全策略\n1. 敏感词过滤：\n   - 违规内容 → 拒绝服务并记录日志\n2. 金融类查询：\n   - 需二次身份验证\n\n七、性能要求\n1. 响应时间：\n   - 向量检索：≤500ms\n   - 图数据库检索：≤1s\n   - 代码分析：≤2s\n   - 总响应时间：≤3s（超时则服务降级）\n\n八、日志管理\n1. 保留周期：\n   - 错误日志：90天\n   - 访问日志：30天\n   - 调试日志：7天\n2. 存储要求：所有日志上传中央日志系统\n\n九、监控指标\n1. 核心指标：\n   - 每秒查询率(QPS)\n   - 平均响应时间\n   - 95分位响应时间\n   - 缓存命中率(CRH)\n   - 检索准确率\n2. 告警规则：\n   - QPS＜10持续10分钟 → 触发告警\n   - 95分位响应时间＞3s持续5分钟 → 触发扩容",
+    "prompt10_mode": "dictionary",
+    "prompt10_steps": [
+      {
+        "step_name": "术语对齐",
+        "step_index": 1,
+        "input_text": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "changes": {
+          "帮我": "请",
+          "top-3": "前3个结果",
+          "top-5": "前5个结果",
+          "知识图谱": "知识图谱(KG)",
+          "向量索引": "向量索引(VI)",
+          "QPS": "每秒查询率(QPS)",
+          "缓存命中率": "缓存命中率(CRH)"
+        },
+        "duration_ms": 0,
+        "notes": [
+          "替换 8 处"
+        ]
+      },
+      {
+        "step_name": "术语对齐",
+        "step_index": 2,
+        "input_text": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "changes": {
+          "帮我": "请",
+          "top-3": "前3个结果",
+          "top-5": "前5个结果",
+          "知识图谱": "知识图谱(KG)",
+          "向量索引": "向量索引(VI)",
+          "QPS": "每秒查询率(QPS)",
+          "缓存命中率": "缓存命中率(CRH)"
+        },
+        "duration_ms": 0,
+        "notes": []
+      },
+      {
+        "step_name": "LLM语义重构",
+        "step_index": 3,
+        "input_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "<think>\n好的，我现在需要处理用户提供的这个智能问答系统的设计文档。首先，我得确定这是属于类型1还是类型2。用户给出的内容看起来像是一个详细的系统设计规范，包含多个部分，比如查询类型判断、检索模式、代码分析引擎、用户反馈、数据源配置等。里面有很多结构化的描述，比如“向量检索模式下...”，“图数据库检索时...”，还有具体的数值和规则，比如相似度阈值0.85，缓存有效期30分钟等。这些特征符合类型1：Prompt 规范文档，因为它详细说明了系统的各个模块和处理流程，而不是一个具体的用户需求描述。\n\n接下来，根据处理规则，如果是类型1，我需要保持文档的完整结构和所有示例，仅对术语进行标准化，比如将“RAG”改为“检索增强生成”，但在这个文档中并没有出现RAG，所以可能不需要替换。不过文档中提到了“知识图谱(KG)”，这里可能需要标准化为“知识图谱（KG）”，但用户可能已经正确使用了括号，所以可能不需要改动。另外，检查是否有其他术语需要标准化，比如“VI”是否指“向量索引”，但用户已经写成“向量索引(VI)”，所以可能已经正确。\n\n然后，我需要确保不简化、不压缩、不修改逻辑结构，保留所有示例、规则和说明。用户提供的文档中没有示例，但有很多规则和步骤，所以需要保持原样。同时，输出必须是纯文本，不包含任何额外解释，所以处理后的结果应该直接是标准化后的文档，没有其他内容。\n\n现在检查是否有需要修正的地方。例如，用户提到“向量检索通道”和“图数据库检索”，这些术语是否需要调整？可能不需要，因为它们已经是标准术语。另外，用户提到“混合检索模式”，是否需要更明确的术语？可能不需要，因为上下文已经清楚。还有“代码分析引擎支持Python和Java代码”，这里是否需要标准化为“代码分析引擎支持Python和Java语言”？可能更准确，但用户原文是“代码”，所以保持原样。\n\n接下来，检查是否有语法错误或口语化表达。用户文档中的描述比较正式，没有明显的口语化词汇，所以可能不需要修改。例如，“搞”、“那个”等词不存在，所以符合类型1的处理规则。\n\n最后，确保所有部分都被正确保留，没有遗漏。例如，并发控制、安全策略、响应时间要求、日志级别、监控指标等部分都需要完整保留。同时，检查标点符号是否正确，比如中文引号是否使用正确，逗号、句号是否合适。例如，用户原文中的“结果结果”可能是笔误，需要修正为“结果”；还有“2跳邻居探索”是否正确，应该是“两跳邻居探索”，但用户可能使用数字更简洁，所以保持原样。\n\n总结处理步骤：保持结构，标准化术语，修正明显笔误，确保所有规则和描述准确无误，输出纯文本。\n</think>\n\n智能问答系统设计规范\n\n一、查询类型判断机制\n1. 系统需实时识别用户输入查询类型：\n   - 简单事实查询 → 向量检索通道\n   - 复杂推理查询 → 意图分解后图数据库检索\n   - 代码相关问题 → 调用代码分析引擎\n\n二、检索处理流程\n（一）向量检索模式\n1. 相似度阈值判定：\n   - ≥0.85：直接返回前3个结果\n   - ＜0.85：启用重排序模型重新评分，返回前5个结果\n2. 检索失败处理：自动切换混合检索模式\n\n（二）图数据库检索\n1. 知识图谱(KG)探索规则：\n   - 执行2跳邻居探索\n   - 匹配节点存在：返回实体及关系\n   - 未匹配：启动全量搜索\n2. 缓存策略：\n   - 所有查询结果缓存\n   - 缓存有效期：30分钟\n\n三、代码分析引擎\n1. 支持语言：Python、Java\n2. 分析策略：\n   - 行数＞500：仅执行静态分析\n   - 行数≤500：执行完整语义分析并生成解释文档\n\n四、用户反馈机制\n1. 重生成触发：\n   - 用户点击\"重新生成\" → 启用强推理模型\n2. 人工审核触发：\n   - 连续3次不满意 → 自动升级人工审核队列\n\n五、数据源配置\n1. 知识库架构：\n   - 医学知识库A：2000文档\n   - 技术知识库B：3000文档\n   - 法律知识库C：1500文档\n2. 索引配置：\n   - 独立向量索引(VI)\n   - 统一向量维度：1536\n\n六、系统控制策略\n（一）并发控制\n1. 最大并发数：50\n2. 优先级配置：\n   - 普通用户：1\n   - VIP用户：5\n   - 管理员：10\n\n（二）安全策略\n1. 敏感词过滤：\n   - 违规内容 → 拒绝服务并记录日志\n2. 金融类查询：\n   - 需二次身份验证\n\n七、性能要求\n1. 响应时间：\n   - 向量检索：≤500ms\n   - 图数据库检索：≤1s\n   - 代码分析：≤2s\n   - 总响应时间：≤3s（超时则服务降级）\n\n八、日志管理\n1. 保留周期：\n   - 错误日志：90天\n   - 访问日志：30天\n   - 调试日志：7天\n2. 存储要求：所有日志上传中央日志系统\n\n九、监控指标\n1. 核心指标：\n   - 每秒查询率(QPS)\n   - 平均响应时间\n   - 95分位响应时间\n   - 缓存命中率(CRH)\n   - 检索准确率\n2. 告警规则：\n   - QPS＜10持续10分钟 → 触发告警\n   - 95分位响应时间＞3s持续5分钟 → 触发扩容",
+        "changes": {
+          "标准化": "840字 → 2192字"
+        },
+        "duration_ms": 28369,
+        "notes": []
+      }
+    ],
+    "prompt10_terminology_changes": {
+      "帮我": "请",
+      "top-3": "前3个结果",
+      "top-5": "前5个结果",
+      "知识图谱": "知识图谱(KG)",
+      "向量索引": "向量索引(VI)",
+      "QPS": "每秒查询率(QPS)",
+      "缓存命中率": "缓存命中率(CRH)"
+    },
+    "prompt10_ambiguity_detected": false,
+    "prompt10_status": "success",
+    "prompt10_time_ms": 28370,
+    "prompt20_id": "54de16e1",
+    "prompt20_template": "<think>\n好的，我现在需要处理用户提供的这个智能问答系统的设计文档。首先，我得确定这是属于类型1还是类型2。用户给出的内容看起来像是一个详细的系统设计规范，包含多个部分，比如查询类型判断、检索模式、代码分析引擎、用户反馈、数据源配置等。里面有很多结构化的描述，比如“向量检索模式下...”，“图数据库检索时...”，还有具体的数值和规则，比如相似度阈值0.85，缓存有效期30分钟等。这些特征符合类型1：Prompt 规范文档，因为它详细说明了系统的各个模块和处理流程，而不是一个具体的用户需求描述。\n\n接下来，根据处理规则，如果是类型1，我需要保持文档的完整结构和所有示例，仅对术语进行标准化，比如将“RAG”改为“检索增强生成”，但在这个文档中并没有出现RAG，所以可能不需要替换。不过文档中提到了“知识图谱(KG)”，这里可能需要标准化为“知识图谱（KG）”，但用户可能已经正确使用了括号，所以可能不需要改动。另外，检查是否有其他术语需要标准化，比如“VI”是否指“向量索引”，但用户已经写成“向量索引(VI)”，所以可能已经正确。\n\n然后，我需要确保不简化、不压缩、不修改逻辑结构，保留所有示例、规则和说明。用户提供的文档中没有示例，但有很多规则和步骤，所以需要保持原样。同时，输出必须是纯文本，不包含任何额外解释，所以处理后的结果应该直接是标准化后的文档，没有其他内容。\n\n现在检查是否有需要修正的地方。例如，用户提到“向量检索通道”和“图数据库检索”，这些术语是否需要调整？可能不需要，因为它们已经是标准术语。另外，用户提到“混合检索模式”，是否需要更明确的术语？可能不需要，因为上下文已经清楚。还有“代码分析引擎支持Python和Java代码”，这里是否需要标准化为“代码分析引擎支持Python和Java语言”？可能更准确，但用户原文是“代码”，所以保持原样。\n\n接下来，检查是否有语法错误或口语化表达。用户文档中的描述比较正式，没有明显的口语化词汇，所以可能不需要修改。例如，“搞”、“那个”等词不存在，所以符合类型1的处理规则。\n\n最后，确保所有部分都被正确保留，没有遗漏。例如，并发控制、安全策略、响应时间要求、日志级别、监控指标等部分都需要完整保留。同时，检查标点符号是否正确，比如中文引号是否使用正确，逗号、句号是否合适。例如，用户原文中的“结果结果”可能是笔误，需要修正为“结果”；还有“2跳邻居探索”是否正确，应该是“两跳邻居探索”，但用户可能使用数字更简洁，所以保持原样。\n\n总结处理步骤：保持结构，标准化术语，修正明显笔误，确保所有规则和描述准确无误，输出纯文本。\n</think>\n\n智能问答系统设计规范\n\n一、查询类型判断机制\n1. 系统需实时识别用户输入查询类型：\n   - 简单事实查询 → 向量检索通道\n   - 复杂推理查询 → 意图分解后图数据库检索\n   - 代码相关问题 → 调用代码分析引擎\n\n二、检索处理流程\n（一）向量检索模式\n1. 相似度阈值判定：\n   - ≥0.85：直接返回前3个结果\n   - ＜0.85：启用重排序模型重新评分，返回前5个结果\n2. 检索失败处理：自动切换混合检索模式\n\n（二）图数据库检索\n1. 知识图谱(KG)探索规则：\n   - 执行2跳邻居探索\n   - 匹配节点存在：返回实体及关系\n   - 未匹配：启动全量搜索\n2. 缓存策略：\n   - 所有查询结果缓存\n   - 缓存有效期：30分钟\n\n三、代码分析引擎\n1. 支持语言：Python、Java\n2. 分析策略：\n   - 行数＞500：仅执行静态分析\n   - 行数≤500：执行完整语义分析并生成解释文档\n\n四、用户反馈机制\n1. 重生成触发：\n   - 用户点击\"重新生成\" → 启用强推理模型\n2. 人工审核触发：\n   - 连续3次不满意 → 自动升级人工审核队列\n\n五、数据源配置\n1. 知识库架构：\n   - 医学知识库A：2000文档\n   - 技术知识库B：3000文档\n   - 法律知识库C：1500文档\n2. 索引配置：\n   - 独立向量索引(VI)\n   - 统一向量维度：1536\n\n六、系统控制策略\n（一）并发控制\n1. 最大并发数：50\n2. 优先级配置：\n   - 普通用户：1\n   - VIP用户：5\n   - 管理员：10\n\n（二）安全策略\n1. 敏感词过滤：\n   - 违规内容 → 拒绝服务并记录日志\n2. 金融类查询：\n   - 需二次身份验证\n\n七、性能要求\n1. 响应时间：\n   - 向量检索：≤500ms\n   - 图数据库检索：≤1s\n   - 代码分析：≤2s\n   - 总响应时间：≤3s（超时则服务降级）\n\n八、日志管理\n1. 保留周期：\n   - 错误日志：90天\n   - 访问日志：30天\n   - 调试日志：7天\n2. 存储要求：所有日志上传中央日志系统\n\n九、监控指标\n1. 核心指标：\n   - 每秒查询率(QPS)\n   - 平均响应时间\n   - 95分位响应时间\n   - 缓存命中率(CRH)\n   - 检索准确率\n2. 告警规则：\n   - QPS＜10持续10分钟 → 触发告警\n   - 95分位响应时间＞3s持续5分钟 → 触发扩容",
+    "prompt20_variables": [],
+    "prompt20_variable_count": 0,
+    "prompt20_type_stats": {},
+    "prompt20_extraction_log": [],
+    "prompt20_time_ms": 0,
+    "prompt30_id": "595a95d7",
+    "prompt30_dsl_code": "<think>\n好的，我现在需要处理用户提供的这个智能问答系统的设计文档。首先，我得确定这是属于类型1还是类型2。用户给出的内容看起来像是一个详细的系统设计规范，包含多个部分，比如查询类型判断、检索模式、代码分析引擎、用户反馈、数据源配置等。里面有很多结构化的描述，比如“向量检索模式下...”，“图数据库检索时...”，还有具体的数值和规则，比如相似度阈值0.85，缓存有效期30分钟等。这些特征符合类型1：Prompt 规范文档，因为它详细说明了系统的各个模块和处理流程，而不是一个具体的用户需求描述。\n接下来，根据处理规则，如果是类型1，我需要保持文档的完整结构和所有示例，仅对术语进行标准化，比如将“RAG”改为“检索增强生成”，但在这个文档中并没有出现RAG，所以可能不需要替换。不过文档中提到了“知识图谱(KG)”，这里可能需要标准化为“知识图谱（KG）”，但用户可能已经正确使用了括号，所以可能不需要改动。另外，检查是否有其他术语需要标准化，比如“VI”是否指“向量索引”，但用户已经写成“向量索引(VI)”，所以可能已经正确。\n然后，我需要确保不简化、不压缩、不修改逻辑结构，保留所有示例、规则和说明。用户提供的文档中没有示例，但有很多规则和步骤，所以需要保持原样。同时，输出必须是纯文本，不包含任何额外解释，所以处理后的结果应该直接是标准化后的文档，没有其他内容。\n现在检查是否有需要修正的地方。例如，用户提到“向量检索通道”和“图数据库检索”，这些术语是否需要调整？可能不需要，因为它们已经是标准术语。另外，用户提到“混合检索模式”，是否需要更明确的术语？可能不需要，因为上下文已经清楚。还有“代码分析引擎支持Python和Java代码”，这里是否需要标准化为“代码分析引擎支持Python和Java语言”？可能更准确，但用户原文是“代码”，所以保持原样。\n接下来，检查是否有语法错误或口语化表达。用户文档中的描述比较正式，没有明显的口语化词汇，所以可能不需要修改。例如，“搞”、“那个”等词不存在，所以符合类型1的处理规则。\n最后，确保所有部分都被正确保留，没有遗漏。例如，并发控制、安全策略、响应时间要求、日志级别、监控指标等部分都需要完整保留。同时，检查标点符号是否正确，比如中文引号是否使用正确，逗号、句号是否合适。例如，用户原文中的“结果结果”可能是笔误，需要修正为“结果”；还有“2跳邻居探索”是否正确，应该是“两跳邻居探索”，但用户可能使用数字更简洁，所以保持原样。\n总结处理步骤：保持结构，标准化术语，修正明显笔误，确保所有规则和描述准确无误，输出纯文本。\n</think>\n智能问答系统设计规范\n一、查询类型判断机制\n1. 系统需实时识别用户输入查询类型：\n   - 简单事实查询 → 向量检索通道\n   - 复杂推理查询 → 意图分解后图数据库检索\n   - 代码相关问题 → 调用代码分析引擎\n二、检索处理流程\n（一）向量检索模式\n1. 相似度阈值判定：\n   - ≥0.85：直接返回前3个结果\n   - ＜0.85：启用重排序模型重新评分，返回前5个结果\n2. 检索失败处理：自动切换混合检索模式\n（二）图数据库检索\n1. 知识图谱(KG)探索规则：\n   - 执行2跳邻居探索\n   - 匹配节点存在：返回实体及关系\n   - 未匹配：启动全量搜索\n2. 缓存策略：\n   - 所有查询结果缓存\n   - 缓存有效期：30分钟\n三、代码分析引擎\n1. 支持语言：Python、Java\n2. 分析策略：\n   - 行数＞500：仅执行静态分析\n   - 行数≤500：执行完整语义分析并生成解释文档\n四、用户反馈机制\n1. 重生成触发：\n   - 用户点击\"重新生成\" → 启用强推理模型\n2. 人工审核触发：\n   - 连续3次不满意 → 自动升级人工审核队列\n五、数据源配置\n1. 知识库架构：\n   - 医学知识库A：2000文档\n   - 技术知识库B：3000文档\n   - 法律知识库C：1500文档\n2. 索引配置：\n   - 独立向量索引(VI)\n   - 统一向量维度：1536\n六、系统控制策略\n（一）并发控制\n1. 最大并发数：50\n2. 优先级配置：\n   - 普通用户：1\n   - VIP用户：5\n   - 管理员：10\n（二）安全策略\n1. 敏感词过滤：\n   - 违规内容 → 拒绝服务并记录日志\n2. 金融类查询：\n   - 需二次身份验证\n七、性能要求\n1. 响应时间：\n   - 向量检索：≤500ms\n   - 图数据库检索：≤1s\n   - 代码分析：≤2s\n   - 总响应时间：≤3s（超时则服务降级）\n八、日志管理\n1. 保留周期：\n   - 错误日志：90天\n   - 访问日志：30天\n   - 调试日志：7天\n2. 存储要求：所有日志上传中央日志系统\n九、监控指标\n1. 核心指标：\n   - 每秒查询率(QPS)\n   - 平均响应时间\n   - 95分位响应时间\n   - 缓存命中率(CRH)\n   - 检索准确率\n2. 告警规则：\n   - QPS＜10持续10分钟 → 触发告警\n   - 95分位响应时间＞3s持续5分钟 → 触发扩容",
+    "prompt30_validation_result": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "defined_variables": {},
+      "runtime_variables": [],
+      "function_calls": [],
+      "control_blocks": [],
+      "max_nesting_depth": 0
+    },
+    "prompt30_time_ms": 27097,
+    "prompt30_compile_history": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "dsl_code": "<think>\n好的，我现在需要处理用户提供的这个智能问答系统的设计文档。首先，我得确定这是属于类型1还是类型2。用户给出的内容看起来像是一个详细的系统设计规范，包含多个部分，比如查询类型判断、检索模式、代码分析引擎、用户反馈、数据源配置等。里面有很多结构化的描述，比如“向量检索模式下...”，“图数据库检索时...”，还有具体的数值和规则，比如相似度阈值0.85，缓存有效期30分钟等。这些特征符合类型1：Prompt 规范文档，因为它详细说明了系统的各个模块和处理流程，而不是一个具体的用户需求描述。\n接下来，根据处理规则，如果是类型1，我需要保持文档的完整结构和所有示例，仅对术语进行标准化，比如将“RAG”改为“检索增强生成”，但在这个文档中并没有出现RAG，所以可能不需要替换。不过文档中提到了“知识图谱(KG)”，这里可能需要标准化为“知识图谱（KG）”，但用户可能已经正确使用了括号，所以可能不需要改动。另外，检查是否有其他术语需要标准化，比如“VI”是否指“向量索引”，但用户已经写成“向量索引(VI)”，所以可能已经正确。\n然后，我需要确保不简化、不压缩、不修改逻辑结构，保留所有示例、规则和说明。用户提供的文档中没有示例，但有很多规则和步骤，所以需要保持原样。同时，输出必须是纯文本，不包含任何额外解释，所以处理后的结果应该直接是标准化后的文档，没有其他内容。\n现在检查是否有需要修正的地方。例如，用户提到“向量检索通道”和“图数据库检索”，这些术语是否需要调整？可能不需要，因为它们已经是标准术语。另外，用户提到“混合检索模式”，是否需要更明确的术语？可能不需要，因为上下文已经清楚。还有“代码分析引擎支持Python和Java代码”，这里是否需要标准化为“代码分析引擎支持Python和Java语言”？可能更准确，但用户原文是“代码”，所以保持原样。\n接下来，检查是否有语法错误或口语化表达。用户文档中的描述比较正式，没有明显的口语化词汇，所以可能不需要修改。例如，“搞”、“那个”等词不存在，所以符合类型1的处理规则。\n最后，确保所有部分都被正确保留，没有遗漏。例如，并发控制、安全策略、响应时间要求、日志级别、监控指标等部分都需要完整保留。同时，检查标点符号是否正确，比如中文引号是否使用正确，逗号、句号是否合适。例如，用户原文中的“结果结果”可能是笔误，需要修正为“结果”；还有“2跳邻居探索”是否正确，应该是“两跳邻居探索”，但用户可能使用数字更简洁，所以保持原样。\n总结处理步骤：保持结构，标准化术语，修正明显笔误，确保所有规则和描述准确无误，输出纯文本。\n</think>\n智能问答系统设计规范\n一、查询类型判断机制\n1. 系统需实时识别用户输入查询类型：\n   - 简单事实查询 → 向量检索通道\n   - 复杂推理查询 → 意图分解后图数据库检索\n   - 代码相关问题 → 调用代码分析引擎\n二、检索处理流程\n（一）向量检索模式\n1. 相似度阈值判定：\n   - ≥0.85：直接返回前3个结果\n   - ＜0.85：启用重排序模型重新评分，返回前5个结果\n2. 检索失败处理：自动切换混合检索模式\n（二）图数据库检索\n1. 知识图谱(KG)探索规则：\n   - 执行2跳邻居探索\n   - 匹配节点存在：返回实体及关系\n   - 未匹配：启动全量搜索\n2. 缓存策略：\n   - 所有查询结果缓存\n   - 缓存有效期：30分钟\n三、代码分析引擎\n1. 支持语言：Python、Java\n2. 分析策略：\n   - 行数＞500：仅执行静态分析\n   - 行数≤500：执行完整语义分析并生成解释文档\n四、用户反馈机制\n1. 重生成触发：\n   - 用户点击\"重新生成\" → 启用强推理模型\n2. 人工审核触发：\n   - 连续3次不满意 → 自动升级人工审核队列\n五、数据源配置\n1. 知识库架构：\n   - 医学知识库A：2000文档\n   - 技术知识库B：3000文档\n   - 法律知识库C：1500文档\n2. 索引配置：\n   - 独立向量索引(VI)\n   - 统一向量维度：1536\n六、系统控制策略\n（一）并发控制\n1. 最大并发数：50\n2. 优先级配置：\n   - 普通用户：1\n   - VIP用户：5\n   - 管理员：10\n（二）安全策略\n1. 敏感词过滤：\n   - 违规内容 → 拒绝服务并记录日志\n2. 金融类查询：\n   - 需二次身份验证\n七、性能要求\n1. 响应时间：\n   - 向量检索：≤500ms\n   - 图数据库检索：≤1s\n   - 代码分析：≤2s\n   - 总响应时间：≤3s（超时则服务降级）\n八、日志管理\n1. 保留周期：\n   - 错误日志：90天\n   - 访问日志：30天\n   - 调试日志：7天\n2. 存储要求：所有日志上传中央日志系统\n九、监控指标\n1. 核心指标：\n   - 每秒查询率(QPS)\n   - 平均响应时间\n   - 95分位响应时间\n   - 缓存命中率(CRH)\n   - 检索准确率\n2. 告警规则：\n   - QPS＜10持续10分钟 → 触发告警\n   - 95分位响应时间＞3s持续5分钟 → 触发扩容",
+          "total_errors": 0,
+          "error_analysis": {
+            "p0_count": 0,
+            "p1_count": 0,
+            "p2_count": 0,
+            "total": 0
+          }
+        }
+      ],
+      "final_decision": "success",
+      "error_summary": {},
+      "auto_fix_applied": false
+    },
+    "prompt30_success": true,
+    "prompt40_id": "01f39793",
+    "prompt40_modules": [],
+    "prompt40_module_count": 0,
+    "prompt40_main_code": "",
+    "prompt40_time_ms": 10,
+    "prompt40_module_bodies": {},
+    "prompt40_step1_parsing": {
+      "status": "failed",
+      "reason": "语法验证失败，发现 1 个错误：\n  ❌ step_1_process: 语法错误 - invalid character '，' (U+FF0C) (行 4)"
+    },
+    "prompt40_step2_dependency": {
+      "status": "skipped",
+      "reason": "Parsing failed"
+    },
+    "prompt40_step3_clustering": {
+      "status": "skipped",
+      "reason": "Parsing failed"
+    },
+    "prompt40_step4_generation": {
+      "status": "skipped",
+      "reason": "Parsing failed"
+    },
+    "prompt40_step5_orchestration": {
+      "status": "skipped",
+      "reason": "Parsing failed"
+    },
+    "overall_status": "success",
+    "total_time_ms": 55477,
+    "error_message": null
   }
 }

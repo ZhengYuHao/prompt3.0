@@ -2214,14 +2214,28 @@ graph TD
                 # 不再直接返回默认图，尝试继续使用（即使有语法错误）
                 warning(f"尝试使用可能包含错误的 Mermaid 代码")
 
-            # 直接验证是否包含 graph TD，不需要复杂的清理逻辑
-            # LLM 返回的 Mermaid 代码已经足够好了
-            if 'graph TD' not in mermaid_code:
-                # 如果 LLM 返回的不是 Mermaid 代码，使用默认模板
-                error(f"[Approach图] 未找到 'graph TD'，使用默认图")
+            # 提取所有节点和它们的类
+            node_class_map = {}
+            class_pattern = r'(\w+)\([^\)]+\)|(\w+)\[[^\]]+\)|(\w+)\{\{[^}]+\}\}\s*:::(\w+)'
+
+            # 查找所有使用 :::className 的节点
+            try:
+                for match in re.finditer(r'(\w+)\([^\)]+\)|(\w+)\[[^\]]+\)|(\w+)\{\{[^}]+\}\}):::(\w+)', mermaid_code):
+                    node_def = match.group(1)
+                    class_name = match.group(4)
+                    node_class_map[node_def] = class_name
+
+                # 移除 :::className 语法
+                mermaid_code = re.sub(r':::\w+', '', mermaid_code)
+            except Exception as regex_error:
+                error(f"正则表达式清理失败: {regex_error}")
                 return self._get_default_approach_diagram(context)
 
-            info(f"[Approach图] 验证通过，使用 LLM 生成的代码，长度: {len(mermaid_code)} 字符")
+            # 验证是否包含 graph TD
+            if 'graph TD' not in mermaid_code:
+                # 如果 LLM 返回的不是 Mermaid 代码，使用默认模板
+                return self._get_default_approach_diagram(context)
+            
             return mermaid_code
             
         except Exception as e:

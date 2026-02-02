@@ -139,6 +139,58 @@ class UnifiedLLMClient:
             )
         return self._client
     
+    def _clean_llm_response(self, content: str) -> str:
+        """
+        清理 LLM 响应中的格式标签和脏数据
+
+        Args:
+            content: 原始 LLM 响应内容
+
+        Returns:
+            清理后的内容
+        """
+        import re
+
+        # 移除完整的格式标签（包括角色名）
+        # 匹配格式：<|im_start|>role 或 <|im_end|>
+        patterns_to_remove = [
+            r'<\|im_start\|>\s*\w+\s*',  # <|im_start|>role 格式
+            r'<\|im_end\|>',              # <|im_end|> 格式
+            r'<\|.*?\|>',                 # 其他 <|xxx|> 格式的标签
+        ]
+
+        cleaned = content
+        for pattern in patterns_to_remove:
+            cleaned = re.sub(pattern, '', cleaned)
+
+        # 清理多余的空白字符
+        cleaned = re.sub(r'\n\s*\n', '\n\n', cleaned)  # 多个空行变成两个
+        cleaned = cleaned.strip()
+
+        return cleaned
+
+    def _suppress_thought_process(self, user_content: str) -> str:
+        """
+        在用户提示词末尾添加指令，抑制模型的思考过程输出
+
+        Args:
+            user_content: 原始用户提示词
+
+        Returns:
+            添加了抑制指令的提示词
+        """
+        suppress_instruction = """
+
+【关键要求】
+1. 直接输出最终结果，不展示思考过程
+2. 禁止使用以下任何标记：|im_start|>、|im_end|>、<思考>、</思考> 等
+3. 禁止使用引导词：好的、我现在需要、接下来、首先、然后等
+4. 输出内容必须符合要求的格式
+5. 保持输出简洁精确，不要多余解释
+"""
+
+        return user_content + suppress_instruction
+
     def call(
         self,
         system_prompt: str,
@@ -148,23 +200,36 @@ class UnifiedLLMClient:
     ) -> LLMResponse:
         """
         基础对话调用
-        
+
         Args:
             system_prompt: 系统提示词
             user_content: 用户输入
             temperature: 可选的温度覆盖
             model: 可选的模型覆盖
-            
+
         Returns:
             LLMResponse 对象
         """
         _model = model or self.model
         _temp = temperature if temperature is not None else self.temperature
-        
+
+        # 如果是千问模型，在系统提示词中添加强抑制指令
+        if "qwen" in _model.lower():
+            suppress_thought = """
+
+【禁止输出思考过程】
+- 直接输出最终结果
+- 严禁输出推理步骤、思考过程或中间想法
+- 严禁使用"好的"、"我现在需要"、"接下来"等引导词
+- 只输出符合要求格式的内容
+- 输出必须简洁精确
+"""
+            system_prompt = system_prompt + suppress_thought
+
         info(f"[LLM调用] 模型: {_model}, Temperature: {_temp}")
         debug(f"[System] {system_prompt[:100]}...")
         debug(f"[User] {user_content[:100]}...")
-        
+
         client = self._get_client()
         
         for attempt in range(self.max_retries):
@@ -179,6 +244,10 @@ class UnifiedLLMClient:
                 )
                 
                 content = (resp.choices[0].message.content or "").strip()
+
+                # 清理响应中的格式标签和脏数据
+                content = self._clean_llm_response(content)
+
                 usage = None
                 if hasattr(resp, 'usage') and resp.usage:
                     usage = {
@@ -186,7 +255,7 @@ class UnifiedLLMClient:
                         "completion_tokens": resp.usage.completion_tokens,
                         "total_tokens": resp.usage.total_tokens
                     }
-                
+
                 debug(f"[LLM响应] 长度: {len(content)} 字符")
                 
                 return LLMResponse(

@@ -21181,5 +21181,2088 @@
     "overall_status": "success",
     "total_time_ms": 76749,
     "error_message": null
+  },
+  "45ce73c0": {
+    "pipeline_id": "45ce73c0",
+    "timestamp": "2026-02-02 21:49:38",
+    "raw_input": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+    "prompt10_id": "a74c6361",
+    "prompt10_original": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+    "prompt10_processed": "<think>\n</think>\n\n你是一个智能问答系统设计规范文档。\n\n系统需要处理多领域知识库的检索与推理。\n\n查询类型判断：\n- 简单事实查询：走向量检索通道\n- 复杂推理查询：先进行意图分解，再走图数据库检索\n- 代码相关问题：调用代码分析引擎\n\n向量检索模式：\n- 相似度超过0.85：直接返回前3个结果\n- 相似度低于0.85：结合重排序模型重新评分，返回前5个结果\n- 检索失败时自动切换到混合检索模式\n\n图数据库检索：\n- 沿着知识图谱(KG)进行2跳邻居探索\n- 找到匹配节点：返回相关实体和关系\n- 未找到匹配节点：回退到全量搜索\n- 每次查询都要缓存结果，缓存有效期30分钟\n\n代码分析引擎：\n- 支持Python和Java代码\n- 代码行数超过500行：只进行静态分析\n- 代码行数少于500行：进行完整语义分析并生成解释文档\n\n用户反馈环节：\n- 点击\"重新生成\"：启用更强的推理模型\n- 连续3次不满意：自动升级到人工审核队列\n\n数据源配置：\n- 知识库A：2000个医学文档\n- 知识库B：3000个技术文档\n- 知识库C：1500个法律文档\n- 每个知识库都有独立的向量索引(VI)\n- 向量维度统一为1536\n\n并发控制：\n- 最大支持50个并发请求\n- 超出则排队等待\n- 优先级设置：\n  - 普通用户：1\n  - VIP用户：5\n  - 管理员：10\n\n安全策略：\n- 所有查询内容经过敏感词过滤\n- 检测到违规内容：拒绝服务并记录日志\n- 金融类查询：需要二次确认用户身份\n\n响应时间要求：\n- 向量检索：500ms内完成\n- 图数据库检索：1秒内完成\n- 代码分析：2秒内完成\n- 总响应时间：不超过3秒，否则降级服务\n\n日志级别：\n- 错误日志：保留90天\n- 访问日志：保留30天\n- 调试日志：保留7天\n- 所有日志都要上传到中央日志系统\n\n监控指标：\n- 每秒查询率(QPS)\n- 平均响应时间\n- 95分位响应时间\n- 缓存命中率(CRH)\n- 检索准确率\n- QPS低于10持续10分钟：触发告警\n- 95分位响应时间超过3秒持续5分钟：触发扩容",
+    "prompt10_mode": "dictionary",
+    "prompt10_steps": [
+      {
+        "step_name": "术语对齐",
+        "step_index": 1,
+        "input_text": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "changes": {
+          "帮我": "请",
+          "top-3": "前3个结果",
+          "top-5": "前5个结果",
+          "知识图谱": "知识图谱(KG)",
+          "向量索引": "向量索引(VI)",
+          "QPS": "每秒查询率(QPS)",
+          "缓存命中率": "缓存命中率(CRH)"
+        },
+        "duration_ms": 0,
+        "notes": [
+          "替换 8 处"
+        ]
+      },
+      {
+        "step_name": "术语对齐",
+        "step_index": 2,
+        "input_text": "帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "changes": {
+          "帮我": "请",
+          "top-3": "前3个结果",
+          "top-5": "前5个结果",
+          "知识图谱": "知识图谱(KG)",
+          "向量索引": "向量索引(VI)",
+          "QPS": "每秒查询率(QPS)",
+          "缓存命中率": "缓存命中率(CRH)"
+        },
+        "duration_ms": 0,
+        "notes": []
+      },
+      {
+        "step_name": "LLM语义重构",
+        "step_index": 3,
+        "input_text": "请设计一个智能问答系统，需要处理多领域知识库的检索与推理。\n\n首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。\n\n向量检索模式下，如果相似度超过0.85，直接返回前3个结果结果；否则结合重排序模型重新评分，再返回前5个结果。检索失败时自动切换到混合检索模式。\n\n图数据库检索时，需要沿着知识图谱(KG)进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。\n\n代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。\n\n用户反馈环节：如果用户对结果不满意，点击\"重新生成\"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。\n\n数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引(VI)，向量维度统一为1536。\n\n并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。\n\n安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。\n\n响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。\n\n日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。\n\n监控指标：每秒查询率(QPS)、平均响应时间、95分位响应时间、缓存命中率(CRH)、检索准确率。如果每秒查询率(QPS)低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。",
+        "output_text": "<think>\n</think>\n\n你是一个智能问答系统设计规范文档。\n\n系统需要处理多领域知识库的检索与推理。\n\n查询类型判断：\n- 简单事实查询：走向量检索通道\n- 复杂推理查询：先进行意图分解，再走图数据库检索\n- 代码相关问题：调用代码分析引擎\n\n向量检索模式：\n- 相似度超过0.85：直接返回前3个结果\n- 相似度低于0.85：结合重排序模型重新评分，返回前5个结果\n- 检索失败时自动切换到混合检索模式\n\n图数据库检索：\n- 沿着知识图谱(KG)进行2跳邻居探索\n- 找到匹配节点：返回相关实体和关系\n- 未找到匹配节点：回退到全量搜索\n- 每次查询都要缓存结果，缓存有效期30分钟\n\n代码分析引擎：\n- 支持Python和Java代码\n- 代码行数超过500行：只进行静态分析\n- 代码行数少于500行：进行完整语义分析并生成解释文档\n\n用户反馈环节：\n- 点击\"重新生成\"：启用更强的推理模型\n- 连续3次不满意：自动升级到人工审核队列\n\n数据源配置：\n- 知识库A：2000个医学文档\n- 知识库B：3000个技术文档\n- 知识库C：1500个法律文档\n- 每个知识库都有独立的向量索引(VI)\n- 向量维度统一为1536\n\n并发控制：\n- 最大支持50个并发请求\n- 超出则排队等待\n- 优先级设置：\n  - 普通用户：1\n  - VIP用户：5\n  - 管理员：10\n\n安全策略：\n- 所有查询内容经过敏感词过滤\n- 检测到违规内容：拒绝服务并记录日志\n- 金融类查询：需要二次确认用户身份\n\n响应时间要求：\n- 向量检索：500ms内完成\n- 图数据库检索：1秒内完成\n- 代码分析：2秒内完成\n- 总响应时间：不超过3秒，否则降级服务\n\n日志级别：\n- 错误日志：保留90天\n- 访问日志：保留30天\n- 调试日志：保留7天\n- 所有日志都要上传到中央日志系统\n\n监控指标：\n- 每秒查询率(QPS)\n- 平均响应时间\n- 95分位响应时间\n- 缓存命中率(CRH)\n- 检索准确率\n- QPS低于10持续10分钟：触发告警\n- 95分位响应时间超过3秒持续5分钟：触发扩容",
+        "changes": {
+          "标准化": "840字 → 901字"
+        },
+        "duration_ms": 16247,
+        "notes": []
+      }
+    ],
+    "prompt10_terminology_changes": {
+      "帮我": "请",
+      "top-3": "前3个结果",
+      "top-5": "前5个结果",
+      "知识图谱": "知识图谱(KG)",
+      "向量索引": "向量索引(VI)",
+      "QPS": "每秒查询率(QPS)",
+      "缓存命中率": "缓存命中率(CRH)"
+    },
+    "prompt10_ambiguity_detected": false,
+    "prompt10_status": "success",
+    "prompt10_time_ms": 16248,
+    "prompt20_id": "15c98e99",
+    "prompt20_template": "<think>\n</think>\n\n你是一个智能问答系统设计规范文档。\n\n系统需要处理多领域知识库的检索与推理。\n\n查询类型判断：\n- 简单事实查询：走向量检索通道\n- 复杂推理查询：先进行意图分解，再走图数据库检索\n- 代码相关问题：调用代码分析引擎\n\n向量检索模式：\n- 相似度超过0.85：直接返回前3个结果\n- 相似度低于0.85：结合重排序模型重新评分，返回前5个结果\n- 检索失败时自动切换到混合检索模式\n\n图数据库检索：\n- 沿着知识图谱(KG)进行2跳邻居探索\n- 找到匹配节点：返回相关实体和关系\n- 未找到匹配节点：回退到全量搜索\n- 每次查询都要缓存结果，缓存有效期30分钟\n\n代码分析引擎：\n- 支持Python和Java代码\n- 代码行数超过500行：只进行静态分析\n- 代码行数少于500行：进行完整语义分析并生成解释文档\n\n用户反馈环节：\n- 点击\"重新生成\"：启用更强的推理模型\n- 连续3次不满意：自动升级到人工审核队列\n\n数据源配置：\n- 知识库A：2000个医学文档\n- 知识库B：3000个技术文档\n- 知识库C：1500个法律文档\n- 每个知识库都有独立的向量索引(VI)\n- 向量维度统一为1536\n\n并发控制：\n- 最大支持50个并发请求\n- 超出则排队等待\n- 优先级设置：\n  - 普通用户：1\n  - VIP用户：5\n  - 管理员：10\n\n安全策略：\n- 所有查询内容经过敏感词过滤\n- 检测到违规内容：拒绝服务并记录日志\n- 金融类查询：需要二次确认用户身份\n\n响应时间要求：\n- 向量检索：500ms内完成\n- 图数据库检索：1秒内完成\n- 代码分析：2秒内完成\n- 总响应时间：不超过3秒，否则降级服务\n\n日志级别：\n- 错误日志：保留90天\n- 访问日志：保留30天\n- 调试日志：保留7天\n- 所有日志都要上传到中央日志系统\n\n监控指标：\n- 每秒查询率(QPS)\n- 平均响应时间\n- 95分位响应时间\n- 缓存命中率(CRH)\n- 检索准确率\n- QPS低于10持续10分钟：触发告警\n- 95分位响应时间超过3秒持续5分钟：触发扩容",
+    "prompt20_variables": [],
+    "prompt20_variable_count": 0,
+    "prompt20_type_stats": {},
+    "prompt20_extraction_log": [],
+    "prompt20_time_ms": 0,
+    "prompt30_id": "c93d3761",
+    "prompt30_dsl_code": "DEFINE {{knowledge_base_a}}: Integer = 2000\nDEFINE {{knowledge_base_b}}: Integer = 3000\nDEFINE {{knowledge_base_c}}: Integer = 1500\nDEFINE {{vector_index_a}}: String\nDEFINE {{vector_index_b}}: String\nDEFINE {{vector_index_c}}: String\nDEFINE {{vector_dim}}: Integer = 1536\nDEFINE {{max_concurrent}}: Integer = 50\nDEFINE {{cache_ttl}}: Integer = 30\nDEFINE {{similarity_threshold}}: Float = 0.85\nDEFINE {{max_results}}: Integer = 3\nDEFINE {{fallback_results}}: Integer = 5\nDEFINE {{code_line_limit}}: Integer = 500\nDEFINE {{kg_hop}}: Integer = 2\nDEFINE {{log_retention_error}}: Integer = 90\nDEFINE {{log_retention_access}}: Integer = 30\nDEFINE {{log_retention_debug}}: Integer = 7\nDEFINE {{qps_threshold}}: Integer = 10\nDEFINE {{response_time_threshold}}: Integer = 3\nDEFINE {{alert_duration}}: Integer = 10\nDEFINE {{re_rank_results}}: Integer = 5\nIF {{query_type}} == \"simple_fact\"\n    {{results}} = CALL vector_search({{query}}, similarity_threshold={{similarity_threshold}})\n    IF {{results}}.similarity >= {{similarity_threshold}}\n        {{top_results}} = {{results}}.top_n({{max_results}})\n        RETURN {{top_results}}\n    ELIF {{results}}.similarity < {{similarity_threshold}}\n        {{re_ranked}} = CALL re_rank({{results}}, top_n={{re_rank_results}})\n        RETURN {{re_ranked}}\n    ELSE\n        {{hybrid_results}} = CALL hybrid_search({{query}})\n        RETURN {{hybrid_results}}\n    ENDIF\nELIF {{query_type}} == \"complex_reasoning\"\n    {{intent}} = CALL intent_analysis({{query}})\n    {{kg_results}} = CALL kg_search({{intent}}, hops={{kg_hop}})\n    IF {{kg_results}}.found\n        {{entities}} = {{kg_results}}.entities\n        {{relations}} = {{kg_results}}.relations\n        RETURN {{entities}}, {{relations}}\n    ELSE\n        {{full_search}} = CALL full_search({{query}})\n        RETURN {{full_search}}\n    ENDIF\n    {{cache}}.store({{query}}, {{kg_results}}, ttl={{cache_ttl}})\nELIF {{query_type}} == \"code_analysis\"\n    {{language}} = CALL detect_language({{query}})\n    {{line_count}} = CALL count_lines({{query}})\n    IF {{language}} IN [\"Python\", \"Java\"]\n        IF {{line_count}} > {{code_line_limit}}\n            {{static_analysis}} = CALL static_analysis({{query}})\n            RETURN {{static_analysis}}\n        ELSE\n            {{semantic_analysis}} = CALL semantic_analysis({{query}})\n            {{doc}} = CALL generate_doc({{semantic_analysis}})\n            RETURN {{doc}}\n        ENDIF\n    ELSE\n        RETURN \"Unsupported language\"\n    ENDIF\nELSE\n    RETURN \"Unknown query type\"\nENDIF\nIF {{user_feedback}} == \"regenerate\"\n    {{stronger_model}} = CALL use_stronger_model()\n    RETURN {{stronger_model}}\nENDIF\nIF {{negative_feedback_count}} >= 3\n    CALL escalate_to_human_review()\nENDIF\nIF {{query}} CONTAINS \"金融\" OR \"财务\" OR \"投资\"\n    {{verified}} = CALL verify_user()\n    IF NOT {{verified}}\n        CALL log_to_security()\n        RETURN \"Access denied\"\n    ENDIF\nENDIF\nIF {{qps}} < {{qps_threshold}} FOR {{alert_duration}} MINUTES\n    CALL trigger_alert()\nENDIF\n{{log}} = CALL create_log({{query}}, {{response}})\nCALL upload_to_central_logging({{log}})",
+    "prompt30_validation_result": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [],
+      "defined_variables": {
+        "knowledge_base_a": {
+          "name": "knowledge_base_a",
+          "var_type": "Integer",
+          "initial_value": "2000",
+          "line_number": 1
+        },
+        "knowledge_base_b": {
+          "name": "knowledge_base_b",
+          "var_type": "Integer",
+          "initial_value": "3000",
+          "line_number": 2
+        },
+        "knowledge_base_c": {
+          "name": "knowledge_base_c",
+          "var_type": "Integer",
+          "initial_value": "1500",
+          "line_number": 3
+        },
+        "vector_index_a": {
+          "name": "vector_index_a",
+          "var_type": "String",
+          "initial_value": null,
+          "line_number": 4
+        },
+        "vector_index_b": {
+          "name": "vector_index_b",
+          "var_type": "String",
+          "initial_value": null,
+          "line_number": 5
+        },
+        "vector_index_c": {
+          "name": "vector_index_c",
+          "var_type": "String",
+          "initial_value": null,
+          "line_number": 6
+        },
+        "vector_dim": {
+          "name": "vector_dim",
+          "var_type": "Integer",
+          "initial_value": "1536",
+          "line_number": 7
+        },
+        "max_concurrent": {
+          "name": "max_concurrent",
+          "var_type": "Integer",
+          "initial_value": "50",
+          "line_number": 8
+        },
+        "cache_ttl": {
+          "name": "cache_ttl",
+          "var_type": "Integer",
+          "initial_value": "30",
+          "line_number": 9
+        },
+        "similarity_threshold": {
+          "name": "similarity_threshold",
+          "var_type": "Float",
+          "initial_value": "0.85",
+          "line_number": 10
+        },
+        "max_results": {
+          "name": "max_results",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 11
+        },
+        "fallback_results": {
+          "name": "fallback_results",
+          "var_type": "Integer",
+          "initial_value": "5",
+          "line_number": 12
+        },
+        "code_line_limit": {
+          "name": "code_line_limit",
+          "var_type": "Integer",
+          "initial_value": "500",
+          "line_number": 13
+        },
+        "kg_hop": {
+          "name": "kg_hop",
+          "var_type": "Integer",
+          "initial_value": "2",
+          "line_number": 14
+        },
+        "log_retention_error": {
+          "name": "log_retention_error",
+          "var_type": "Integer",
+          "initial_value": "90",
+          "line_number": 15
+        },
+        "log_retention_access": {
+          "name": "log_retention_access",
+          "var_type": "Integer",
+          "initial_value": "30",
+          "line_number": 16
+        },
+        "log_retention_debug": {
+          "name": "log_retention_debug",
+          "var_type": "Integer",
+          "initial_value": "7",
+          "line_number": 17
+        },
+        "qps_threshold": {
+          "name": "qps_threshold",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 18
+        },
+        "response_time_threshold": {
+          "name": "response_time_threshold",
+          "var_type": "Integer",
+          "initial_value": "3",
+          "line_number": 19
+        },
+        "alert_duration": {
+          "name": "alert_duration",
+          "var_type": "Integer",
+          "initial_value": "10",
+          "line_number": 20
+        },
+        "re_rank_results": {
+          "name": "re_rank_results",
+          "var_type": "Integer",
+          "initial_value": "5",
+          "line_number": 21
+        }
+      },
+      "runtime_variables": [
+        "query",
+        "response",
+        "qps",
+        "query_type",
+        "user_feedback",
+        "re_ranked",
+        "kg_results",
+        "hybrid_results",
+        "results",
+        "verified",
+        "intent",
+        "semantic_analysis",
+        "relations",
+        "entities",
+        "language",
+        "log",
+        "full_search",
+        "doc",
+        "negative_feedback_count",
+        "top_results",
+        "line_count",
+        "static_analysis",
+        "stronger_model"
+      ],
+      "function_calls": [
+        {
+          "function_name": "vector_search",
+          "arguments": [
+            "{{query}}",
+            "similarity_threshold={{similarity_threshold}}"
+          ],
+          "result_var": "results",
+          "line_number": 23
+        },
+        {
+          "function_name": "re_rank",
+          "arguments": [
+            "{{results}}",
+            "top_n={{re_rank_results}}"
+          ],
+          "result_var": "re_ranked",
+          "line_number": 28
+        },
+        {
+          "function_name": "hybrid_search",
+          "arguments": [
+            "{{query}}"
+          ],
+          "result_var": "hybrid_results",
+          "line_number": 31
+        },
+        {
+          "function_name": "intent_analysis",
+          "arguments": [
+            "{{query}}"
+          ],
+          "result_var": "intent",
+          "line_number": 35
+        },
+        {
+          "function_name": "kg_search",
+          "arguments": [
+            "{{intent}}",
+            "hops={{kg_hop}}"
+          ],
+          "result_var": "kg_results",
+          "line_number": 36
+        },
+        {
+          "function_name": "full_search",
+          "arguments": [
+            "{{query}}"
+          ],
+          "result_var": "full_search",
+          "line_number": 42
+        },
+        {
+          "function_name": "detect_language",
+          "arguments": [
+            "{{query}}"
+          ],
+          "result_var": "language",
+          "line_number": 47
+        },
+        {
+          "function_name": "count_lines",
+          "arguments": [
+            "{{query}}"
+          ],
+          "result_var": "line_count",
+          "line_number": 48
+        },
+        {
+          "function_name": "static_analysis",
+          "arguments": [
+            "{{query}}"
+          ],
+          "result_var": "static_analysis",
+          "line_number": 51
+        },
+        {
+          "function_name": "semantic_analysis",
+          "arguments": [
+            "{{query}}"
+          ],
+          "result_var": "semantic_analysis",
+          "line_number": 54
+        },
+        {
+          "function_name": "generate_doc",
+          "arguments": [
+            "{{semantic_analysis}}"
+          ],
+          "result_var": "doc",
+          "line_number": 55
+        },
+        {
+          "function_name": "use_stronger_model",
+          "arguments": [],
+          "result_var": "stronger_model",
+          "line_number": 65
+        },
+        {
+          "function_name": "verify_user",
+          "arguments": [],
+          "result_var": "verified",
+          "line_number": 72
+        },
+        {
+          "function_name": "create_log",
+          "arguments": [
+            "{{query}}",
+            "{{response}}"
+          ],
+          "result_var": "log",
+          "line_number": 81
+        }
+      ],
+      "control_blocks": [],
+      "max_nesting_depth": 3
+    },
+    "prompt30_time_ms": 90277,
+    "prompt30_compile_history": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "dsl_code": "DEFINE {{query_type}}: String\nDEFINE {{similarity_score}}: Float\nDEFINE {{retrieval_mode}}: String\nDEFINE {{cache_hit}}: Boolean\nDEFINE {{code_lines}}: Integer\nDEFINE {{user_level}}: Integer\nDEFINE {{response_time}}: Float\nDEFINE {{qps}}: Integer\nDEFINE {{crh}}: Float\nDEFINE {{accuracy}}: Float\nDEFINE {{alert_duration}}: Integer = 10\nDEFINE {{max_concurrency}}: Integer = 50\nDEFINE {{vi_a}}: String\nDEFINE {{vi_b}}: String\nDEFINE {{vi_c}}: String\nDEFINE {{vector_dim}}: Integer = 1536\nIF {{query_type}} == \"simple_fact\"\n    {{retrieval_mode}} = \"vector\"\n    IF {{similarity_score}} > 0.85\n        RETURN top 3 results\n    ELIF {{similarity_score}} < 0.85\n        CALL reranking_model()\n        RETURN top 5 results\n    ELSE\n        {{retrieval_mode}} = \"hybrid\"\n        RETURN search_results\n    ENDIF\nELIF {{query_type}} == \"complex_reasoning\"\n    CALL intent_decomposition()\n    {{retrieval_mode}} = \"graph\"\n    FOR {{hop}} IN [1, 2]\n        CALL kg_search(hop={{hop}})\n        IF {{match_found}}\n            RETURN entities_and_relations\n        ENDIF\n    ENDFOR\n    CALL full_search()\n    RETURN search_results\nELIF {{query_type}} == \"code_analysis\"\n    IF {{code_lines}} > 500\n        CALL static_analysis()\n    ELIF {{code_lines}} < 500\n        CALL semantic_analysis()\n        CALL generate_explanation()\n    ENDIF\nELSE\n    RETURN \"Unsupported query type\"\nENDIF\nIF {{user_feedback}} == \"regenerate\"\n    CALL enhanced_reasoning_model()\nELIF {{negative_feedback_count}} >= 3\n    CALL human_review_queue()\nENDIF\nIF {{sensitive_words_detected}}\n    CALL reject_service()\n    CALL log_to_security()\nENDIF\nIF {{query_type}} == \"financial\"\n    CALL user_authentication()\nENDIF\nIF {{response_time}} > 3.0\n    CALL service_downgrade()\nENDIF\nIF {{qps}} < 10 FOR {{alert_duration}} MINUTES\n    CALL trigger_alert()\nENDIF\nIF {{user_level}} == 10\n    {{priority}} = \"admin\"\nELIF {{user_level}} == 5\n    {{priority}} = \"vip\"\nELSE\n    {{priority}} = \"normal\"\nENDIF\nIF {{concurrent_requests}} > {{max_concurrency}}\n    {{waiting}} = True\nENDIF\nCALL log_to_central_system(log_type=\"error\", retention_days=90)\nCALL log_to_central_system(log_type=\"access\", retention_days=30)\nCALL log_to_central_system(log_type=\"debug\", retention_days=7)\nRETURN system_status",
+          "total_errors": 1,
+          "error_analysis": {
+            "p0_count": 0,
+            "p1_count": 1,
+            "p2_count": 0,
+            "total": 1
+          }
+        },
+        {
+          "attempt": 2,
+          "dsl_code": "DEFINE {{knowledge_base_a}}: Integer = 2000\nDEFINE {{knowledge_base_b}}: Integer = 3000\nDEFINE {{knowledge_base_c}}: Integer = 1500\nDEFINE {{vector_index_a}}: String\nDEFINE {{vector_index_b}}: String\nDEFINE {{vector_index_c}}: String\nDEFINE {{vector_dim}}: Integer = 1536\nDEFINE {{max_concurrent}}: Integer = 50\nDEFINE {{cache_ttl}}: Integer = 30\nDEFINE {{similarity_threshold}}: Float = 0.85\nDEFINE {{max_results}}: Integer = 3\nDEFINE {{fallback_results}}: Integer = 5\nDEFINE {{code_line_limit}}: Integer = 500\nDEFINE {{kg_hop}}: Integer = 2\nDEFINE {{log_retention_error}}: Integer = 90\nDEFINE {{log_retention_access}}: Integer = 30\nDEFINE {{log_retention_debug}}: Integer = 7\nDEFINE {{qps_threshold}}: Integer = 10\nDEFINE {{response_time_threshold}}: Integer = 3\nDEFINE {{alert_duration}}: Integer = 10\nDEFINE {{re_rank_results}}: Integer = 5\nIF {{query_type}} == \"simple_fact\"\n    {{results}} = CALL vector_search({{query}}, similarity_threshold={{similarity_threshold}})\n    IF {{results}}.similarity >= {{similarity_threshold}}\n        {{top_results}} = {{results}}.top_n({{max_results}})\n        RETURN {{top_results}}\n    ELIF {{results}}.similarity < {{similarity_threshold}}\n        {{re_ranked}} = CALL re_rank({{results}}, top_n={{re_rank_results}})\n        RETURN {{re_ranked}}\n    ELSE\n        {{hybrid_results}} = CALL hybrid_search({{query}})\n        RETURN {{hybrid_results}}\n    ENDIF\nELIF {{query_type}} == \"complex_reasoning\"\n    {{intent}} = CALL intent_analysis({{query}})\n    {{kg_results}} = CALL kg_search({{intent}}, hops={{kg_hop}})\n    IF {{kg_results}}.found\n        {{entities}} = {{kg_results}}.entities\n        {{relations}} = {{kg_results}}.relations\n        RETURN {{entities}}, {{relations}}\n    ELSE\n        {{full_search}} = CALL full_search({{query}})\n        RETURN {{full_search}}\n    ENDIF\n    {{cache}}.store({{query}}, {{kg_results}}, ttl={{cache_ttl}})\nELIF {{query_type}} == \"code_analysis\"\n    {{language}} = CALL detect_language({{query}})\n    {{line_count}} = CALL count_lines({{query}})\n    IF {{language}} IN [\"Python\", \"Java\"]\n        IF {{line_count}} > {{code_line_limit}}\n            {{static_analysis}} = CALL static_analysis({{query}})\n            RETURN {{static_analysis}}\n        ELSE\n            {{semantic_analysis}} = CALL semantic_analysis({{query}})\n            {{doc}} = CALL generate_doc({{semantic_analysis}})\n            RETURN {{doc}}\n        ENDIF\n    ELSE\n        RETURN \"Unsupported language\"\n    ENDIF\nELSE\n    RETURN \"Unknown query type\"\nENDIF\nIF {{user_feedback}} == \"regenerate\"\n    {{stronger_model}} = CALL use_stronger_model()\n    RETURN {{stronger_model}}\nENDIF\nIF {{negative_feedback_count}} >= 3\n    CALL escalate_to_human_review()\nENDIF\nIF {{query}} CONTAINS \"金融\" OR \"财务\" OR \"投资\"\n    {{verified}} = CALL verify_user()\n    IF NOT {{verified}}\n        CALL log_to_security()\n        RETURN \"Access denied\"\n    ENDIF\nENDIF\nIF {{qps}} < {{qps_threshold}} FOR {{alert_duration}} MINUTES\n    CALL trigger_alert()\nENDIF\n{{log}} = CALL create_log({{query}}, {{response}})\nCALL upload_to_central_logging({{log}})",
+          "total_errors": 0,
+          "error_analysis": {
+            "p0_count": 0,
+            "p1_count": 0,
+            "p2_count": 0,
+            "total": 0
+          }
+        }
+      ],
+      "final_decision": "success",
+      "error_summary": {},
+      "auto_fix_applied": true
+    },
+    "prompt30_success": true,
+    "prompt40_id": "d9aa8173",
+    "prompt40_modules": [
+      {
+        "name": "step_1_compute_knowledge_base_a",
+        "inputs": [
+          "vector_index_a",
+          "vector_index_b",
+          "vector_index_c"
+        ],
+        "outputs": [
+          "alert_duration",
+          "cache_ttl",
+          "code_line_limit",
+          "fallback_results",
+          "kg_hop",
+          "knowledge_base_a",
+          "knowledge_base_b",
+          "knowledge_base_c",
+          "log_retention_access",
+          "log_retention_debug",
+          "log_retention_error",
+          "max_concurrent",
+          "max_results",
+          "qps_threshold",
+          "re_rank_results",
+          "response_time_threshold",
+          "similarity_threshold",
+          "vector_dim"
+        ],
+        "is_async": false,
+        "body_code": "def step_1_compute_knowledge_base_a(vector_index_a, vector_index_b, vector_index_c):\n    \"\"\"Auto-generated module\"\"\"\n    return alert_duration, cache_ttl, code_line_limit, fallback_results, kg_hop, knowledge_base_a, knowledge_base_b, knowledge_base_c, log_retention_access, log_retention_debug, log_retention_error, max_concurrent, max_results, qps_threshold, re_rank_results, response_time_threshold, similarity_threshold, vector_dim",
+        "code_lines_count": 3
+      },
+      {
+        "name": "step_2_vector_search",
+        "inputs": [
+          "cache_ttl",
+          "code_line_limit",
+          "kg_hop",
+          "max_results",
+          "query_type",
+          "re_rank_results",
+          "similarity_threshold"
+        ],
+        "outputs": [
+          "__doc__",
+          "__full_search__",
+          "__hybrid_results__",
+          "__re_ranked__",
+          "__static_analysis__",
+          "__top_results__",
+          "cache",
+          "doc",
+          "entities",
+          "full_search",
+          "hybrid_results",
+          "intent",
+          "kg_results",
+          "language",
+          "line_count",
+          "query",
+          "re_ranked",
+          "relations",
+          "results",
+          "semantic_analysis",
+          "static_analysis",
+          "top_results"
+        ],
+        "is_async": true,
+        "body_code": "async def step_2_vector_search(cache_ttl, code_line_limit, kg_hop, max_results, query_type, re_rank_results, similarity_threshold):\n    \"\"\"Auto-generated module\"\"\"\n    if query_type == \"simple_fact\":\n        results = await invoke_function('vector_search', query=query, similarity_threshold=similarity_threshold)\n        if results.similarity >= similarity_threshold:\n            top_results = results.top_n(max_results)\n            return top_results\n        elif results.similarity < similarity_threshold:\n            re_ranked = await invoke_function('re_rank', results=results, top_n=re_rank_results)\n            return re_ranked\n        else:\n            hybrid_results = await invoke_function('hybrid_search', query=query)\n            return hybrid_results\n    elif query_type == \"complex_reasoning\":\n        intent = await invoke_function('intent_analysis', query=query)\n        kg_results = await invoke_function('kg_search', intent=intent, hops=kg_hop)\n        if kg_results.found:\n            entities = kg_results.entities\n            relations = kg_results.relations\n            return entities, relations\n        else:\n            full_search = await invoke_function('full_search', query=query)\n            return full_search\n        cache.store(query, kg_results, ttl=cache_ttl)\n    elif query_type == \"code_analysis\":\n        language = await invoke_function('detect_language', query=query)\n        line_count = await invoke_function('count_lines', query=query)\n        if language  in  [\"Python\", \"Java\"]:\n            if line_count > code_line_limit:\n                static_analysis = await invoke_function('static_analysis', query=query)\n                return static_analysis\n            else:\n                semantic_analysis = await invoke_function('semantic_analysis', query=query)\n                doc = await invoke_function('generate_doc', semantic_analysis=semantic_analysis)\n                return doc\n        else:\n            return \"Unsupported language\"\n    else:\n        return \"Unknown query type\"",
+        "code_lines_count": 39
+      },
+      {
+        "name": "step_3_use_stronger_model",
+        "inputs": [
+          "user_feedback"
+        ],
+        "outputs": [
+          "__stronger_model__",
+          "stronger_model"
+        ],
+        "is_async": true,
+        "body_code": "async def step_3_use_stronger_model(user_feedback):\n    \"\"\"Auto-generated module\"\"\"\n    if user_feedback == \"regenerate\":\n        stronger_model = await invoke_function('use_stronger_model')\n        return stronger_model",
+        "code_lines_count": 5
+      },
+      {
+        "name": "step_4_escalate_to_human_review",
+        "inputs": [
+          "negative_feedback_count"
+        ],
+        "outputs": [],
+        "is_async": true,
+        "body_code": "async def step_4_escalate_to_human_review(negative_feedback_count):\n    \"\"\"Auto-generated module\"\"\"\n    if negative_feedback_count >= 3:\n        await invoke_function('escalate_to_human_review')\n    return None",
+        "code_lines_count": 5
+      },
+      {
+        "name": "step_5_verify_user",
+        "inputs": [
+          "query"
+        ],
+        "outputs": [
+          "verified"
+        ],
+        "is_async": true,
+        "body_code": "async def step_5_verify_user(query):\n    \"\"\"Auto-generated module\"\"\"\n    if \"金融\" in query  or  \"财务\"  or  \"投资\":\n        verified = await invoke_function('verify_user')\n        if  not  verified:\n            await invoke_function('log_to_security')\n            return \"Access denied\"",
+        "code_lines_count": 7
+      },
+      {
+        "name": "step_6_trigger_alert",
+        "inputs": [
+          "alert_duration",
+          "qps",
+          "qps_threshold"
+        ],
+        "outputs": [],
+        "is_async": true,
+        "body_code": "async def step_6_trigger_alert(alert_duration, qps, qps_threshold):\n    \"\"\"Auto-generated module\"\"\"\n    if qps < qps_threshold:\n        await invoke_function('trigger_alert')\n    return None",
+        "code_lines_count": 5
+      },
+      {
+        "name": "step_7_create_log",
+        "inputs": [
+          "query",
+          "response"
+        ],
+        "outputs": [
+          "log"
+        ],
+        "is_async": true,
+        "body_code": "async def step_7_create_log(query, response):\n    \"\"\"Auto-generated module\"\"\"\n    log = await invoke_function('create_log', query=query, response=response)\n    return log",
+        "code_lines_count": 4
+      },
+      {
+        "name": "step_8_upload_to_central_logging",
+        "inputs": [
+          "log"
+        ],
+        "outputs": [],
+        "is_async": true,
+        "body_code": "async def step_8_upload_to_central_logging(log):\n    \"\"\"Auto-generated module\"\"\"\n    await invoke_function('upload_to_central_logging', log=log)\n    return None",
+        "code_lines_count": 4
+      }
+    ],
+    "prompt40_module_count": 8,
+    "prompt40_main_code": "async def main_workflow(input_params: dict):\n    \"\"\"\n    主工作流 - 自动生成\n    \n    Args:\n        input_params: 包含 ['negative_feedback_count', 'qps', 'query_type', 'response', 'user_feedback', 'vector_index_a', 'vector_index_b', 'vector_index_c'] 的字典\n    \n    Returns:\n        执行结果上下文\n    \"\"\"\n    # 初始化上下文\n    ctx = input_params.copy()\n\n    # Module 1: step_1_compute_knowledge_base_a\n    ctx[\"alert_duration\"], ctx[\"cache_ttl\"], ctx[\"code_line_limit\"], ctx[\"fallback_results\"], ctx[\"kg_hop\"], ctx[\"knowledge_base_a\"], ctx[\"knowledge_base_b\"], ctx[\"knowledge_base_c\"], ctx[\"log_retention_access\"], ctx[\"log_retention_debug\"], ctx[\"log_retention_error\"], ctx[\"max_concurrent\"], ctx[\"max_results\"], ctx[\"qps_threshold\"], ctx[\"re_rank_results\"], ctx[\"response_time_threshold\"], ctx[\"similarity_threshold\"], ctx[\"vector_dim\"] = step_1_compute_knowledge_base_a(ctx.get(\"vector_index_a\"), ctx.get(\"vector_index_b\"), ctx.get(\"vector_index_c\"))\n\n    # Module 2: step_2_vector_search\n    ctx[\"__doc__\"], ctx[\"__full_search__\"], ctx[\"__hybrid_results__\"], ctx[\"__re_ranked__\"], ctx[\"__static_analysis__\"], ctx[\"__top_results__\"], ctx[\"cache\"], ctx[\"doc\"], ctx[\"entities\"], ctx[\"full_search\"], ctx[\"hybrid_results\"], ctx[\"intent\"], ctx[\"kg_results\"], ctx[\"language\"], ctx[\"line_count\"], ctx[\"query\"], ctx[\"re_ranked\"], ctx[\"relations\"], ctx[\"results\"], ctx[\"semantic_analysis\"], ctx[\"static_analysis\"], ctx[\"top_results\"] = await step_2_vector_search(ctx.get(\"cache_ttl\"), ctx.get(\"code_line_limit\"), ctx.get(\"kg_hop\"), ctx.get(\"max_results\"), ctx.get(\"query_type\"), ctx.get(\"re_rank_results\"), ctx.get(\"similarity_threshold\"))\n\n    # Module 3: step_3_use_stronger_model\n    ctx[\"__stronger_model__\"], ctx[\"stronger_model\"] = await step_3_use_stronger_model(ctx.get(\"user_feedback\"))\n\n    # Module 4: step_4_escalate_to_human_review\n    await step_4_escalate_to_human_review(ctx.get(\"negative_feedback_count\"))\n\n    # Module 5: step_5_verify_user\n    ctx[\"verified\"] = await step_5_verify_user(ctx.get(\"query\"))\n\n    # Module 6: step_6_trigger_alert\n    await step_6_trigger_alert(ctx.get(\"alert_duration\"), ctx.get(\"qps\"), ctx.get(\"qps_threshold\"))\n\n    # Module 7: step_7_create_log\n    ctx[\"log\"] = await step_7_create_log(ctx.get(\"query\"), ctx.get(\"response\"))\n\n    # Module 8: step_8_upload_to_central_logging\n    await step_8_upload_to_central_logging(ctx.get(\"log\"))\n\n    return ctx",
+    "prompt40_time_ms": 6,
+    "prompt40_module_bodies": {
+      "step_1_compute_knowledge_base_a": "def step_1_compute_knowledge_base_a(vector_index_a, vector_index_b, vector_index_c):\n    \"\"\"Auto-generated module\"\"\"\n    return alert_duration, cache_ttl, code_line_limit, fallback_results, kg_hop, knowledge_base_a, knowledge_base_b, knowledge_base_c, log_retention_access, log_retention_debug, log_retention_error, max_concurrent, max_results, qps_threshold, re_rank_results, response_time_threshold, similarity_threshold, vector_dim",
+      "step_2_vector_search": "async def step_2_vector_search(cache_ttl, code_line_limit, kg_hop, max_results, query_type, re_rank_results, similarity_threshold):\n    \"\"\"Auto-generated module\"\"\"\n    if query_type == \"simple_fact\":\n        results = await invoke_function('vector_search', query=query, similarity_threshold=similarity_threshold)\n        if results.similarity >= similarity_threshold:\n            top_results = results.top_n(max_results)\n            return top_results\n        elif results.similarity < similarity_threshold:\n            re_ranked = await invoke_function('re_rank', results=results, top_n=re_rank_results)\n            return re_ranked\n        else:\n            hybrid_results = await invoke_function('hybrid_search', query=query)\n            return hybrid_results\n    elif query_type == \"complex_reasoning\":\n        intent = await invoke_function('intent_analysis', query=query)\n        kg_results = await invoke_function('kg_search', intent=intent, hops=kg_hop)\n        if kg_results.found:\n            entities = kg_results.entities\n            relations = kg_results.relations\n            return entities, relations\n        else:\n            full_search = await invoke_function('full_search', query=query)\n            return full_search\n        cache.store(query, kg_results, ttl=cache_ttl)\n    elif query_type == \"code_analysis\":\n        language = await invoke_function('detect_language', query=query)\n        line_count = await invoke_function('count_lines', query=query)\n        if language  in  [\"Python\", \"Java\"]:\n            if line_count > code_line_limit:\n                static_analysis = await invoke_function('static_analysis', query=query)\n                return static_analysis\n            else:\n                semantic_analysis = await invoke_function('semantic_analysis', query=query)\n                doc = await invoke_function('generate_doc', semantic_analysis=semantic_analysis)\n                return doc\n        else:\n            return \"Unsupported language\"\n    else:\n        return \"Unknown query type\"",
+      "step_3_use_stronger_model": "async def step_3_use_stronger_model(user_feedback):\n    \"\"\"Auto-generated module\"\"\"\n    if user_feedback == \"regenerate\":\n        stronger_model = await invoke_function('use_stronger_model')\n        return stronger_model",
+      "step_4_escalate_to_human_review": "async def step_4_escalate_to_human_review(negative_feedback_count):\n    \"\"\"Auto-generated module\"\"\"\n    if negative_feedback_count >= 3:\n        await invoke_function('escalate_to_human_review')\n    return None",
+      "step_5_verify_user": "async def step_5_verify_user(query):\n    \"\"\"Auto-generated module\"\"\"\n    if \"金融\" in query  or  \"财务\"  or  \"投资\":\n        verified = await invoke_function('verify_user')\n        if  not  verified:\n            await invoke_function('log_to_security')\n            return \"Access denied\"",
+      "step_6_trigger_alert": "async def step_6_trigger_alert(alert_duration, qps, qps_threshold):\n    \"\"\"Auto-generated module\"\"\"\n    if qps < qps_threshold:\n        await invoke_function('trigger_alert')\n    return None",
+      "step_7_create_log": "async def step_7_create_log(query, response):\n    \"\"\"Auto-generated module\"\"\"\n    log = await invoke_function('create_log', query=query, response=response)\n    return log",
+      "step_8_upload_to_central_logging": "async def step_8_upload_to_central_logging(log):\n    \"\"\"Auto-generated module\"\"\"\n    await invoke_function('upload_to_central_logging', log=log)\n    return None"
+    },
+    "prompt40_step1_parsing": {
+      "total_blocks": 82,
+      "block_types": {
+        "ASSIGN": 36,
+        "IF": 10,
+        "CALL": 18,
+        "ELIF": 3,
+        "ELSE": 5,
+        "ENDIF": 10
+      },
+      "blocks": [
+        {
+          "id": "OP_0",
+          "type": "ASSIGN",
+          "line_number": 1,
+          "is_async": false,
+          "inputs": [
+            "knowledge_base_a"
+          ],
+          "outputs": [
+            "knowledge_base_a"
+          ],
+          "code_lines": [
+            "DEFINE {{knowledge_base_a}}: Integer = 2000"
+          ]
+        },
+        {
+          "id": "OP_1",
+          "type": "ASSIGN",
+          "line_number": 2,
+          "is_async": false,
+          "inputs": [
+            "knowledge_base_b"
+          ],
+          "outputs": [
+            "knowledge_base_b"
+          ],
+          "code_lines": [
+            "DEFINE {{knowledge_base_b}}: Integer = 3000"
+          ]
+        },
+        {
+          "id": "OP_2",
+          "type": "ASSIGN",
+          "line_number": 3,
+          "is_async": false,
+          "inputs": [
+            "knowledge_base_c"
+          ],
+          "outputs": [
+            "knowledge_base_c"
+          ],
+          "code_lines": [
+            "DEFINE {{knowledge_base_c}}: Integer = 1500"
+          ]
+        },
+        {
+          "id": "OP_3",
+          "type": "ASSIGN",
+          "line_number": 4,
+          "is_async": false,
+          "inputs": [
+            "vector_index_a"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "DEFINE {{vector_index_a}}: String"
+          ]
+        },
+        {
+          "id": "OP_4",
+          "type": "ASSIGN",
+          "line_number": 5,
+          "is_async": false,
+          "inputs": [
+            "vector_index_b"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "DEFINE {{vector_index_b}}: String"
+          ]
+        },
+        {
+          "id": "OP_5",
+          "type": "ASSIGN",
+          "line_number": 6,
+          "is_async": false,
+          "inputs": [
+            "vector_index_c"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "DEFINE {{vector_index_c}}: String"
+          ]
+        },
+        {
+          "id": "OP_6",
+          "type": "ASSIGN",
+          "line_number": 7,
+          "is_async": false,
+          "inputs": [
+            "vector_dim"
+          ],
+          "outputs": [
+            "vector_dim"
+          ],
+          "code_lines": [
+            "DEFINE {{vector_dim}}: Integer = 1536"
+          ]
+        },
+        {
+          "id": "OP_7",
+          "type": "ASSIGN",
+          "line_number": 8,
+          "is_async": false,
+          "inputs": [
+            "max_concurrent"
+          ],
+          "outputs": [
+            "max_concurrent"
+          ],
+          "code_lines": [
+            "DEFINE {{max_concurrent}}: Integer = 50"
+          ]
+        },
+        {
+          "id": "OP_8",
+          "type": "ASSIGN",
+          "line_number": 9,
+          "is_async": false,
+          "inputs": [
+            "cache_ttl"
+          ],
+          "outputs": [
+            "cache_ttl"
+          ],
+          "code_lines": [
+            "DEFINE {{cache_ttl}}: Integer = 30"
+          ]
+        },
+        {
+          "id": "OP_9",
+          "type": "ASSIGN",
+          "line_number": 10,
+          "is_async": false,
+          "inputs": [
+            "similarity_threshold"
+          ],
+          "outputs": [
+            "similarity_threshold"
+          ],
+          "code_lines": [
+            "DEFINE {{similarity_threshold}}: Float = 0.85"
+          ]
+        },
+        {
+          "id": "OP_10",
+          "type": "ASSIGN",
+          "line_number": 11,
+          "is_async": false,
+          "inputs": [
+            "max_results"
+          ],
+          "outputs": [
+            "max_results"
+          ],
+          "code_lines": [
+            "DEFINE {{max_results}}: Integer = 3"
+          ]
+        },
+        {
+          "id": "OP_11",
+          "type": "ASSIGN",
+          "line_number": 12,
+          "is_async": false,
+          "inputs": [
+            "fallback_results"
+          ],
+          "outputs": [
+            "fallback_results"
+          ],
+          "code_lines": [
+            "DEFINE {{fallback_results}}: Integer = 5"
+          ]
+        },
+        {
+          "id": "OP_12",
+          "type": "ASSIGN",
+          "line_number": 13,
+          "is_async": false,
+          "inputs": [
+            "code_line_limit"
+          ],
+          "outputs": [
+            "code_line_limit"
+          ],
+          "code_lines": [
+            "DEFINE {{code_line_limit}}: Integer = 500"
+          ]
+        },
+        {
+          "id": "OP_13",
+          "type": "ASSIGN",
+          "line_number": 14,
+          "is_async": false,
+          "inputs": [
+            "kg_hop"
+          ],
+          "outputs": [
+            "kg_hop"
+          ],
+          "code_lines": [
+            "DEFINE {{kg_hop}}: Integer = 2"
+          ]
+        },
+        {
+          "id": "OP_14",
+          "type": "ASSIGN",
+          "line_number": 15,
+          "is_async": false,
+          "inputs": [
+            "log_retention_error"
+          ],
+          "outputs": [
+            "log_retention_error"
+          ],
+          "code_lines": [
+            "DEFINE {{log_retention_error}}: Integer = 90"
+          ]
+        },
+        {
+          "id": "OP_15",
+          "type": "ASSIGN",
+          "line_number": 16,
+          "is_async": false,
+          "inputs": [
+            "log_retention_access"
+          ],
+          "outputs": [
+            "log_retention_access"
+          ],
+          "code_lines": [
+            "DEFINE {{log_retention_access}}: Integer = 30"
+          ]
+        },
+        {
+          "id": "OP_16",
+          "type": "ASSIGN",
+          "line_number": 17,
+          "is_async": false,
+          "inputs": [
+            "log_retention_debug"
+          ],
+          "outputs": [
+            "log_retention_debug"
+          ],
+          "code_lines": [
+            "DEFINE {{log_retention_debug}}: Integer = 7"
+          ]
+        },
+        {
+          "id": "OP_17",
+          "type": "ASSIGN",
+          "line_number": 18,
+          "is_async": false,
+          "inputs": [
+            "qps_threshold"
+          ],
+          "outputs": [
+            "qps_threshold"
+          ],
+          "code_lines": [
+            "DEFINE {{qps_threshold}}: Integer = 10"
+          ]
+        },
+        {
+          "id": "OP_18",
+          "type": "ASSIGN",
+          "line_number": 19,
+          "is_async": false,
+          "inputs": [
+            "response_time_threshold"
+          ],
+          "outputs": [
+            "response_time_threshold"
+          ],
+          "code_lines": [
+            "DEFINE {{response_time_threshold}}: Integer = 3"
+          ]
+        },
+        {
+          "id": "OP_19",
+          "type": "ASSIGN",
+          "line_number": 20,
+          "is_async": false,
+          "inputs": [
+            "alert_duration"
+          ],
+          "outputs": [
+            "alert_duration"
+          ],
+          "code_lines": [
+            "DEFINE {{alert_duration}}: Integer = 10"
+          ]
+        },
+        {
+          "id": "OP_20",
+          "type": "ASSIGN",
+          "line_number": 21,
+          "is_async": false,
+          "inputs": [
+            "re_rank_results"
+          ],
+          "outputs": [
+            "re_rank_results"
+          ],
+          "code_lines": [
+            "DEFINE {{re_rank_results}}: Integer = 5"
+          ]
+        },
+        {
+          "id": "CTRL_21",
+          "type": "IF",
+          "line_number": 22,
+          "is_async": false,
+          "inputs": [
+            "query_type"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{query_type}} == \"simple_fact\""
+          ]
+        },
+        {
+          "id": "OP_22",
+          "type": "CALL",
+          "line_number": 23,
+          "is_async": true,
+          "inputs": [
+            "query",
+            "similarity_threshold"
+          ],
+          "outputs": [
+            "results"
+          ],
+          "code_lines": [
+            "{{results}} = CALL vector_search({{query}}, similarity_threshold={{similarity_threshold}})"
+          ]
+        },
+        {
+          "id": "CTRL_23",
+          "type": "IF",
+          "line_number": 24,
+          "is_async": false,
+          "inputs": [
+            "similarity_threshold",
+            "results"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{results}}.similarity >= {{similarity_threshold}}"
+          ]
+        },
+        {
+          "id": "OP_24",
+          "type": "ASSIGN",
+          "line_number": 25,
+          "is_async": false,
+          "inputs": [
+            "results",
+            "max_results"
+          ],
+          "outputs": [
+            "top_results"
+          ],
+          "code_lines": [
+            "{{top_results}} = {{results}}.top_n({{max_results}})"
+          ]
+        },
+        {
+          "id": "OP_25",
+          "type": "ASSIGN",
+          "line_number": 26,
+          "is_async": false,
+          "inputs": [
+            "top_results"
+          ],
+          "outputs": [
+            "{{top_results}}"
+          ],
+          "code_lines": [
+            "RETURN {{top_results}}"
+          ]
+        },
+        {
+          "id": "CTRL_26",
+          "type": "ELIF",
+          "line_number": 27,
+          "is_async": false,
+          "inputs": [
+            "similarity_threshold",
+            "results"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "ELIF {{results}}.similarity < {{similarity_threshold}}"
+          ]
+        },
+        {
+          "id": "OP_27",
+          "type": "CALL",
+          "line_number": 28,
+          "is_async": true,
+          "inputs": [
+            "re_rank_results",
+            "results"
+          ],
+          "outputs": [
+            "re_ranked"
+          ],
+          "code_lines": [
+            "{{re_ranked}} = CALL re_rank({{results}}, top_n={{re_rank_results}})"
+          ]
+        },
+        {
+          "id": "OP_28",
+          "type": "ASSIGN",
+          "line_number": 29,
+          "is_async": false,
+          "inputs": [
+            "re_ranked"
+          ],
+          "outputs": [
+            "{{re_ranked}}"
+          ],
+          "code_lines": [
+            "RETURN {{re_ranked}}"
+          ]
+        },
+        {
+          "id": "CTRL_29",
+          "type": "ELSE",
+          "line_number": 30,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ELSE"
+          ]
+        },
+        {
+          "id": "OP_30",
+          "type": "CALL",
+          "line_number": 31,
+          "is_async": true,
+          "inputs": [
+            "query"
+          ],
+          "outputs": [
+            "hybrid_results"
+          ],
+          "code_lines": [
+            "{{hybrid_results}} = CALL hybrid_search({{query}})"
+          ]
+        },
+        {
+          "id": "OP_31",
+          "type": "ASSIGN",
+          "line_number": 32,
+          "is_async": false,
+          "inputs": [
+            "hybrid_results"
+          ],
+          "outputs": [
+            "{{hybrid_results}}"
+          ],
+          "code_lines": [
+            "RETURN {{hybrid_results}}"
+          ]
+        },
+        {
+          "id": "CTRL_32",
+          "type": "ENDIF",
+          "line_number": 33,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_33",
+          "type": "ELIF",
+          "line_number": 34,
+          "is_async": false,
+          "inputs": [
+            "query_type"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "ELIF {{query_type}} == \"complex_reasoning\""
+          ]
+        },
+        {
+          "id": "OP_34",
+          "type": "CALL",
+          "line_number": 35,
+          "is_async": true,
+          "inputs": [
+            "query"
+          ],
+          "outputs": [
+            "intent"
+          ],
+          "code_lines": [
+            "{{intent}} = CALL intent_analysis({{query}})"
+          ]
+        },
+        {
+          "id": "OP_35",
+          "type": "CALL",
+          "line_number": 36,
+          "is_async": true,
+          "inputs": [
+            "intent",
+            "kg_hop"
+          ],
+          "outputs": [
+            "kg_results"
+          ],
+          "code_lines": [
+            "{{kg_results}} = CALL kg_search({{intent}}, hops={{kg_hop}})"
+          ]
+        },
+        {
+          "id": "CTRL_36",
+          "type": "IF",
+          "line_number": 37,
+          "is_async": false,
+          "inputs": [
+            "kg_results"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{kg_results}}.found"
+          ]
+        },
+        {
+          "id": "OP_37",
+          "type": "ASSIGN",
+          "line_number": 38,
+          "is_async": false,
+          "inputs": [
+            "kg_results"
+          ],
+          "outputs": [
+            "entities"
+          ],
+          "code_lines": [
+            "{{entities}} = {{kg_results}}.entities"
+          ]
+        },
+        {
+          "id": "OP_38",
+          "type": "ASSIGN",
+          "line_number": 39,
+          "is_async": false,
+          "inputs": [
+            "kg_results"
+          ],
+          "outputs": [
+            "relations"
+          ],
+          "code_lines": [
+            "{{relations}} = {{kg_results}}.relations"
+          ]
+        },
+        {
+          "id": "OP_39",
+          "type": "ASSIGN",
+          "line_number": 40,
+          "is_async": false,
+          "inputs": [
+            "relations",
+            "entities"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "RETURN {{entities}}, {{relations}}"
+          ]
+        },
+        {
+          "id": "CTRL_40",
+          "type": "ELSE",
+          "line_number": 41,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ELSE"
+          ]
+        },
+        {
+          "id": "OP_41",
+          "type": "CALL",
+          "line_number": 42,
+          "is_async": true,
+          "inputs": [
+            "query"
+          ],
+          "outputs": [
+            "full_search"
+          ],
+          "code_lines": [
+            "{{full_search}} = CALL full_search({{query}})"
+          ]
+        },
+        {
+          "id": "OP_42",
+          "type": "ASSIGN",
+          "line_number": 43,
+          "is_async": false,
+          "inputs": [
+            "full_search"
+          ],
+          "outputs": [
+            "{{full_search}}"
+          ],
+          "code_lines": [
+            "RETURN {{full_search}}"
+          ]
+        },
+        {
+          "id": "CTRL_43",
+          "type": "ENDIF",
+          "line_number": 44,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "OP_44",
+          "type": "ASSIGN",
+          "line_number": 45,
+          "is_async": false,
+          "inputs": [
+            "cache_ttl"
+          ],
+          "outputs": [
+            "query",
+            "kg_results",
+            "cache"
+          ],
+          "code_lines": [
+            "{{cache}}.store({{query}}, {{kg_results}}, ttl={{cache_ttl}})"
+          ]
+        },
+        {
+          "id": "CTRL_45",
+          "type": "ELIF",
+          "line_number": 46,
+          "is_async": false,
+          "inputs": [
+            "query_type"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "ELIF {{query_type}} == \"code_analysis\""
+          ]
+        },
+        {
+          "id": "OP_46",
+          "type": "CALL",
+          "line_number": 47,
+          "is_async": true,
+          "inputs": [
+            "query"
+          ],
+          "outputs": [
+            "language"
+          ],
+          "code_lines": [
+            "{{language}} = CALL detect_language({{query}})"
+          ]
+        },
+        {
+          "id": "OP_47",
+          "type": "CALL",
+          "line_number": 48,
+          "is_async": true,
+          "inputs": [
+            "query"
+          ],
+          "outputs": [
+            "line_count"
+          ],
+          "code_lines": [
+            "{{line_count}} = CALL count_lines({{query}})"
+          ]
+        },
+        {
+          "id": "CTRL_48",
+          "type": "IF",
+          "line_number": 49,
+          "is_async": false,
+          "inputs": [
+            "language"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{language}} IN [\"Python\", \"Java\"]"
+          ]
+        },
+        {
+          "id": "CTRL_49",
+          "type": "IF",
+          "line_number": 50,
+          "is_async": false,
+          "inputs": [
+            "line_count",
+            "code_line_limit"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{line_count}} > {{code_line_limit}}"
+          ]
+        },
+        {
+          "id": "OP_50",
+          "type": "CALL",
+          "line_number": 51,
+          "is_async": true,
+          "inputs": [
+            "query"
+          ],
+          "outputs": [
+            "static_analysis"
+          ],
+          "code_lines": [
+            "{{static_analysis}} = CALL static_analysis({{query}})"
+          ]
+        },
+        {
+          "id": "OP_51",
+          "type": "ASSIGN",
+          "line_number": 52,
+          "is_async": false,
+          "inputs": [
+            "static_analysis"
+          ],
+          "outputs": [
+            "{{static_analysis}}"
+          ],
+          "code_lines": [
+            "RETURN {{static_analysis}}"
+          ]
+        },
+        {
+          "id": "CTRL_52",
+          "type": "ELSE",
+          "line_number": 53,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ELSE"
+          ]
+        },
+        {
+          "id": "OP_53",
+          "type": "CALL",
+          "line_number": 54,
+          "is_async": true,
+          "inputs": [
+            "query"
+          ],
+          "outputs": [
+            "semantic_analysis"
+          ],
+          "code_lines": [
+            "{{semantic_analysis}} = CALL semantic_analysis({{query}})"
+          ]
+        },
+        {
+          "id": "OP_54",
+          "type": "CALL",
+          "line_number": 55,
+          "is_async": true,
+          "inputs": [
+            "semantic_analysis"
+          ],
+          "outputs": [
+            "doc"
+          ],
+          "code_lines": [
+            "{{doc}} = CALL generate_doc({{semantic_analysis}})"
+          ]
+        },
+        {
+          "id": "OP_55",
+          "type": "ASSIGN",
+          "line_number": 56,
+          "is_async": false,
+          "inputs": [
+            "doc"
+          ],
+          "outputs": [
+            "{{doc}}"
+          ],
+          "code_lines": [
+            "RETURN {{doc}}"
+          ]
+        },
+        {
+          "id": "CTRL_56",
+          "type": "ENDIF",
+          "line_number": 57,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_57",
+          "type": "ELSE",
+          "line_number": 58,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ELSE"
+          ]
+        },
+        {
+          "id": "OP_58",
+          "type": "ASSIGN",
+          "line_number": 59,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "RETURN \"Unsupported language\""
+          ]
+        },
+        {
+          "id": "CTRL_59",
+          "type": "ENDIF",
+          "line_number": 60,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_60",
+          "type": "ELSE",
+          "line_number": 61,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ELSE"
+          ]
+        },
+        {
+          "id": "OP_61",
+          "type": "ASSIGN",
+          "line_number": 62,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "RETURN \"Unknown query type\""
+          ]
+        },
+        {
+          "id": "CTRL_62",
+          "type": "ENDIF",
+          "line_number": 63,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_63",
+          "type": "IF",
+          "line_number": 64,
+          "is_async": false,
+          "inputs": [
+            "user_feedback"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{user_feedback}} == \"regenerate\""
+          ]
+        },
+        {
+          "id": "OP_64",
+          "type": "CALL",
+          "line_number": 65,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [
+            "stronger_model"
+          ],
+          "code_lines": [
+            "{{stronger_model}} = CALL use_stronger_model()"
+          ]
+        },
+        {
+          "id": "OP_65",
+          "type": "ASSIGN",
+          "line_number": 66,
+          "is_async": false,
+          "inputs": [
+            "stronger_model"
+          ],
+          "outputs": [
+            "{{stronger_model}}"
+          ],
+          "code_lines": [
+            "RETURN {{stronger_model}}"
+          ]
+        },
+        {
+          "id": "CTRL_66",
+          "type": "ENDIF",
+          "line_number": 67,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_67",
+          "type": "IF",
+          "line_number": 68,
+          "is_async": false,
+          "inputs": [
+            "negative_feedback_count"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{negative_feedback_count}} >= 3"
+          ]
+        },
+        {
+          "id": "OP_68",
+          "type": "CALL",
+          "line_number": 69,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "CALL escalate_to_human_review()"
+          ]
+        },
+        {
+          "id": "CTRL_69",
+          "type": "ENDIF",
+          "line_number": 70,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_70",
+          "type": "IF",
+          "line_number": 71,
+          "is_async": false,
+          "inputs": [
+            "query"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{query}} CONTAINS \"金融\" OR \"财务\" OR \"投资\""
+          ]
+        },
+        {
+          "id": "OP_71",
+          "type": "CALL",
+          "line_number": 72,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [
+            "verified"
+          ],
+          "code_lines": [
+            "{{verified}} = CALL verify_user()"
+          ]
+        },
+        {
+          "id": "CTRL_72",
+          "type": "IF",
+          "line_number": 73,
+          "is_async": false,
+          "inputs": [
+            "verified"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF NOT {{verified}}"
+          ]
+        },
+        {
+          "id": "OP_73",
+          "type": "CALL",
+          "line_number": 74,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "CALL log_to_security()"
+          ]
+        },
+        {
+          "id": "OP_74",
+          "type": "ASSIGN",
+          "line_number": 75,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "RETURN \"Access denied\""
+          ]
+        },
+        {
+          "id": "CTRL_75",
+          "type": "ENDIF",
+          "line_number": 76,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_76",
+          "type": "ENDIF",
+          "line_number": 77,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "CTRL_77",
+          "type": "IF",
+          "line_number": 78,
+          "is_async": false,
+          "inputs": [
+            "qps",
+            "alert_duration",
+            "qps_threshold"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "IF {{qps}} < {{qps_threshold}} FOR {{alert_duration}} MINUTES"
+          ]
+        },
+        {
+          "id": "OP_78",
+          "type": "CALL",
+          "line_number": 79,
+          "is_async": true,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "CALL trigger_alert()"
+          ]
+        },
+        {
+          "id": "CTRL_79",
+          "type": "ENDIF",
+          "line_number": 80,
+          "is_async": false,
+          "inputs": [],
+          "outputs": [],
+          "code_lines": [
+            "ENDIF"
+          ]
+        },
+        {
+          "id": "OP_80",
+          "type": "CALL",
+          "line_number": 81,
+          "is_async": true,
+          "inputs": [
+            "response",
+            "query"
+          ],
+          "outputs": [
+            "log"
+          ],
+          "code_lines": [
+            "{{log}} = CALL create_log({{query}}, {{response}})"
+          ]
+        },
+        {
+          "id": "OP_81",
+          "type": "CALL",
+          "line_number": 82,
+          "is_async": true,
+          "inputs": [
+            "log"
+          ],
+          "outputs": [],
+          "code_lines": [
+            "CALL upload_to_central_logging({{log}})"
+          ]
+        }
+      ]
+    },
+    "prompt40_step2_dependency": {
+      "has_cycles": false,
+      "dead_code_count": 19,
+      "dead_code_blocks": [
+        "OP_0",
+        "OP_1",
+        "OP_2",
+        "OP_3",
+        "OP_4",
+        "OP_5",
+        "OP_6",
+        "OP_7",
+        "OP_11",
+        "OP_14",
+        "OP_15",
+        "OP_16",
+        "OP_18",
+        "OP_58",
+        "OP_61",
+        "OP_68",
+        "OP_73",
+        "OP_74",
+        "OP_78"
+      ],
+      "topological_order": [
+        "OP_0",
+        "OP_1",
+        "OP_2",
+        "OP_3",
+        "OP_4",
+        "OP_5",
+        "OP_6",
+        "OP_7",
+        "OP_8",
+        "OP_9",
+        "OP_10",
+        "OP_11",
+        "OP_12",
+        "OP_13",
+        "OP_14",
+        "OP_15",
+        "OP_16",
+        "OP_17",
+        "OP_18",
+        "OP_19",
+        "OP_20",
+        "CTRL_21",
+        "CTRL_29",
+        "CTRL_32",
+        "CTRL_33",
+        "CTRL_40",
+        "CTRL_43",
+        "CTRL_45",
+        "CTRL_52",
+        "CTRL_56",
+        "CTRL_57",
+        "OP_58",
+        "CTRL_59",
+        "CTRL_60",
+        "OP_61",
+        "CTRL_62",
+        "CTRL_63",
+        "OP_64",
+        "CTRL_66",
+        "CTRL_67",
+        "OP_68",
+        "CTRL_69",
+        "OP_71",
+        "OP_73",
+        "OP_74",
+        "CTRL_75",
+        "CTRL_76",
+        "OP_78",
+        "CTRL_79",
+        "OP_44",
+        "CTRL_77",
+        "OP_65",
+        "CTRL_72",
+        "OP_22",
+        "OP_30",
+        "OP_34",
+        "CTRL_36",
+        "OP_37",
+        "OP_38",
+        "OP_41",
+        "OP_46",
+        "OP_47",
+        "OP_50",
+        "OP_53",
+        "CTRL_70",
+        "OP_80",
+        "CTRL_23",
+        "OP_24",
+        "CTRL_26",
+        "OP_27",
+        "OP_31",
+        "OP_35",
+        "OP_39",
+        "OP_42",
+        "CTRL_48",
+        "CTRL_49",
+        "OP_51",
+        "OP_54",
+        "OP_81",
+        "OP_25",
+        "OP_28",
+        "OP_55"
+      ],
+      "edge_count": 42,
+      "node_count": 82
+    },
+    "prompt40_step3_clustering": {
+      "strategy": "hybrid",
+      "total_clusters": 8,
+      "clusters": [
+        {
+          "cluster_id": 1,
+          "block_count": 21,
+          "blocks": [
+            "OP_0",
+            "OP_1",
+            "OP_2",
+            "OP_3",
+            "OP_4",
+            "OP_5",
+            "OP_6",
+            "OP_7",
+            "OP_8",
+            "OP_9",
+            "OP_10",
+            "OP_11",
+            "OP_12",
+            "OP_13",
+            "OP_14",
+            "OP_15",
+            "OP_16",
+            "OP_17",
+            "OP_18",
+            "OP_19",
+            "OP_20"
+          ]
+        },
+        {
+          "cluster_id": 2,
+          "block_count": 42,
+          "blocks": [
+            "CTRL_21",
+            "OP_22",
+            "CTRL_23",
+            "OP_24",
+            "OP_25",
+            "CTRL_26",
+            "OP_27",
+            "OP_28",
+            "CTRL_29",
+            "OP_30",
+            "OP_31",
+            "CTRL_32",
+            "CTRL_33",
+            "OP_34",
+            "OP_35",
+            "CTRL_36",
+            "OP_37",
+            "OP_38",
+            "OP_39",
+            "CTRL_40",
+            "OP_41",
+            "OP_42",
+            "CTRL_43",
+            "OP_44",
+            "CTRL_45",
+            "OP_46",
+            "OP_47",
+            "CTRL_48",
+            "CTRL_49",
+            "OP_50",
+            "OP_51",
+            "CTRL_52",
+            "OP_53",
+            "OP_54",
+            "OP_55",
+            "CTRL_56",
+            "CTRL_57",
+            "OP_58",
+            "CTRL_59",
+            "CTRL_60",
+            "OP_61",
+            "CTRL_62"
+          ]
+        },
+        {
+          "cluster_id": 3,
+          "block_count": 4,
+          "blocks": [
+            "CTRL_63",
+            "OP_64",
+            "OP_65",
+            "CTRL_66"
+          ]
+        },
+        {
+          "cluster_id": 4,
+          "block_count": 3,
+          "blocks": [
+            "CTRL_67",
+            "OP_68",
+            "CTRL_69"
+          ]
+        },
+        {
+          "cluster_id": 5,
+          "block_count": 7,
+          "blocks": [
+            "CTRL_70",
+            "OP_71",
+            "CTRL_72",
+            "OP_73",
+            "OP_74",
+            "CTRL_75",
+            "CTRL_76"
+          ]
+        },
+        {
+          "cluster_id": 6,
+          "block_count": 3,
+          "blocks": [
+            "CTRL_77",
+            "OP_78",
+            "CTRL_79"
+          ]
+        },
+        {
+          "cluster_id": 7,
+          "block_count": 1,
+          "blocks": [
+            "OP_80"
+          ]
+        },
+        {
+          "cluster_id": 8,
+          "block_count": 1,
+          "blocks": [
+            "OP_81"
+          ]
+        }
+      ]
+    },
+    "prompt40_step4_generation": {
+      "total_modules": 8,
+      "async_modules": 7,
+      "sync_modules": 1,
+      "modules": [
+        {
+          "name": "step_1_compute_knowledge_base_a",
+          "inputs": [
+            "vector_index_a",
+            "vector_index_b",
+            "vector_index_c"
+          ],
+          "outputs": [
+            "alert_duration",
+            "cache_ttl",
+            "code_line_limit",
+            "fallback_results",
+            "kg_hop",
+            "knowledge_base_a",
+            "knowledge_base_b",
+            "knowledge_base_c",
+            "log_retention_access",
+            "log_retention_debug",
+            "log_retention_error",
+            "max_concurrent",
+            "max_results",
+            "qps_threshold",
+            "re_rank_results",
+            "response_time_threshold",
+            "similarity_threshold",
+            "vector_dim"
+          ],
+          "is_async": false,
+          "body_code": "def step_1_compute_knowledge_base_a(vector_index_a, vector_index_b, vector_index_c):\n    \"\"\"Auto-generated module\"\"\"\n    return alert_duration, cache_ttl, code_line_limit, fallback_results, kg_hop, knowledge_base_a, knowledge_base_b, knowledge_base_c, log_retention_access, log_retention_debug, log_retention_error, max_concurrent, max_results, qps_threshold, re_rank_results, response_time_threshold, similarity_threshold, vector_dim",
+          "original_block_count": 21
+        },
+        {
+          "name": "step_2_vector_search",
+          "inputs": [
+            "cache_ttl",
+            "code_line_limit",
+            "kg_hop",
+            "max_results",
+            "query_type",
+            "re_rank_results",
+            "similarity_threshold"
+          ],
+          "outputs": [
+            "__doc__",
+            "__full_search__",
+            "__hybrid_results__",
+            "__re_ranked__",
+            "__static_analysis__",
+            "__top_results__",
+            "cache",
+            "doc",
+            "entities",
+            "full_search",
+            "hybrid_results",
+            "intent",
+            "kg_results",
+            "language",
+            "line_count",
+            "query",
+            "re_ranked",
+            "relations",
+            "results",
+            "semantic_analysis",
+            "static_analysis",
+            "top_results"
+          ],
+          "is_async": true,
+          "body_code": "async def step_2_vector_search(cache_ttl, code_line_limit, kg_hop, max_results, query_type, re_rank_results, similarity_threshold):\n    \"\"\"Auto-generated module\"\"\"\n    if query_type == \"simple_fact\":\n        results = await invoke_function('vector_search', query=query, similarity_threshold=similarity_threshold)\n        if results.similarity >= similarity_threshold:\n            top_results = results.top_n(max_results)\n            return top_results\n        elif results.similarity < similarity_threshold:\n            re_ranked = await invoke_function('re_rank', results=results, top_n=re_rank_results)\n            return re_ranked\n        else:\n            hybrid_results = await invoke_function('hybrid_search', query=query)\n            return hybrid_results\n    elif query_type == \"complex_reasoning\":\n        intent = await invoke_function('intent_analysis', query=query)\n        kg_results = await invoke_function('kg_search', intent=intent, hops=kg_hop)\n        if kg_results.found:\n            entities = kg_results.entities\n            relations = kg_results.relations\n            return entities, relations\n        else:\n            full_search = await invoke_function('full_search', query=query)\n            return full_search\n        cache.store(query, kg_results, ttl=cache_ttl)\n    elif query_type == \"code_analysis\":\n        language = await invoke_function('detect_language', query=query)\n        line_count = await invoke_function('count_lines', query=query)\n        if language  in  [\"Python\", \"Java\"]:\n            if line_count > code_line_limit:\n                static_analysis = await invoke_function('static_analysis', query=query)\n                return static_analysis\n            else:\n                semantic_analysis = await invoke_function('semantic_analysis', query=query)\n                doc = await invoke_function('generate_doc', semantic_analysis=semantic_analysis)\n                return doc\n        else:\n            return \"Unsupported language\"\n    else:\n        return \"Unknown query type\"",
+          "original_block_count": 42
+        },
+        {
+          "name": "step_3_use_stronger_model",
+          "inputs": [
+            "user_feedback"
+          ],
+          "outputs": [
+            "__stronger_model__",
+            "stronger_model"
+          ],
+          "is_async": true,
+          "body_code": "async def step_3_use_stronger_model(user_feedback):\n    \"\"\"Auto-generated module\"\"\"\n    if user_feedback == \"regenerate\":\n        stronger_model = await invoke_function('use_stronger_model')\n        return stronger_model",
+          "original_block_count": 4
+        },
+        {
+          "name": "step_4_escalate_to_human_review",
+          "inputs": [
+            "negative_feedback_count"
+          ],
+          "outputs": [],
+          "is_async": true,
+          "body_code": "async def step_4_escalate_to_human_review(negative_feedback_count):\n    \"\"\"Auto-generated module\"\"\"\n    if negative_feedback_count >= 3:\n        await invoke_function('escalate_to_human_review')\n    return None",
+          "original_block_count": 3
+        },
+        {
+          "name": "step_5_verify_user",
+          "inputs": [
+            "query"
+          ],
+          "outputs": [
+            "verified"
+          ],
+          "is_async": true,
+          "body_code": "async def step_5_verify_user(query):\n    \"\"\"Auto-generated module\"\"\"\n    if \"金融\" in query  or  \"财务\"  or  \"投资\":\n        verified = await invoke_function('verify_user')\n        if  not  verified:\n            await invoke_function('log_to_security')\n            return \"Access denied\"",
+          "original_block_count": 7
+        },
+        {
+          "name": "step_6_trigger_alert",
+          "inputs": [
+            "alert_duration",
+            "qps",
+            "qps_threshold"
+          ],
+          "outputs": [],
+          "is_async": true,
+          "body_code": "async def step_6_trigger_alert(alert_duration, qps, qps_threshold):\n    \"\"\"Auto-generated module\"\"\"\n    if qps < qps_threshold:\n        await invoke_function('trigger_alert')\n    return None",
+          "original_block_count": 3
+        },
+        {
+          "name": "step_7_create_log",
+          "inputs": [
+            "query",
+            "response"
+          ],
+          "outputs": [
+            "log"
+          ],
+          "is_async": true,
+          "body_code": "async def step_7_create_log(query, response):\n    \"\"\"Auto-generated module\"\"\"\n    log = await invoke_function('create_log', query=query, response=response)\n    return log",
+          "original_block_count": 1
+        },
+        {
+          "name": "step_8_upload_to_central_logging",
+          "inputs": [
+            "log"
+          ],
+          "outputs": [],
+          "is_async": true,
+          "body_code": "async def step_8_upload_to_central_logging(log):\n    \"\"\"Auto-generated module\"\"\"\n    await invoke_function('upload_to_central_logging', log=log)\n    return None",
+          "original_block_count": 1
+        }
+      ]
+    },
+    "prompt40_step5_orchestration": {
+      "main_inputs": [
+        "negative_feedback_count",
+        "qps",
+        "query_type",
+        "response",
+        "user_feedback",
+        "vector_index_a",
+        "vector_index_b",
+        "vector_index_c"
+      ],
+      "input_count": 8,
+      "main_code": "async def main_workflow(input_params: dict):\n    \"\"\"\n    主工作流 - 自动生成\n    \n    Args:\n        input_params: 包含 ['negative_feedback_count', 'qps', 'query_type', 'response', 'user_feedback', 'vector_index_a', 'vector_index_b', 'vector_index_c'] 的字典\n    \n    Returns:\n        执行结果上下文\n    \"\"\"\n    # 初始化上下文\n    ctx = input_params.copy()\n\n    # Module 1: step_1_compute_knowledge_base_a\n    ctx[\"alert_duration\"], ctx[\"cache_ttl\"], ctx[\"code_line_limit\"], ctx[\"fallback_results\"], ctx[\"kg_hop\"], ctx[\"knowledge_base_a\"], ctx[\"knowledge_base_b\"], ctx[\"knowledge_base_c\"], ctx[\"log_retention_access\"], ctx[\"log_retention_debug\"], ctx[\"log_retention_error\"], ctx[\"max_concurrent\"], ctx[\"max_results\"], ctx[\"qps_threshold\"], ctx[\"re_rank_results\"], ctx[\"response_time_threshold\"], ctx[\"similarity_threshold\"], ctx[\"vector_dim\"] = step_1_compute_knowledge_base_a(ctx.get(\"vector_index_a\"), ctx.get(\"vector_index_b\"), ctx.get(\"vector_index_c\"))\n\n    # Module 2: step_2_vector_search\n    ctx[\"__doc__\"], ctx[\"__full_search__\"], ctx[\"__hybrid_results__\"], ctx[\"__re_ranked__\"], ctx[\"__static_analysis__\"], ctx[\"__top_results__\"], ctx[\"cache\"], ctx[\"doc\"], ctx[\"entities\"], ctx[\"full_search\"], ctx[\"hybrid_results\"], ctx[\"intent\"], ctx[\"kg_results\"], ctx[\"language\"], ctx[\"line_count\"], ctx[\"query\"], ctx[\"re_ranked\"], ctx[\"relations\"], ctx[\"results\"], ctx[\"semantic_analysis\"], ctx[\"static_analysis\"], ctx[\"top_results\"] = await step_2_vector_search(ctx.get(\"cache_ttl\"), ctx.get(\"code_line_limit\"), ctx.get(\"kg_hop\"), ctx.get(\"max_results\"), ctx.get(\"query_type\"), ctx.get(\"re_rank_results\"), ctx.get(\"similarity_threshold\"))\n\n    # Module 3: step_3_use_stronger_model\n    ctx[\"__stronger_model__\"], ctx[\"stronger_model\"] = await step_3_use_stronger_model(ctx.get(\"user_feedback\"))\n\n    # Module 4: step_4_escalate_to_human_review\n    await step_4_escalate_to_human_review(ctx.get(\"negative_feedback_count\"))\n\n    # Module 5: step_5_verify_user\n    ctx[\"verified\"] = await step_5_verify_user(ctx.get(\"query\"))\n\n    # Module 6: step_6_trigger_alert\n    await step_6_trigger_alert(ctx.get(\"alert_duration\"), ctx.get(\"qps\"), ctx.get(\"qps_threshold\"))\n\n    # Module 7: step_7_create_log\n    ctx[\"log\"] = await step_7_create_log(ctx.get(\"query\"), ctx.get(\"response\"))\n\n    # Module 8: step_8_upload_to_central_logging\n    await step_8_upload_to_central_logging(ctx.get(\"log\"))\n\n    return ctx"
+    },
+    "overall_status": "success",
+    "total_time_ms": 106531,
+    "error_message": null
   }
 }

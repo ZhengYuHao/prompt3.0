@@ -7,106 +7,92 @@ from typing import Dict, Any
 from llm_client import invoke_function  # 需要实现 LLM 客户端
 
 
-def step_1_compute_cache_duration(cache_hit_rate, click_feedback, code_lines, current_concurrent, is_admin, is_finance, is_sensitive, is_vip, knowledge_base, priority, qps, query_type, response_time, search_accuracy, similarity, unhappy_count, user_level, vector_index, vi_a, vi_b, vi_c):
+def step_1_compute_knowledge_base_a(vector_index_a, vector_index_b, vector_index_c):
     """Auto-generated module"""
-    return alert_duration, alert_qps_threshold, cache_duration, code_time_threshold, fallback_vector_results, graph_time_threshold, kb_a_docs, kb_b_docs, kb_c_docs, kg_hops, log_access_days, log_debug_days, log_error_days, max_code_lines, max_concurrent, max_vector_results, response_time_threshold, timeout_threshold, vector_dim, vector_time_threshold
+    return alert_duration, cache_ttl, code_line_limit, fallback_results, kg_hop, knowledge_base_a, knowledge_base_b, knowledge_base_c, log_retention_access, log_retention_debug, log_retention_error, max_concurrent, max_results, qps_threshold, re_rank_results, response_time_threshold, similarity_threshold, vector_dim
 
 
-async def step_2_vector_search(cache_duration, code, code_lines, fallback_vector_results, kg_hops, knowledge_base, max_code_lines, max_vector_results, query_type, similarity):
+async def step_2_vector_search(cache_ttl, code_line_limit, kg_hop, max_results, query_type, re_rank_results, similarity_threshold):
     """Auto-generated module"""
     if query_type == "simple_fact":
-        if similarity > 0.85:
-            result = await invoke_function('vector_search', knowledge_base=knowledge_base, top_n=max_vector_results)
-        elif similarity <= 0.85:
-            result = await invoke_function('rerank_search', knowledge_base=knowledge_base, top_n=fallback_vector_results)
+        results = await invoke_function('vector_search', query=query, similarity_threshold=similarity_threshold)
+        if results.similarity >= similarity_threshold:
+            top_results = results.top_n(max_results)
+            return top_results
+        elif results.similarity < similarity_threshold:
+            re_ranked = await invoke_function('re_rank', results=results, top_n=re_rank_results)
+            return re_ranked
         else:
-            result = await invoke_function('hybrid_search', knowledge_base=knowledge_base)
+            hybrid_results = await invoke_function('hybrid_search', query=query)
+            return hybrid_results
     elif query_type == "complex_reasoning":
-        result = await invoke_function('graph_search', knowledge_base=knowledge_base, hops=kg_hops)
-        if result.found == False:
-            result = await invoke_function('full_search', knowledge_base=knowledge_base)
-        result.cache_duration = cache_duration
-        await invoke_function('cache_result', result=result)
+        intent = await invoke_function('intent_analysis', query=query)
+        kg_results = await invoke_function('kg_search', intent=intent, hops=kg_hop)
+        if kg_results.found:
+            entities = kg_results.entities
+            relations = kg_results.relations
+            return entities, relations
+        else:
+            full_search = await invoke_function('full_search', query=query)
+            return full_search
+        cache.store(query, kg_results, ttl=cache_ttl)
     elif query_type == "code_analysis":
-        if code_lines > max_code_lines:
-            result = await invoke_function('static_code_analysis', code=code)
+        language = await invoke_function('detect_language', query=query)
+        line_count = await invoke_function('count_lines', query=query)
+        if language  in  ["Python", "Java"]:
+            if line_count > code_line_limit:
+                static_analysis = await invoke_function('static_analysis', query=query)
+                return static_analysis
+            else:
+                semantic_analysis = await invoke_function('semantic_analysis', query=query)
+                doc = await invoke_function('generate_doc', semantic_analysis=semantic_analysis)
+                return doc
         else:
-            result = await invoke_function('semantic_code_analysis', code=code)
-            result = await invoke_function('generate_code_explanation', result=result)
+            return "Unsupported language"
     else:
-        result = await invoke_function('default_search', knowledge_base=knowledge_base)
-    return result
+        return "Unknown query type"
 
 
-async def step_3_strong_model_inference(click_feedback, query, unhappy_count):
+async def step_3_use_stronger_model(user_feedback):
     """Auto-generated module"""
-    if click_feedback == "regenerate":
-        result = await invoke_function('strong_model_inference', query=query)
-    elif unhappy_count >= 3:
-        result = await invoke_function('human_review', query=query)
-    return result
+    if user_feedback == "regenerate":
+        stronger_model = await invoke_function('use_stronger_model')
+        return stronger_model
 
 
-async def step_4_reject_service(is_finance, is_sensitive, query):
+async def step_4_escalate_to_human_review(negative_feedback_count):
     """Auto-generated module"""
-    if is_sensitive == True:
-        await invoke_function('reject_service')
-        await invoke_function('log_sensitive_content', query=query)
-    elif is_finance == True:
-        result = await invoke_function('identity_verification')
-        if result.verified == False:
-            await invoke_function('reject_service')
-    return result
-
-
-async def step_5_queue_request(current_concurrent, is_admin, is_vip, max_concurrent):
-    """Auto-generated module"""
-    if current_concurrent > max_concurrent:
-        await invoke_function('queue_request')
-        if is_vip == True:
-            priority = 5
-        elif is_admin == True:
-            priority = 10
-        else:
-            priority = 1
-    return priority
-
-
-async def step_6_degraded_service(response_time, timeout_threshold):
-    """Auto-generated module"""
-    if response_time > timeout_threshold:
-        result = await invoke_function('degraded_service')
-    return result
-
-
-async def step_7_log_performance(code_time_threshold, graph_time_threshold, query_type, response_time, vector_time_threshold):
-    """Auto-generated module"""
-    if response_time > vector_time_threshold  and  query_type == "simple_fact":
-        await invoke_function('log_performance', _vector_search_=_vector_search_, response_time=response_time)
-    elif response_time > graph_time_threshold  and  query_type == "complex_reasoning":
-        await invoke_function('log_performance', _graph_search_=_graph_search_, response_time=response_time)
-    elif response_time > code_time_threshold  and  query_type == "code_analysis":
-        await invoke_function('log_performance', _code_analysis_=_code_analysis_, response_time=response_time)
+    if negative_feedback_count >= 3:
+        await invoke_function('escalate_to_human_review')
     return None
 
 
-async def step_8_trigger_alert(alert_duration, alert_qps_threshold, qps):
+async def step_5_verify_user(query):
     """Auto-generated module"""
-    if qps < alert_qps_threshold:
-        await invoke_function('trigger_alert', _low_qps_=_low_qps_)
+    if "金融" in query  or  "财务"  or  "投资":
+        verified = await invoke_function('verify_user')
+        if  not  verified:
+            await invoke_function('log_to_security')
+            return "Access denied"
+
+
+async def step_6_trigger_alert(alert_duration, qps, qps_threshold):
+    """Auto-generated module"""
+    if qps < qps_threshold:
+        await invoke_function('trigger_alert')
     return None
 
 
-async def step_9_scale_out(response_time, response_time_threshold):
+async def step_7_create_log(query, response):
     """Auto-generated module"""
-    if response_time > response_time_threshold:
-        await invoke_function('scale_out')
+    log = await invoke_function('create_log', query=query, response=response)
+    return log
+
+
+async def step_8_upload_to_central_logging(log):
+    """Auto-generated module"""
+    await invoke_function('upload_to_central_logging', log=log)
     return None
-
-
-def step_10_compute_result(result):
-    """Auto-generated module"""
-    return result
 
 
 async def main_workflow(input_params: dict):
@@ -114,7 +100,7 @@ async def main_workflow(input_params: dict):
     主工作流 - 自动生成
     
     Args:
-        input_params: 包含 ['cache_hit_rate', 'click_feedback', 'code', 'code_lines', 'current_concurrent', 'is_admin', 'is_finance', 'is_sensitive', 'is_vip', 'knowledge_base', 'qps', 'query', 'query_type', 'response_time', 'search_accuracy', 'similarity', 'unhappy_count', 'user_level', 'vector_index', 'vi_a', 'vi_b', 'vi_c'] 的字典
+        input_params: 包含 ['negative_feedback_count', 'qps', 'query_type', 'response', 'user_feedback', 'vector_index_a', 'vector_index_b', 'vector_index_c'] 的字典
     
     Returns:
         执行结果上下文
@@ -122,35 +108,29 @@ async def main_workflow(input_params: dict):
     # 初始化上下文
     ctx = input_params.copy()
 
-    # Module 1: step_1_compute_cache_duration
-    ctx["alert_duration"], ctx["alert_qps_threshold"], ctx["cache_duration"], ctx["code_time_threshold"], ctx["fallback_vector_results"], ctx["graph_time_threshold"], ctx["kb_a_docs"], ctx["kb_b_docs"], ctx["kb_c_docs"], ctx["kg_hops"], ctx["log_access_days"], ctx["log_debug_days"], ctx["log_error_days"], ctx["max_code_lines"], ctx["max_concurrent"], ctx["max_vector_results"], ctx["response_time_threshold"], ctx["timeout_threshold"], ctx["vector_dim"], ctx["vector_time_threshold"] = step_1_compute_cache_duration(ctx.get("cache_hit_rate"), ctx.get("click_feedback"), ctx.get("code_lines"), ctx.get("current_concurrent"), ctx.get("is_admin"), ctx.get("is_finance"), ctx.get("is_sensitive"), ctx.get("is_vip"), ctx.get("knowledge_base"), ctx.get("priority"), ctx.get("qps"), ctx.get("query_type"), ctx.get("response_time"), ctx.get("search_accuracy"), ctx.get("similarity"), ctx.get("unhappy_count"), ctx.get("user_level"), ctx.get("vector_index"), ctx.get("vi_a"), ctx.get("vi_b"), ctx.get("vi_c"))
+    # Module 1: step_1_compute_knowledge_base_a
+    ctx["alert_duration"], ctx["cache_ttl"], ctx["code_line_limit"], ctx["fallback_results"], ctx["kg_hop"], ctx["knowledge_base_a"], ctx["knowledge_base_b"], ctx["knowledge_base_c"], ctx["log_retention_access"], ctx["log_retention_debug"], ctx["log_retention_error"], ctx["max_concurrent"], ctx["max_results"], ctx["qps_threshold"], ctx["re_rank_results"], ctx["response_time_threshold"], ctx["similarity_threshold"], ctx["vector_dim"] = step_1_compute_knowledge_base_a(ctx.get("vector_index_a"), ctx.get("vector_index_b"), ctx.get("vector_index_c"))
 
     # Module 2: step_2_vector_search
-    ctx["result"] = await step_2_vector_search(ctx.get("cache_duration"), ctx.get("code"), ctx.get("code_lines"), ctx.get("fallback_vector_results"), ctx.get("kg_hops"), ctx.get("knowledge_base"), ctx.get("max_code_lines"), ctx.get("max_vector_results"), ctx.get("query_type"), ctx.get("similarity"))
+    ctx["__doc__"], ctx["__full_search__"], ctx["__hybrid_results__"], ctx["__re_ranked__"], ctx["__static_analysis__"], ctx["__top_results__"], ctx["cache"], ctx["doc"], ctx["entities"], ctx["full_search"], ctx["hybrid_results"], ctx["intent"], ctx["kg_results"], ctx["language"], ctx["line_count"], ctx["query"], ctx["re_ranked"], ctx["relations"], ctx["results"], ctx["semantic_analysis"], ctx["static_analysis"], ctx["top_results"] = await step_2_vector_search(ctx.get("cache_ttl"), ctx.get("code_line_limit"), ctx.get("kg_hop"), ctx.get("max_results"), ctx.get("query_type"), ctx.get("re_rank_results"), ctx.get("similarity_threshold"))
 
-    # Module 3: step_3_strong_model_inference
-    ctx["result"] = await step_3_strong_model_inference(ctx.get("click_feedback"), ctx.get("query"), ctx.get("unhappy_count"))
+    # Module 3: step_3_use_stronger_model
+    ctx["__stronger_model__"], ctx["stronger_model"] = await step_3_use_stronger_model(ctx.get("user_feedback"))
 
-    # Module 4: step_4_reject_service
-    ctx["result"] = await step_4_reject_service(ctx.get("is_finance"), ctx.get("is_sensitive"), ctx.get("query"))
+    # Module 4: step_4_escalate_to_human_review
+    await step_4_escalate_to_human_review(ctx.get("negative_feedback_count"))
 
-    # Module 5: step_5_queue_request
-    ctx["priority"] = await step_5_queue_request(ctx.get("current_concurrent"), ctx.get("is_admin"), ctx.get("is_vip"), ctx.get("max_concurrent"))
+    # Module 5: step_5_verify_user
+    ctx["verified"] = await step_5_verify_user(ctx.get("query"))
 
-    # Module 6: step_6_degraded_service
-    ctx["result"] = await step_6_degraded_service(ctx.get("response_time"), ctx.get("timeout_threshold"))
+    # Module 6: step_6_trigger_alert
+    await step_6_trigger_alert(ctx.get("alert_duration"), ctx.get("qps"), ctx.get("qps_threshold"))
 
-    # Module 7: step_7_log_performance
-    await step_7_log_performance(ctx.get("code_time_threshold"), ctx.get("graph_time_threshold"), ctx.get("query_type"), ctx.get("response_time"), ctx.get("vector_time_threshold"))
+    # Module 7: step_7_create_log
+    ctx["log"] = await step_7_create_log(ctx.get("query"), ctx.get("response"))
 
-    # Module 8: step_8_trigger_alert
-    await step_8_trigger_alert(ctx.get("alert_duration"), ctx.get("alert_qps_threshold"), ctx.get("qps"))
-
-    # Module 9: step_9_scale_out
-    await step_9_scale_out(ctx.get("response_time"), ctx.get("response_time_threshold"))
-
-    # Module 10: step_10_compute_result
-    ctx["__result__"] = step_10_compute_result(ctx.get("result"))
+    # Module 8: step_8_upload_to_central_logging
+    await step_8_upload_to_central_logging(ctx.get("log"))
 
     return ctx
 

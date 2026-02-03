@@ -157,15 +157,22 @@ class UnifiedLLMClient:
             r'<\|im_start\|>\s*\w+\s*',  # <|im_start|>role 格式
             r'<\|im_end\|>',              # <|im_end|> 格式
             r'<\|.*?\|>',                 # 其他 <|xxx|> 格式的标签
+            r'<think>.*?</think>',        # Qwen 思考过程标签
+            r'<思考>.*?</思考>',          # 中文思考过程标签
         ]
 
         cleaned = content
         for pattern in patterns_to_remove:
-            cleaned = re.sub(pattern, '', cleaned)
+            cleaned = re.sub(pattern, '', cleaned, flags=re.DOTALL)
 
         # 清理多余的空白字符
         cleaned = re.sub(r'\n\s*\n', '\n\n', cleaned)  # 多个空行变成两个
-        cleaned = cleaned.strip()
+
+        # 清理开头的空白字符（包括换行符、空格、制表符、软回车等）
+        cleaned = re.sub(r'^[\s\r\n\t\u2028\u2029]+', '', cleaned)
+
+        # 清理结尾的空白字符
+        cleaned = re.sub(r'[\s\r\n\t\u2028\u2029]+$', '', cleaned)
 
         return cleaned
 
@@ -380,14 +387,17 @@ class UnifiedLLMClient:
 6. 如果描述包含动词+名词但没有数字，大概率是固定需求，不要提取"""
         
         response = self.call(system_prompt, text)
-        
+
+        # 打印原始响应用于调试
+        debug(f"[实体抽取] LLM 原始响应:\n{response.content}\n")
+
         try:
             entities = json.loads(response.content)
             if isinstance(entities, list):
                 info(f"[实体抽取] 识别到 {len(entities)} 个实体")
                 return entities
             else:
-                warning("[实体抽取] 响应格式不是数组")
+                warning(f"[实体抽取] 响应格式不是数组，实际类型: {type(entities)}")
                 return []
         except json.JSONDecodeError as e:
             warning(f"[实体抽取] JSON 解析失败: {e}")

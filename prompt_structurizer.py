@@ -237,7 +237,25 @@ class EntityPostValidator:
     @classmethod
     def _is_proper_noun(cls, text: str) -> bool:
         """判断是否为专有名词（技术术语）"""
-        proper_nouns = ["RAG", "LLM", "API", "K8s", "Kubernetes", "LangChain", "Milvus", "FastAPI"]
+        proper_nouns = [
+            # 技术框架/平台
+            "RAG", "LLM", "API", "K8s", "Kubernetes",
+            "LangChain", "Milvus", "FastAPI",
+            # 编程语言
+            "Python", "Java", "JavaScript", "TypeScript",
+            "C++", "C#", "Go", "Rust", "PHP", "Ruby",
+            # 数据科学/机器学习
+            "机器学习", "深度学习", "数据分析", "人工智能",
+            "AI", "ML", "DL", "TensorFlow", "PyTorch",
+            # 数据库/存储
+            "MySQL", "PostgreSQL", "MongoDB", "Redis",
+            "Elasticsearch", "Milvus", "向量数据库",
+            # 开发领域
+            "前端开发", "后端开发", "全栈开发",
+            "Web开发", "移动开发", "数据科学",
+            # 其他技术术语
+            "微服务", "容器化", "DevOps", "CI/CD"
+        ]
         return any(noun in text for noun in proper_nouns)
     
     @staticmethod
@@ -563,12 +581,12 @@ class PromptStructurizer:
         
         # ===== 阶段 2.3: 强类型清洗与转换 (Code-Layer) =====
         variable_metas = []
-        for entity in resolved_entities:
+        for entity in filtered_entities:  # 修复：使用过滤后的实体
             cleaned_value, actual_type = self.type_cleaner.clean(
-                entity['value'], 
+                entity['value'],
                 entity['type']
             )
-            
+
             var_meta = VariableMeta(
                 name=entity['name'],
                 original_text=entity['original_text'],

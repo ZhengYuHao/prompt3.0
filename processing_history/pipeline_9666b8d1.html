@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流水线报告 - 9666b8d1</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .meta-bar {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .meta-item {
+            text-align: center;
+        }
+        .meta-item .label {
+            color: #666;
+            font-size: 12px;
+        }
+        .meta-item .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .stage {
+            margin: 30px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .stage-header {
+            padding: 15px 20px;
+            font-weight: bold;
+            color: white;
+        }
+        .stage-1 .stage-header { background: linear-gradient(90deg, #667eea, #764ba2); }
+        .stage-2 .stage-header { background: linear-gradient(90deg, #11998e, #38ef7d); }
+        .stage-3 .stage-header { background: linear-gradient(90deg, #ff7e5f, #feb47b); }
+        .stage-4 .stage-header { background: linear-gradient(90deg, #f093fb, #f5576c); }
+        .stage-content {
+            padding: 20px;
+        }
+        .text-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+            white-space: pre-wrap;
+            font-family: 'Consolas', monospace;
+            line-height: 1.8;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .text-box.template { border-left-color: #11998e; }
+        .text-box.dsl-code { border-left-color: #ff7e5f; }
+        .text-box.main-code { border-left-color: #f093fb; max-height: 500px; }
+        .term-changes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .term-item {
+            background: #fff3cd;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .old { color: #d32f2f; text-decoration: line-through; }
+        .new { color: #388e3c; font-weight: bold; }
+        .deleted { color: #999; font-style: italic; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        .type-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .type-badge { background: #e3f2fd; color: #1976d2; }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .stat-card .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .step-cards {
+            display: grid;
+            gap: 15px;
+        }
+        .step-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .step-header {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .step-title {
+            flex: 1;
+            font-weight: bold;
+        }
+        .step-duration {
+            color: #666;
+            font-size: 14px;
+        }
+        .step-body {
+            padding: 15px;
+        }
+        .step-section {
+            margin-bottom: 15px;
+        }
+        .step-section:last-child { margin-bottom: 0; }
+        .step-section h5 {
+            margin: 0 0 10px 0;
+            color: #666;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .change-item {
+            padding: 5px 0;
+            font-size: 14px;
+        }
+        .note-item {
+            padding: 3px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .module-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .module-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .module-header {
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .module-number {
+            background: rgba(255,255,255,0.3);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .module-name {
+            flex: 1;
+            font-weight: bold;
+        }
+        .badge-async, .badge-sync {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .badge-async { background: #4CAF50; }
+        .badge-sync { background: #2196F3; }
+        .module-body {
+            padding: 15px;
+            font-size: 14px;
+        }
+        .module-body div {
+            margin: 5px 0;
+        }
+        .time-breakdown {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .time-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .time-item:last-child { border-bottom: none; }
+        .time-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .time-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+        .time-fill.stage-2 { background: linear-gradient(90deg, #11998e, #38ef7d); }
+        .time-fill.stage-3 { background: linear-gradient(90deg, #ff7e5f, #feb47b); }
+        .time-fill.stage-4 { background: linear-gradient(90deg, #f093fb, #f5576c); }
+
+        /* 调用关系图样式 - 优化显示空间 */
+        .call-graph-container {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px 0;
+            overflow: hidden;
+            position: relative;
+            min-height: 600px;
+        }
+        .call-graph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .call-graph-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .control-btn {
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        .control-btn:hover {
+            background: #0056b3;
+        }
+        .control-btn.reset {
+            background: #6c757d;
+        }
+        .control-btn.reset:hover {
+            background: #545b62;
+        }
+        .zoom-level {
+            background: #e9ecef;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 80px;
+            text-align: center;
+        }
+        .mermaid-wrapper {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: grab;
+        }
+        .mermaid-wrapper:active {
+            cursor: grabbing;
+        }
+        .mermaid {
+            display: block;
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: transform 0.1s ease;
+            transform-origin: center center;
+            min-width: 1000px;
+        }
+        .zoom-hint {
+            text-align: center;
+            color: #6c757d;
+            font-size: 12px;
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+    <!-- 引入 Mermaid.js 用于渲染架构图 -->
+    <!-- 使用 jsDelivr CDN (lib.baomitu.com/10.6.1 不存在，jsdelivr 可用) -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 完整流水线处理报告</h1>
+        <p class="subtitle">Prompt 1.0 预处理 → Prompt 2.0 结构化 → Prompt 3.0 DSL 编译 → Prompt 4.0 代码生成</p>
+        
+        <div class="meta-bar">
+            <div class="meta-item">
+                <div class="label">流水线 ID</div>
+                <div class="value">9666b8d1</div>
+            </div>
+            <div class="meta-item">
+                <div class="label">处理时间</div>
+                <div class="value">2026-02-03 14:48:11</div>
+            </div>
+            <div class="meta-item">
+                <div class="label">状态</div>
+                <div class="value">✅ success</div>
+            </div>
+            <div class="meta-item">
+                <div class="label">总耗时</div>
+                <div class="value">78305ms</div>
+            </div>
+        </div>
+        
+        <!-- 阶段 1 -->
+        <div class="stage stage-1">
+            <div class="stage-header">📝 阶段 1: Prompt 1.0 预处理 (耗时 38322ms)</div>
+            <div class="stage-content">
+                <h4>原始输入</h4>
+                <div class="text-box">帮我设计一个智能问答系统，需要处理多领域知识库的检索与推理。
+
+首先，用户输入查询后，系统需要判断查询类型：如果是简单事实查询，走向量检索通道；如果是复杂推理查询，先进行意图分解，再走图数据库检索；如果是代码相关问题，则调用代码分析引擎。
+
+向量检索模式下，如果相似度超过0.85，直接返回top-3结果；否则结合重排序模型重新评分，再返回top-5。检索失败时自动切换到混合检索模式。
+
+图数据库检索时，需要沿着知识图谱进行2跳邻居探索，如果找到匹配节点则返回相关实体和关系，否则回退到全量搜索。每次查询都要缓存结果，缓存有效期30分钟。
+
+代码分析引擎支持Python和Java代码，如果代码行数超过500行，只进行静态分析；如果少于500行，则进行完整语义分析并生成解释文档。
+
+用户反馈环节：如果用户对结果不满意，点击"重新生成"时启用更强的推理模型；如果连续3次不满意，则自动升级到人工审核队列。
+
+数据源配置：知识库A包含2000个医学文档，知识库B包含3000个技术文档，知识库C包含1500个法律文档。每个知识库都有独立的向量索引，向量维度统一为1536。
+
+并发控制：系统支持最大50个并发请求，如果超过则排队等待。普通用户优先级设为1，VIP用户优先级设为5，管理员优先级设为10。
+
+安全策略：所有查询内容经过敏感词过滤，如果检测到违规内容则拒绝服务并记录日志。对于金融类查询，需要二次确认用户身份。
+
+响应时间要求：向量检索要在500ms内完成，图数据库检索在1秒内完成，代码分析在2秒内完成。总响应时间不超过3秒，否则降级服务。
+
+日志级别：错误日志保留90天，访问日志保留30天，调试日志保留7天。所有日志都要上传到中央日志系统。
+
+监控指标：QPS、平均响应时间、95分位响应时间、缓存命中率、检索准确率。如果QPS低于10持续10分钟，触发告警；如果95分位响应时间超过3秒持续5分钟，触发扩容。</div>
+                
+                <h4>标准化输出</h4>
+                <div class="text-box">你是一个智能问答系统设计规范文档。
+
+系统需要处理多领域知识库的检索与推理。
+
+查询类型判断：
+1. 简单事实查询 → 向量检索通道
+2. 复杂推理查询 → 意图分解 → 图数据库检索
+3. 代码相关问题 → 调用代码分析引擎
+
+向量检索模式：
+- 相似度 > 0.85 → 返回前3个结果
+- 相似度 ≤ 0.85 → 重排序模型评分 → 返回前5个结果
+- 检索失败 → 切换到混合检索模式
+
+图数据库检索：
+- 沿知识图谱(KG)进行2跳邻居探索
+- 找到匹配节点 → 返回相关实体和关系
+- 未找到匹配节点 → 回退到全量搜索
+- 每次查询缓存结果，缓存有效期30分钟
+
+代码分析引擎：
+- 支持Python和Java代码
+- 代码行数 > 500 → 静态分析
+- 代码行数 ≤ 500 → 完整语义分析 + 生成解释文档
+
+用户反馈机制：
+- 点击"重新生成" → 启用更强的推理模型
+- 连续3次不满意 → 升级到人工审核队列
+
+数据源配置：
+- 知识库A：2000个医学文档
+- 知识库B：3000个技术文档
+- 知识库C：1500个法律文档
+- 每个知识库有独立向量索引(VI)
+- 向量维度统一为1536
+
+并发控制：
+- 最大50个并发请求
+- 超出则排队等待
+- 用户优先级：
+  - 普通用户：1
+  - VIP用户：5
+  - 管理员：10
+
+安全策略：
+- 所有查询内容经过敏感词过滤
+- 检测到违规内容 → 拒绝服务 + 记录日志
+- 金融类查询 → 需要二次确认用户身份
+
+响应时间要求：
+- 向量检索：≤ 500ms
+- 图数据库检索：≤ 1秒
+- 代码分析：≤ 2秒
+- 总响应时间：≤ 3秒
+- 超时 → 降级服务
+
+日志管理：
+- 错误日志：保留90天
+- 访问日志：保留30天
+- 调试日志：保留7天
+- 所有日志上传到中央日志系统
+
+监控指标：
+- 每秒查询率(QPS)
+- 平均响应时间
+- 95分位响应时间
+- 缓存命中率(CRH)
+- 检索准确率
+- QPS < 10 持续10分钟 → 触发告警
+- 95分位响应时间 > 3秒 持续5分钟 → 触发扩容</div>
+                
+                <h4>处理步骤详情 (3 个步骤)</h4>
+                <div class="step-cards">
+                    
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <span class="step-title">术语对齐</span>
+                        <span class="step-duration">0ms</span>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-section">
+                            <h5>变更记录</h5>
+                            <div class="change-item"><span class="old">帮我</span> → <span class="new">'请'</span></div><div class="change-item"><span class="old">top-3</span> → <span class="new">'前3个结果'</span></div><div class="change-item"><span class="old">top-5</span> → <span class="new">'前5个结果'</span></div><div class="change-item">... 还有 4 处变更</div>
+                        </div>
+                        <div class="step-section"><h5>备注</h5><div class="note-item">• 替换 8 处</div></div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <span class="step-title">术语对齐</span>
+                        <span class="step-duration">0ms</span>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-section">
+                            <h5>变更记录</h5>
+                            <div class="change-item"><span class="old">帮我</span> → <span class="new">'请'</span></div><div class="change-item"><span class="old">top-3</span> → <span class="new">'前3个结果'</span></div><div class="change-item"><span class="old">top-5</span> → <span class="new">'前5个结果'</span></div><div class="change-item">... 还有 4 处变更</div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <span class="step-title">LLM语义重构</span>
+                        <span class="step-duration">38321ms</span>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-section">
+                            <h5>变更记录</h5>
+                            <div class="change-item"><span class="old">标准化</span> → <span class="new">'840字 → 903字'</span></div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                </div>
+                
+                <h4>术语替换 (7 处)</h4>
+                <div class="term-changes"><div class="term-item"><span class="old">帮我</span> → <span class="new">请</span></div><div class="term-item"><span class="old">top-3</span> → <span class="new">前3个结果</span></div><div class="term-item"><span class="old">top-5</span> → <span class="new">前5个结果</span></div><div class="term-item"><span class="old">知识图谱</span> → <span class="new">知识图谱(KG)</span></div><div class="term-item"><span class="old">向量索引</span> → <span class="new">向量索引(VI)</span></div><div class="term-item"><span class="old">QPS</span> → <span class="new">每秒查询率(QPS)</span></div><div class="term-item"><span class="old">缓存命中率</span> → <span class="new">缓存命中率(CRH)</span></div></div>
+            </div>
+        </div>
+        
+        <!-- 阶段 2 -->
+        <div class="stage stage-2">
+            <div class="stage-header">🔧 阶段 2: Prompt 2.0 结构化 (耗时 0ms)</div>
+            <div class="stage-content">
+                <h4>参数化模板</h4>
+                <div class="text-box template">你是一个智能问答系统设计规范文档。
+
+系统需要处理多领域知识库的检索与推理。
+
+查询类型判断：
+1. 简单事实查询 → 向量检索通道
+2. 复杂推理查询 → 意图分解 → 图数据库检索
+3. 代码相关问题 → 调用代码分析引擎
+
+向量检索模式：
+- {{vector_similarity_threshold}} → {{vector_top_k_results_high}}
+- 相似度 ≤ 0.85 → 重排序模型评分 → {{vector_top_k_results_low}}
+- 检索失败 → 切换到混合检索模式
+
+图数据库检索：
+- 沿知识图谱(KG)进行{{kg_neighbor_hops}}
+- 找到匹配节点 → 返回相关实体和关系
+- 未找到匹配节点 → 回退到全量搜索
+- 每次查询缓存结果，{{cache_expiration_minutes}}
+
+代码分析引擎：
+- 支持Python和Java代码
+- {{code_line_threshold}} → 静态分析
+- 代码行数 ≤ 500 → 完整语义分析 + 生成解释文档
+
+用户反馈机制：
+- 点击"重新生成" → 启用更强的推理模型
+- 连续3次不满意 → 升级到人工审核队列
+
+数据源配置：
+- 知识库A：{{medical_docs_count}}
+- 知识库B：{{tech_docs_count}}
+- 知识库C：{{legal_docs_count}}
+- 每个知识库有独立向量索引(VI)
+- {{vector_dim}}
+
+并发控制：
+- {{max_concurrent_requests}}
+- 超出则排队等待
+- 用户优先级：
+  - {{user_priority_normal}}
+  - {{user_priority_vip}}
+  - {{user_priority_admin}}
+
+安全策略：
+- 所有查询内容经过敏感词过滤
+- 检测到违规内容 → 拒绝服务 + 记录日志
+- 金融类查询 → 需要二次确认用户身份
+
+响应时间要求：
+- 向量检索：{{vector_response_time_ms}}
+- 图数据库检索：{{graph_response_time_s}}
+- 代码分析：{{code_analysis_time_s}}
+- 总响应时间：{{total_response_time_s}}
+- 超时 → 降级服务
+
+日志管理：
+- 错误日志：{{error_log_retention_days}}
+- 访问日志：{{access_log_retention_days}}
+- 调试日志：{{debug_log_retention_days}}
+- 所有日志上传到中央日志系统
+
+监控指标：
+- 每秒查询率(QPS)
+- 平均响应时间
+- 95分位响应时间
+- 缓存命中率(CRH)
+- 检索准确率
+- {{qps_alert_threshold}} → 触发告警
+- {{response_time_95th_alert}} → 触发扩容</div>
+                
+                <h4>变量注册表 (23 个变量)</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>变量名</th>
+                            <th>原文片段</th>
+                            <th>提取值</th>
+                            <th>类型</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr>
+                    <td><code>vector_similarity_threshold</code></td>
+                    <td>"相似度 > 0.85"</td>
+                    <td><strong>0.85</strong></td>
+                    <td><span class="type-badge">String</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>vector_top_k_results_high</code></td>
+                    <td>"返回前3个结果"</td>
+                    <td><strong>3</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>vector_top_k_results_low</code></td>
+                    <td>"返回前5个结果"</td>
+                    <td><strong>5</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>kg_neighbor_hops</code></td>
+                    <td>"2跳邻居探索"</td>
+                    <td><strong>2</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>cache_expiration_minutes</code></td>
+                    <td>"缓存有效期30分钟"</td>
+                    <td><strong>30</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>code_line_threshold</code></td>
+                    <td>"代码行数 > 500"</td>
+                    <td><strong>500</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>medical_docs_count</code></td>
+                    <td>"2000个医学文档"</td>
+                    <td><strong>2000</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>tech_docs_count</code></td>
+                    <td>"3000个技术文档"</td>
+                    <td><strong>3000</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>legal_docs_count</code></td>
+                    <td>"1500个法律文档"</td>
+                    <td><strong>1500</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>vector_dim</code></td>
+                    <td>"向量维度统一为1536"</td>
+                    <td><strong>1536</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>max_concurrent_requests</code></td>
+                    <td>"最大50个并发请求"</td>
+                    <td><strong>50</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>user_priority_normal</code></td>
+                    <td>"普通用户：1"</td>
+                    <td><strong>1</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>user_priority_vip</code></td>
+                    <td>"VIP用户：5"</td>
+                    <td><strong>5</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>user_priority_admin</code></td>
+                    <td>"管理员：10"</td>
+                    <td><strong>10</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>vector_response_time_ms</code></td>
+                    <td>"≤ 500ms"</td>
+                    <td><strong>500</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>graph_response_time_s</code></td>
+                    <td>"≤ 1秒"</td>
+                    <td><strong>1</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>code_analysis_time_s</code></td>
+                    <td>"≤ 2秒"</td>
+                    <td><strong>2</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>total_response_time_s</code></td>
+                    <td>"≤ 3秒"</td>
+                    <td><strong>3</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>error_log_retention_days</code></td>
+                    <td>"保留90天"</td>
+                    <td><strong>90</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>access_log_retention_days</code></td>
+                    <td>"保留30天"</td>
+                    <td><strong>30</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>debug_log_retention_days</code></td>
+                    <td>"保留7天"</td>
+                    <td><strong>7</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>qps_alert_threshold</code></td>
+                    <td>"QPS < 10 持续10分钟"</td>
+                    <td><strong>10</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>response_time_95th_alert</code></td>
+                    <td>"95分位响应时间 > 3秒 持续5分钟"</td>
+                    <td><strong>3</strong></td>
+                    <td><span class="type-badge">Integer</span></td>
+                </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 阶段 3 -->
+        <div class="stage stage-3">
+            <div class="stage-header">⚙️ 阶段 3: Prompt 3.0 DSL 编译 (耗时 39975ms)</div>
+            <div class="stage-content">
+                <h4>生成的 DSL 代码</h4>
+                
+                <div class="text-box dsl-code">
+                    <pre>DEFINE {{vector_similarity_threshold}}: String = "0.85"
+DEFINE {{vector_top_k_results_high}}: Integer = 3
+DEFINE {{vector_top_k_results_low}}: Integer = 5
+DEFINE {{kg_neighbor_hops}}: Integer = 2
+DEFINE {{cache_expiration_minutes}}: Integer = 30
+DEFINE {{code_line_threshold}}: Integer = 500
+DEFINE {{medical_docs_count}}: Integer = 2000
+DEFINE {{tech_docs_count}}: Integer = 3000
+DEFINE {{legal_docs_count}}: Integer = 1500
+DEFINE {{vector_dim}}: Integer = 1536
+DEFINE {{max_concurrent_requests}}: Integer = 50
+DEFINE {{user_priority_normal}}: Integer = 1
+DEFINE {{user_priority_vip}}: Integer = 5
+DEFINE {{user_priority_admin}}: Integer = 10
+DEFINE {{vector_response_time_ms}}: Integer = 500
+DEFINE {{graph_response_time_s}}: Integer = 1
+DEFINE {{code_analysis_time_s}}: Integer = 2
+DEFINE {{total_response_time_s}}: Integer = 3
+DEFINE {{error_log_retention_days}}: Integer = 90
+DEFINE {{access_log_retention_days}}: Integer = 30
+DEFINE {{debug_log_retention_days}}: Integer = 7
+DEFINE {{qps_alert_threshold}}: Integer = 10
+DEFINE {{response_time_95th_alert}}: Integer = 3
+IF {{query_type}} == "simple_fact"
+    IF {{similarity}} &gt; {{vector_similarity_threshold}}
+        {{results}} = CALL vector_search(top_k={{vector_top_k_results_high}})
+    ELIF {{similarity}} &lt;= {{vector_similarity_threshold}}
+        {{results}} = CALL rerank_model()
+        {{results}} = CALL vector_search(top_k={{vector_top_k_results_low}})
+    ELSE
+        {{results}} = CALL hybrid_search()
+    ENDIF
+ENDIF
+IF {{query_type}} == "complex_reasoning"
+    {{intents}} = CALL intent_decomposition({{query}})
+    {{graph_results}} = CALL graph_search(hops={{kg_neighbor_hops}})
+    IF {{graph_results}}.found
+        {{results}} = {{graph_results}}.entities_and_relations
+    ELSE
+        {{results}} = CALL full_graph_search()
+    ENDIF
+    CALL cache_results({{results}}, expiration_minutes={{cache_expiration_minutes}})
+ENDIF
+IF {{query_type}} == "code_analysis"
+    DEFINE {{code_lines}}: Integer = CALL count_code_lines({{query}})
+    IF {{code_lines}} &gt; {{code_line_threshold}}
+        {{analysis}} = CALL static_code_analysis({{query}})
+    ELSE
+        {{analysis}} = CALL semantic_code_analysis({{query}})
+        {{documentation}} = CALL generate_code_documentation({{analysis}})
+    ENDIF
+    {{results}} = {{analysis}}
+ENDIF
+IF {{user_feedback}} == "regenerate"
+    {{results}} = CALL strong_reasoning_model({{query}})
+ENDIF
+IF {{negative_feedback_count}} &gt;= 3
+    CALL escalate_to_human_review({{query}})
+ENDIF
+IF {{query}} CONTAINS "sensitive_word"
+    CALL reject_service()
+    CALL log_security_incident()
+ENDIF
+IF {{query}} CONTAINS "financial"
+    CALL require_user_authentication()
+ENDIF
+IF {{response_time}} &gt; {{total_response_time_s}}
+    CALL degrade_service()
+ENDIF
+CALL upload_log_to_central_system(log_type="error", retention_days={{error_log_retention_days}})
+CALL upload_log_to_central_system(log_type="access", retention_days={{access_log_retention_days}})
+CALL upload_log_to_central_system(log_type="debug", retention_days={{debug_log_retention_days}})
+IF {{qps}} &lt; {{qps_alert_threshold}}
+    CALL trigger_alert("Low QPS")
+ENDIF
+IF {{response_time_95th}} &gt; {{response_time_95th_alert}}
+    CALL trigger_scaling()
+ENDIF
+RETURN {{results}}</pre>
+                </div>
+            
+                
+                <h4>验证结果</h4>
+                
+                <div class="validation-result">
+                    <p><strong>验证状态:</strong> ✅ 通过</p>
+                    <p><strong>定义变量:</strong> 24 个</p>
+                    <p><strong>函数调用:</strong> 15 个</p>
+                    <p><strong>错误数量:</strong> 0 个</p>
+                    <p><strong>警告数量:</strong> 0 个</p>
+                </div>
+            
+            </div>
+        </div>
+        
+        <!-- 阶段 4 -->
+        <div class="stage stage-4">
+            <div class="stage-header">💻 阶段 4: Prompt 4.0 代码生成 (耗时 8ms)</div>
+            <div class="stage-content">
+                <h4>业务流程图（Approach 图）</h4>
+                <div class="call-graph-container">
+                    <div class="call-graph-header">
+                        <span><strong>交互控制</strong></span>
+                        <div class="call-graph-controls">
+                            <button class="control-btn" onclick="zoomIn()">🔍 放大 (+)</button>
+                            <button class="control-btn" onclick="zoomOut()">🔍 缩小 (-)</button>
+                            <button class="control-btn reset" onclick="resetZoom()">↺ 重置</button>
+                            <span class="zoom-level" id="zoomLevel">100%</span>
+                        </div>
+                    </div>
+                    <div class="mermaid-wrapper" id="mermaidWrapper">
+                        <div class="mermaid" id="mermaidDiagram">
+graph TD
+    Start([用户输入]) --> CheckType{判断查询类型}
+    CheckType -->|简单事实查询| VectorSearch[向量检索]
+    CheckType -->|复杂推理查询| IntentDecomposition[意图分解]
+    CheckType -->|代码相关问题| CodeAnalysis[代码分析]
+    CheckType -->|其他| End([返回结果])
+
+    VectorSearch --> CheckSimilarity{相似度 > 0.85?}
+    CheckSimilarity -->|是| Top3[返回前3个结果]
+    CheckSimilarity -->|否| Rerank[重排序模型评分]
+    Rerank --> Top5[返回前5个结果]
+    Top3 --> End
+    Top5 --> End
+
+    IntentDecomposition --> GraphSearch[图数据库检索]
+    GraphSearch --> CheckFound{找到匹配节点?}
+    CheckFound -->|是| ReturnEntities[返回实体和关系]
+    CheckFound -->|否| FullSearch[全量搜索]
+    ReturnEntities --> Cache[缓存结果]
+    FullSearch --> Cache
+    Cache --> End
+
+    CodeAnalysis --> CheckLines{代码行数 > 500?}
+    CheckLines -->|是| StaticAnalysis[静态分析]
+    CheckLines -->|否| SemanticAnalysis[语义分析]
+    StaticAnalysis --> GenerateDoc[生成解释文档]
+    SemanticAnalysis --> GenerateDoc
+    GenerateDoc --> End
+
+    End --> Feedback[用户反馈]
+    Feedback --> CheckFeedback{是否点击重新生成?}
+    CheckFeedback -->|是| StrongModel[启用强推理模型]
+    CheckFeedback -->|否| CheckUnsatisfied{连续3次不满意?}
+    CheckUnsatisfied -->|是| HumanReview[人工审核]
+    CheckUnsatisfied -->|否| End
+
+    classDef start fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    classDef endNode fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    classDef decision fill:#fff3cd,stroke:#ffc107,stroke-width:2px;
+    classDef process fill:#e1f5ff,stroke:#007bff,stroke-width:2px;
+
+    class Start start;
+    class End endNode;
+    class CheckType decision;
+    class CheckSimilarity decision;
+    class CheckFound decision;
+    class CheckLines decision;
+    class CheckFeedback decision;
+    class CheckUnsatisfied decision;
+    class VectorSearch process;
+    class IntentDecomposition process;
+    class CodeAnalysis process;
+    class Rerank process;
+    class Top3 process;
+    class Top5 process;
+    class GraphSearch process;
+    class ReturnEntities process;
+    class FullSearch process;
+    class Cache process;
+    class StaticAnalysis process;
+    class SemanticAnalysis process;
+    class GenerateDoc process;
+    class StrongModel process;
+    class HumanReview process;
+    class Feedback process;
+                        </div>
+                    </div>
+                    <div class="zoom-hint">
+                        💡 提示：此图展示业务逻辑和处理流程，使用鼠标滚轮缩放，或拖拽移动图片
+                    </div>
+                </div>
+
+                <h4>编译步骤详情</h4>
+                <div class="step-cards">
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <span class="step-title">词法解析</span>
+                        <span class="step-duration"></span>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-section">
+                            <h5>统计信息</h5>
+                            <div class="change-item">代码块总数: 79</div>
+                            <div class="change-item">类型分布: ASSIGN: 27, IF: 13, CALL: 22, ELIF: 1, ELSE: 3, ENDIF: 13</div>
+                        </div>
+                        <div class="step-section">
+                            <h5>代码块详情 (前3个)</h5>
+                            
+                        <div class="change-item">
+                            <strong>Block OP_0</strong> (ASSIGN, 同步)<br>
+                            &nbsp;&nbsp;输入: vector_similarity_threshold<br>
+                            &nbsp;&nbsp;输出: vector_similarity_threshold
+                        </div>
+                    
+                        <div class="change-item">
+                            <strong>Block OP_1</strong> (ASSIGN, 同步)<br>
+                            &nbsp;&nbsp;输入: vector_top_k_results_high<br>
+                            &nbsp;&nbsp;输出: vector_top_k_results_high
+                        </div>
+                    
+                        <div class="change-item">
+                            <strong>Block OP_2</strong> (ASSIGN, 同步)<br>
+                            &nbsp;&nbsp;输入: vector_top_k_results_low<br>
+                            &nbsp;&nbsp;输出: vector_top_k_results_low
+                        </div>
+                    <div class="change-item" style="color:#666;">... 还有 76 个代码块</div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <span class="step-title">依赖分析</span>
+                        <span class="step-duration"></span>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-section">
+                            <h5>图结构</h5>
+                            <div class="change-item">节点数量: 79</div>
+                            <div class="change-item">边数量: 19</div>
+                            <div class="change-item">循环依赖: 否 ✅</div>
+                        </div>
+                        <div class="step-section">
+                            <h5>死代码检测</h5>
+                            <div class="change-item">发现 23 个死代码块</div>
+                            <div class="change-item">死代码: OP_6, OP_7, OP_8, OP_9, OP_10 ... 还有 18 个</div>
+                        </div>
+                        <div class="step-section">
+                            <h5>拓扑排序</h5>
+                            <div class="change-item" style="word-break:break-all;">OP_0 → OP_1 → OP_2 → OP_3 → OP_4 → OP_5 → OP_6 → OP_7 ... 还有 71 个</div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <span class="step-title">模块聚类</span>
+                        <span class="step-duration"></span>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-section">
+                            <h5>聚类策略</h5>
+                            <div class="change-item">策略类型: <strong>hybrid</strong></div>
+                            <div class="change-item">模块总数: 15</div>
+                        </div>
+                        <div class="step-section">
+                            <h5>聚类结果 (前4个)</h5>
+                            
+                        <div class="change-item">
+                            <strong>模块 1</strong> (23 个代码块)<br>
+                            &nbsp;&nbsp;代码块: OP_0, OP_1, OP_2, OP_3, OP_4 ...
+                        </div>
+                    
+                        <div class="change-item">
+                            <strong>模块 2</strong> (10 个代码块)<br>
+                            &nbsp;&nbsp;代码块: CTRL_23, CTRL_24, OP_25, CTRL_26, OP_27 ...
+                        </div>
+                    
+                        <div class="change-item">
+                            <strong>模块 3</strong> (10 个代码块)<br>
+                            &nbsp;&nbsp;代码块: CTRL_33, OP_34, OP_35, CTRL_36, OP_37 ...
+                        </div>
+                    
+                        <div class="change-item">
+                            <strong>模块 4</strong> (10 个代码块)<br>
+                            &nbsp;&nbsp;代码块: CTRL_43, OP_44, CTRL_45, OP_46, CTRL_47 ...
+                        </div>
+                    <div class="change-item" style="color:#666;">... 还有 11 个模块</div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">4</span>
+                        <span class="step-title">代码生成</span>
+                        <span class="step-duration"></span>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-section">
+                            <h5>生成统计</h5>
+                            <div class="change-item">总模块数: 15</div>
+                            <div class="change-item">异步模块: 10</div>
+                            <div class="change-item">同步模块: 5</div>
+                        </div>
+                        <div class="step-section">
+                            <h5>模块详情 (前4个)</h5>
+                            
+                        <div class="change-item">
+                            <strong>0. step_1_compute_vector_similarity_threshold</strong><br>
+                            &nbsp;&nbsp;输入: 无<br>
+                            &nbsp;&nbsp;输出: access_log_retention_days, cache_expiration_minutes, code_analysis_time_s, code_line_threshold, debug_log_retention_days, error_log_retention_days, graph_response_time_s, kg_neighbor_hops, legal_docs_count, max_concurrent_requests, medical_docs_count, qps_alert_threshold, response_time_95th_alert, tech_docs_count, total_response_time_s, user_priority_admin, user_priority_normal, user_priority_vip, vector_dim, vector_response_time_ms, vector_similarity_threshold, vector_top_k_results_high, vector_top_k_results_low<br>
+                            &nbsp;&nbsp;<span class="badge-sync">同步</span>
+                        </div>
+                        <div style="margin-top:10px; padding:10px; background:#f9f9fa; border-left:4px solid #f093fb; border-radius:4px;">
+                            <strong style="color:#f093fb; display:block; margin-bottom:5px;">函数实现:</strong>
+                            <pre style="background:#f5f5f5; padding:10px; border-radius:4px; font-size:12px; line-height:1.6; color:#333; max-height:200px; overflow-y:auto;">def step_1_compute_vector_similarity_threshold():
+    """Auto-generated module"""
+    return access_log_retention_days, cache_expiration_minutes, code_analysis_time_s, code_line_threshold, debug_log_retention_days, error_log_retention_days, graph_response_time_s, kg_neighbor_hops, legal_docs_count, max_concurrent_requests, medical_docs_count, qps_alert_threshold, response_time_95th_alert, tech_docs_count, total_response_time_s, user_priority_admin, user_priority_normal, user_priority_vip, vector_dim, vector_response_time_ms, vector_similarity_threshold, vector_top_k_results_high, vector_top_k_results_low</pre>
+                        </div>
+                    
+                        <div class="change-item">
+                            <strong>1. step_2_vector_search</strong><br>
+                            &nbsp;&nbsp;输入: query_type, similarity, vector_similarity_threshold, vector_top_k_results_high, vector_top_k_results_low<br>
+                            &nbsp;&nbsp;输出: results<br>
+                            &nbsp;&nbsp;<span class="badge-async">异步</span>
+                        </div>
+                        <div style="margin-top:10px; padding:10px; background:#f9f9fa; border-left:4px solid #f093fb; border-radius:4px;">
+                            <strong style="color:#f093fb; display:block; margin-bottom:5px;">函数实现:</strong>
+                            <pre style="background:#f5f5f5; padding:10px; border-radius:4px; font-size:12px; line-height:1.6; color:#333; max-height:200px; overflow-y:auto;">async def step_2_vector_search(query_type, similarity, vector_similarity_threshold, vector_top_k_results_high, vector_top_k_results_low):
+    """Auto-generated module"""
+    if query_type == "simple_fact":
+        if similarity &gt; vector_similarity_threshold:
+            results = await invoke_function('vector_search', top_k=vector_top_k_results_high)
+        elif similarity &lt;= vector_similarity_threshold:
+            results = await invoke_function('rerank_model')
+            results = await invoke_function('vector_search', top_k=vector_top_k_results_low)
+        else:
+            results = await invoke_function('hybrid_search')
+        ... 还有 1 行</pre>
+                        </div>
+                    
+                        <div class="change-item">
+                            <strong>2. step_3_intent_decomposition</strong><br>
+                            &nbsp;&nbsp;输入: cache_expiration_minutes, kg_neighbor_hops, query, query_type<br>
+                            &nbsp;&nbsp;输出: graph_results, intents, results<br>
+                            &nbsp;&nbsp;<span class="badge-async">异步</span>
+                        </div>
+                        <div style="margin-top:10px; padding:10px; background:#f9f9fa; border-left:4px solid #f093fb; border-radius:4px;">
+                            <strong style="color:#f093fb; display:block; margin-bottom:5px;">函数实现:</strong>
+                            <pre style="background:#f5f5f5; padding:10px; border-radius:4px; font-size:12px; line-height:1.6; color:#333; max-height:200px; overflow-y:auto;">async def step_3_intent_decomposition(cache_expiration_minutes, kg_neighbor_hops, query, query_type):
+    """Auto-generated module"""
+    if query_type == "complex_reasoning":
+        intents = await invoke_function('intent_decomposition', query=query)
+        graph_results = await invoke_function('graph_search', hops=kg_neighbor_hops)
+        if graph_results.found:
+            results = graph_results.entities_and_relations
+        else:
+            results = await invoke_function('full_graph_search')
+        await invoke_function('cache_results', results=results, expiration_minutes=cache_expiration_minutes)
+        ... 还有 1 行</pre>
+                        </div>
+                    
+                        <div class="change-item">
+                            <strong>3. step_4_static_code_analysis</strong><br>
+                            &nbsp;&nbsp;输入: code_line_threshold, query, query_type<br>
+                            &nbsp;&nbsp;输出: analysis, code_lines, documentation, results<br>
+                            &nbsp;&nbsp;<span class="badge-async">异步</span>
+                        </div>
+                        <div style="margin-top:10px; padding:10px; background:#f9f9fa; border-left:4px solid #f093fb; border-radius:4px;">
+                            <strong style="color:#f093fb; display:block; margin-bottom:5px;">函数实现:</strong>
+                            <pre style="background:#f5f5f5; padding:10px; border-radius:4px; font-size:12px; line-height:1.6; color:#333; max-height:200px; overflow-y:auto;">async def step_4_static_code_analysis(code_line_threshold, query, query_type):
+    """Auto-generated module"""
+    if query_type == "code_analysis":
+        if code_lines &gt; code_line_threshold:
+            analysis = await invoke_function('static_code_analysis', query=query)
+        else:
+            analysis = await invoke_function('semantic_code_analysis', query=query)
+            documentation = await invoke_function('generate_code_documentation', analysis=analysis)
+        results = analysis
+    return analysis, code_lines, documentation, results</pre>
+                        </div>
+                    <div class="change-item" style="color:#666;">... 还有 11 个模块</div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">5</span>
+                        <span class="step-title">主控编排</span>
+                        <span class="step-duration"></span>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-section">
+                            <h5>外部输入参数</h5>
+                            <div class="change-item">参数数量: 8</div>
+                            <div class="change-item" style="word-break:break-all;">negative_feedback_count, qps, query, query_type, response_time, response_time_95th, similarity, user_feedback</div>
+                        </div>
+                        <div class="step-section">
+                            <h5>主工作流代码 (预览)</h5>
+                            <div class="note-item">async def main_workflow(input_params: dict):</div><div class="note-item">    """</div><div class="note-item">    主工作流 - 自动生成</div><div class="note-item">    </div><div class="note-item">    Args:</div><div class="note-item" style="color:#666;">... 还有 54 行</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <h4>工作流模块 (15 个)</h4>
+                <div class="module-cards">
+                    
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">1</span>
+                            <span class="module-name">step_1_compute_vector_similarity_threshold</span>
+                            <span class="badge-sync">同步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> 无</div>
+                            <div><strong>输出:</strong> access_log_retention_days, cache_expiration_minutes, code_analysis_time_s, code_line_threshold, debug_log_retention_days, error_log_retention_days, graph_response_time_s, kg_neighbor_hops, legal_docs_count, max_concurrent_requests, medical_docs_count, qps_alert_threshold, response_time_95th_alert, tech_docs_count, total_response_time_s, user_priority_admin, user_priority_normal, user_priority_vip, vector_dim, vector_response_time_ms, vector_similarity_threshold, vector_top_k_results_high, vector_top_k_results_low</div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">2</span>
+                            <span class="module-name">step_2_vector_search</span>
+                            <span class="badge-async">异步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> query_type, similarity, vector_similarity_threshold, vector_top_k_results_high, vector_top_k_results_low</div>
+                            <div><strong>输出:</strong> results</div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">3</span>
+                            <span class="module-name">step_3_intent_decomposition</span>
+                            <span class="badge-async">异步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> cache_expiration_minutes, kg_neighbor_hops, query, query_type</div>
+                            <div><strong>输出:</strong> graph_results, intents, results</div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">4</span>
+                            <span class="module-name">step_4_static_code_analysis</span>
+                            <span class="badge-async">异步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> code_line_threshold, query, query_type</div>
+                            <div><strong>输出:</strong> analysis, code_lines, documentation, results</div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">5</span>
+                            <span class="module-name">step_5_strong_reasoning_model</span>
+                            <span class="badge-async">异步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> query, user_feedback</div>
+                            <div><strong>输出:</strong> results</div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">6</span>
+                            <span class="module-name">step_6_escalate_to_human_review</span>
+                            <span class="badge-async">异步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> negative_feedback_count, query</div>
+                            <div><strong>输出:</strong> 无</div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">7</span>
+                            <span class="module-name">step_7_reject_service</span>
+                            <span class="badge-async">异步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> query</div>
+                            <div><strong>输出:</strong> 无</div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">8</span>
+                            <span class="module-name">step_8_require_user_authentication</span>
+                            <span class="badge-async">异步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> query</div>
+                            <div><strong>输出:</strong> 无</div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">9</span>
+                            <span class="module-name">step_9_degrade_service</span>
+                            <span class="badge-async">异步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> response_time, total_response_time_s</div>
+                            <div><strong>输出:</strong> 无</div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">10</span>
+                            <span class="module-name">step_10_upload_log_to_central_system</span>
+                            <span class="badge-sync">同步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> error_log_retention_days</div>
+                            <div><strong>输出:</strong> 无</div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">11</span>
+                            <span class="module-name">step_11_upload_log_to_central_system</span>
+                            <span class="badge-sync">同步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> access_log_retention_days</div>
+                            <div><strong>输出:</strong> 无</div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">12</span>
+                            <span class="module-name">step_12_upload_log_to_central_system</span>
+                            <span class="badge-sync">同步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> debug_log_retention_days</div>
+                            <div><strong>输出:</strong> 无</div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">13</span>
+                            <span class="module-name">step_13_trigger_alert</span>
+                            <span class="badge-async">异步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> qps, qps_alert_threshold</div>
+                            <div><strong>输出:</strong> 无</div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">14</span>
+                            <span class="module-name">step_14_trigger_scaling</span>
+                            <span class="badge-async">异步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> response_time_95th, response_time_95th_alert</div>
+                            <div><strong>输出:</strong> 无</div>
+                        </div>
+                    </div>
+
+                    <div class="module-card">
+                        <div class="module-header">
+                            <span class="module-number">15</span>
+                            <span class="module-name">step_15_compute_results</span>
+                            <span class="badge-sync">同步</span>
+                        </div>
+                        <div class="module-body">
+                            <div><strong>输入:</strong> results</div>
+                            <div><strong>输出:</strong> __results__</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <h4>主工作流代码</h4>
+                
+                <div class="text-box main-code">
+                    <pre>async def main_workflow(input_params: dict):
+    """
+    主工作流 - 自动生成
+    
+    Args:
+        input_params: 包含 ['negative_feedback_count', 'qps', 'query', 'query_type', 'response_time', 'response_time_95th', 'similarity', 'user_feedback'] 的字典
+    
+    Returns:
+        执行结果上下文
+    """
+    # 初始化上下文
+    ctx = input_params.copy()
+
+    # Module 1: step_1_compute_vector_similarity_threshold
+    ctx["access_log_retention_days"], ctx["cache_expiration_minutes"], ctx["code_analysis_time_s"], ctx["code_line_threshold"], ctx["debug_log_retention_days"], ctx["error_log_retention_days"], ctx["graph_response_time_s"], ctx["kg_neighbor_hops"], ctx["legal_docs_count"], ctx["max_concurrent_requests"], ctx["medical_docs_count"], ctx["qps_alert_threshold"], ctx["response_time_95th_alert"], ctx["tech_docs_count"], ctx["total_response_time_s"], ctx["user_priority_admin"], ctx["user_priority_normal"], ctx["user_priority_vip"], ctx["vector_dim"], ctx["vector_response_time_ms"], ctx["vector_similarity_threshold"], ctx["vector_top_k_results_high"], ctx["vector_top_k_results_low"] = step_1_compute_vector_similarity_threshold()
+
+    # Module 2: step_2_vector_search
+    ctx["results"] = await step_2_vector_search(ctx.get("query_type"), ctx.get("similarity"), ctx.get("vector_similarity_threshold"), ctx.get("vector_top_k_results_high"), ctx.get("vector_top_k_results_low"))
+
+    # Module 3: step_3_intent_decomposition
+    ctx["graph_results"], ctx["intents"], ctx["results"] = await step_3_intent_decomposition(ctx.get("cache_expiration_minutes"), ctx.get("kg_neighbor_hops"), ctx.get("query"), ctx.get("query_type"))
+
+    # Module 4: step_4_static_code_analysis
+    ctx["analysis"], ctx["code_lines"], ctx["documentation"], ctx["results"] = await step_4_static_code_analysis(ctx.get("code_line_threshold"), ctx.get("query"), ctx.get("query_type"))
+
+    # Module 5: step_5_strong_reasoning_model
+    ctx["results"] = await step_5_strong_reasoning_model(ctx.get("query"), ctx.get("user_feedback"))
+
+    # Module 6: step_6_escalate_to_human_review
+    await step_6_escalate_to_human_review(ctx.get("negative_feedback_count"), ctx.get("query"))
+
+    # Module 7: step_7_reject_service
+    await step_7_reject_service(ctx.get("query"))
+
+    # Module 8: step_8_require_user_authentication
+    await step_8_require_user_authentication(ctx.get("query"))
+
+    # Module 9: step_9_degrade_service
+    await step_9_degrade_service(ctx.get("response_time"), ctx.get("total_response_time_s"))
+
+    # Module 10: step_10_upload_log_to_central_system
+    step_10_upload_log_to_central_system(ctx.get("error_log_retention_days"))
+
+    # Module 11: step_11_upload_log_to_central_system
+    step_11_upload_log_to_central_system(ctx.get("access_log_retention_days"))
+
+    # Module 12: step_12_upload_log_to_central_system
+    step_12_upload_log_to_central_system(ctx.get("debug_log_retention_days"))
+
+    # Module 13: step_13_trigger_alert
+    await step_13_trigger_alert(ctx.get("qps"), ctx.get("qps_alert_threshold"))
+
+    # Module 14: step_14_trigger_scaling
+    await step_14_trigger_scaling(ctx.get("response_time_95th"), ctx.get("response_time_95th_alert"))
+
+    # Module 15: step_15_compute_results
+    ctx["__results__"] = step_15_compute_results(ctx.get("results"))
+
+    return ctx</pre>
+                </div>
+            
+            </div>
+        </div>
+        
+        <!-- 统计 -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="number">814</div>
+                <div class="label">原始字符数</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">903</div>
+                <div class="label">标准化字符数</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">7</div>
+                <div class="label">术语替换</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">23</div>
+                <div class="label">识别变量</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">15</div>
+                <div class="label">工作流模块</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">24</div>
+                <div class="label">定义变量</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">15</div>
+                <div class="label">函数调用</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">78305</div>
+                <div class="label">总耗时(ms)</div>
+            </div>
+        </div>
+        
+        <!-- 时间分解 -->
+        <div class="time-breakdown">
+            <h3 style="margin-top:0;">⏱️ 耗时分解</h3>
+            <div class="time-item">
+                <span>阶段 1: 预处理</span>
+                <span>38322ms (48.9%)</span>
+            </div>
+            <div class="time-bar">
+                <div class="time-fill" style="width: 48.93940361407317%;"></div>
+            </div>
+            <div class="time-item">
+                <span>阶段 2: 结构化</span>
+                <span>0ms (0.0%)</span>
+            </div>
+            <div class="time-bar">
+                <div class="time-fill stage-2" style="width: 0.0%;"></div>
+            </div>
+            <div class="time-item">
+                <span>阶段 3: DSL 编译</span>
+                <span>39975ms (51.1%)</span>
+            </div>
+            <div class="time-bar">
+                <div class="time-fill stage-3" style="width: 51.0503799246536%;"></div>
+            </div>
+            <div class="time-item">
+                <span>阶段 4: 代码生成</span>
+                <span>8ms (0.0%)</span>
+            </div>
+            <div class="time-bar">
+                <div class="time-fill stage-4" style="width: 0.010216461273226486%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 初始化 Mermaid.js 和缩放功能 -->
+    <script>
+        // 检查 mermaid 是否加载成功
+        if (typeof mermaid === 'undefined') {
+            console.error('Mermaid.js 加载失败，请检查网络连接');
+            document.getElementById('mermaidWrapper').innerHTML =
+                '<div style="color: red; padding: 20px; text-align: center;">' +
+                '❌ Mermaid.js 加载失败<br>' +
+                '请检查网络连接或刷新页面' +
+                '</div>';
+        } else {
+            // 初始化 Mermaid
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'default',
+                securityLevel: 'loose',
+                flowchart: {
+                    useMaxWidth: false,  // 禁用最大宽度限制
+                    htmlLabels: true
+                },
+                // 添加更多配置选项
+                logLevel: 'error',  // 只显示错误日志
+                suppressErrorRendering: false,  // 不隐藏错误
+            });
+        }
+
+        // 监听 Mermaid 渲染错误
+        window.addEventListener('error', function(e) {
+            if (e.message && e.message.includes('mermaid')) {
+                console.error('Mermaid 渲染错误:', e);
+            }
+        });
+
+        // 缩放和平移功能
+        let currentZoom = 1;
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
+        const mermaidDiagram = document.getElementById('mermaidDiagram');
+        const mermaidWrapper = document.getElementById('mermaidWrapper');
+        const zoomLevelDisplay = document.getElementById('zoomLevel');
+
+        function updateZoom() {
+            // 限制缩放范围: 0.3x - 3.0x
+            currentZoom = Math.max(0.3, Math.min(3.0, currentZoom));
+            mermaidDiagram.style.transform = `scale(${currentZoom})`;
+            zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+        }
+
+        function zoomIn() {
+            currentZoom += 0.1;
+            updateZoom();
+        }
+
+        function zoomOut() {
+            currentZoom -= 0.1;
+            updateZoom();
+        }
+
+        function resetZoom() {
+            currentZoom = 1;
+            updateZoom();
+            mermaidWrapper.scrollTo({
+                left: 0,
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // 鼠标滚轮缩放
+        mermaidWrapper.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            currentZoom += delta;
+            updateZoom();
+        });
+
+        // 鼠标拖拽平移
+        mermaidWrapper.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            startX = e.pageX - mermaidWrapper.offsetLeft;
+            startY = e.pageY - mermaidWrapper.offsetTop;
+            scrollLeft = mermaidWrapper.scrollLeft;
+            scrollTop = mermaidWrapper.scrollTop;
+        });
+
+        mermaidWrapper.addEventListener('mouseleave', function() {
+            isDragging = false;
+        });
+
+        mermaidWrapper.addEventListener('mouseup', function() {
+            isDragging = false;
+        });
+
+        mermaidWrapper.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            const x = e.pageX - mermaidWrapper.offsetLeft;
+            const y = e.pageY - mermaidWrapper.offsetTop;
+            const walkX = (x - startX) * 1.5;  // 平滑系数
+            const walkY = (y - startY) * 1.5;
+            mermaidWrapper.scrollLeft = scrollLeft - walkX;
+            mermaidWrapper.scrollTop = scrollTop - walkY;
+        });
+
+        // 双击重置缩放
+        mermaidWrapper.addEventListener('dblclick', function() {
+            resetZoom();
+        });
+    </script>
+</body>
+</html>

@@ -380,146 +380,75 @@ def run_full_pipeline(input_text: str = None):
     
     info("\n>>> 输入: Prompt 1.0 处理后的标准化文本")
     
-    # 使用 LLM 实体抽取器（根据配置选择模拟或真实）
-    extractor = LLMEntityExtractor(use_mock=USE_MOCK)
+    # 使用 PromptStructurizer 进行完整处理（包括 extraction_log）
+    structurizer = PromptStructurizer(use_mock=USE_MOCK)
+    prompt_structure = structurizer.process(processed_text)
     
-    # 阶段 2.1: 语义扫描
-    info("\n" + "─" * 60)
-    info("【2.1 语义扫描与实体定位 (LLM-Layer)】")
-    info("─" * 60)
+    # 从结果中提取数据
+    template = prompt_structure.template_text
+    variable_registry = prompt_structure.variable_registry
+    extraction_log = prompt_structure.extraction_log
     
-    raw_entities = extractor.extract(processed_text)
-    info(f"\n识别到 {len(raw_entities)} 个候选实体:")
-    
-    for i, entity in enumerate(raw_entities[:10], 1):
-        info(f"  {i:2}. [{entity['type']:8}] \"{entity['original_text'][:20]}{'...' if len(entity['original_text']) > 20 else ''}\"")
-    if len(raw_entities) > 10:
-        info(f"  ... 还有 {len(raw_entities) - 10} 个")
-    
-    # 阶段 2.2: 幻觉防火墙
-    info("\n" + "─" * 60)
-    info("【2.2 幻觉防火墙与存在性校验 (Code-Layer)】")
-    info("─" * 60)
-    
-    firewall = HallucinationFirewall()
-    validated_entities = []
-    rejected = []
-    
-    for entity in raw_entities:
-        is_valid, msg = firewall.validate_existence(entity, processed_text)
-        if is_valid:
-            # 修正索引
-            if not firewall.validate_index(entity, processed_text):
-                snippet = entity['original_text']
-                idx = processed_text.find(snippet)
-                if idx != -1:
-                    entity['start_index'] = idx
-                    entity['end_index'] = idx + len(snippet)
-            validated_entities.append(entity)
-        else:
-            rejected.append(entity)
-    
-    info(f"\n✅ 通过验证: {len(validated_entities)} 个")
-    info(f"❌ 被拒绝 (幻觉): {len(rejected)} 个")
-    for r in rejected:
-        warning(f"    拒绝: \"{r['original_text'][:30]}...\" - 不存在于原文")
-    
-    # 阶段 2.3: 冲突解决
-    info("\n" + "─" * 60)
-    info("【2.3 重叠实体冲突解决 (最长覆盖原则)】")
-    info("─" * 60)
-    
-    resolver = EntityConflictResolver()
-    resolved_entities = resolver.resolve_overlaps(validated_entities)
-    
-    removed_count = len(validated_entities) - len(resolved_entities)
-    info(f"\n冲突解决: {len(validated_entities)} → {len(resolved_entities)} 个 (移除 {removed_count} 个重叠)")
-    
-    # 阶段 2.4: 强类型清洗
-    info("\n" + "─" * 60)
-    info("【2.4 强类型清洗与转换 (Code-Layer)】")
-    info("─" * 60)
-    
-    cleaner = TypeCleaner()
+    # 将 variable_registry (List[Dict]) 转换为 variable_metas (List[VariableMeta])
     variable_metas = []
-    
-    info("\n类型转换详情:")
-    for entity in resolved_entities:
-        cleaned_value, actual_type = cleaner.clean(entity['value'], entity['type'])
-        
+    for var_dict in variable_registry:
         var_meta = VariableMeta(
-            name=entity['name'],
-            original_text=entity['original_text'],
-            value=cleaned_value,
-            data_type=actual_type,
-            start_index=entity['start_index'],
-            end_index=entity['end_index']
+            name=var_dict.get('variable', ''),
+            original_text=var_dict.get('original_text', ''),
+            value=var_dict.get('value', ''),
+            data_type=var_dict.get('type', ''),
+            start_index=0,  # PromptStructure 中没有这个信息，设为0
+            end_index=0
         )
         variable_metas.append(var_meta)
-        
-        # 显示有意义的转换
-        if str(entity['value']) != str(cleaned_value) or entity['type'] != actual_type:
-            info(f"  🔄 \"{entity['original_text'][:15]}{'...' if len(entity['original_text']) > 15 else ''}\":")
-            info(f"      {entity['value']} ({entity['type']}) → {cleaned_value} ({actual_type})")
     
-    # 阶段 2.5: 模板生成
-    info("\n" + "─" * 60)
-    info("【2.5 模板生成与变量注入 (Code-Layer)】")
-    info("─" * 60)
+    info(f"\n✅ 结构化完成，提取到 {len(variable_metas)} 个变量")
+    info(f"📝 提取日志记录数: {len(extraction_log)} 条")
     
-    sorted_vars = sorted(variable_metas, key=lambda v: v.start_index, reverse=True)
-    template = processed_text
+    # 显示提取日志的前几条
+    if extraction_log:
+        info(f"\n📋 提取日志 (前10条):")
+        for log in extraction_log[:10]:
+            info(f"  • {log}")
+        if len(extraction_log) > 10:
+            info(f"  ... 还有 {len(extraction_log) - 10} 条日志")
     
-    for var in sorted_vars:
-        placeholder = f"{{{{{var.name}}}}}"
-        template = template[:var.start_index] + placeholder + template[var.end_index:]
-    
+    # 生成的模板 (Prompt 2.0)
     info("\n📝 生成的模板 (Prompt 2.0):")
     info("─" * 60)
-    # 分行显示模板
     for line in template.split('\n'):
         info(line)
     info("─" * 60)
     
     # =========================================================================
-    # 最终输出
+    # 最终输出: 变量注册表
     # =========================================================================
     info("\n\n" + "=" * 80)
     info("【最终输出: 变量注册表 (Variable Registry)】")
     info("=" * 80)
     
-    variable_registry = []
-    for var in variable_metas:
-        registry_entry = {
-            "variable": var.name,
-            "original_text": var.original_text,
-            "value": var.value,
-            "type": var.data_type,
-        }
-        variable_registry.append(registry_entry)
-    
     info(json.dumps(variable_registry, indent=2, ensure_ascii=False))
-
+    
     # =========================================================================
     # 阶段3: Prompt 3.0 DSL 编译准备
     # =========================================================================
     info("\n>>> 准备 Prompt 2.0 结果用于 DSL 编译...")
-
+    
     # 创建 Prompt20Result 对象
     prompt20_result = create_prompt20_result(
         source_prompt10_id=prompt10_result.id,
         original_text=processed_text,
         template_text=template,
         variables=variable_metas,
-        processing_time_ms=0  # 实际应该计算，这里先设为0
+        processing_time_ms=0
     )
-
+    
     # 转换为 DSL 编译器输入格式
     dsl_input = convert_prompt20_to_dsl_input(prompt20_result)
     info(f"✅ Prompt 2.0 结果已准备，包含 {len(prompt20_result.variables)} 个变量")
-
+    
     # =========================================================================
-    # 验证与应用示例
+    # 验证: 模板回填还原
     # =========================================================================
     info("\n\n" + "=" * 80)
     info("【验证: 模板回填还原】")
@@ -532,42 +461,6 @@ def run_full_pipeline(input_text: str = None):
     
     is_match = filled == processed_text
     info(f"\n还原后与 Prompt 1.0 一致: {'✅ 是' if is_match else '❌ 否'}")
-    
-    # 实际应用示例
-    info("\n\n" + "=" * 80)
-    info("【实际应用: 动态参数调整示例】")
-    info("=" * 80)
-    
-    # 模拟参数调整
-    adjustments = {
-        "duration_weeks": ("8周", "12周"),
-        "budget_wan": ("50万", "80万"),
-        "team_size": ("5个人", "10个人"),
-        "context_rounds": ("20轮", "50轮"),
-    }
-    
-    info("\n用户调整参数:")
-    for key, (old_val, new_val) in adjustments.items():
-        info(f"  • {old_val} → {new_val}")
-    
-    customized = template
-    for var in variable_metas:
-        placeholder = f"{{{{{var.name}}}}}"
-        # 检查是否需要替换
-        replaced = False
-        for key, (old_val, new_val) in adjustments.items():
-            if key in var.name and var.original_text == old_val:
-                customized = customized.replace(placeholder, new_val)
-                replaced = True
-                break
-        if not replaced:
-            customized = customized.replace(placeholder, var.original_text)
-    
-    info("\n📄 定制后的需求文档:")
-    info("─" * 60)
-    for line in customized.split('\n'):
-        info(line)
-    info("─" * 60)
 
     # =========================================================================
     # 阶段3: Prompt 3.0 DSL 编译
@@ -800,7 +693,7 @@ def run_full_pipeline(input_text: str = None):
         prompt20_variables=variable_registry,
         prompt20_variable_count=len(variable_metas),
         prompt20_type_stats=type_stats,
-        prompt20_extraction_log=[],
+        prompt20_extraction_log=extraction_log,
         prompt20_time_ms=0,
 
         # 阶段3结果 (DSL编译) - 无论成功失败都记录 DSL 代码和验证结果

@@ -1135,6 +1135,41 @@ class HistoryManager:
                 </tr>
 """
         
+        # 类型统计HTML
+        type_stats_html = ""
+        if history.prompt20_type_stats:
+            type_stats_html = '<div class="type-stats-box">'
+            for dtype, count in history.prompt20_type_stats.items():
+                type_stats_html += f'<div class="type-stat-item"><span class="type-badge">{dtype}</span>: <strong>{count}</strong></div>'
+            type_stats_html += '</div>'
+        else:
+            type_stats_html = '<p style="color:#999; font-style:italic;">无类型统计数据</p>'
+        
+        # 提取日志HTML（验证过程）
+        extraction_log_html = ""
+        if history.prompt20_extraction_log:
+            extraction_log_html = '<div class="extraction-log-box">'
+            for i, log_msg in enumerate(history.prompt20_extraction_log, 1):
+                # 添加不同图标来区分不同类型的日志
+                icon = "•"
+                if "LLM 识别到" in log_msg:
+                    icon = "🤖"
+                elif "❌" in log_msg or "幻觉检测" in log_msg:
+                    icon = "❌"
+                elif "✓ 验证通过" in log_msg or "精确匹配通过" in log_msg or "模糊匹配通过" in log_msg:
+                    icon = "✓"
+                elif "🔍" in log_msg or "过滤:" in log_msg:
+                    icon = "🔍"
+                elif "类型转换:" in log_msg:
+                    icon = "🔄"
+                elif "冲突解析完成" in log_msg or "后处理校验完成" in log_msg:
+                    icon = "✅"
+                
+                extraction_log_html += f'<div class="log-item"><span class="log-icon">{icon}</span><span class="log-text">{log_msg}</span></div>'
+            extraction_log_html += '</div>'
+        else:
+            extraction_log_html = '<p style="color:#999; font-style:italic;">无提取日志</p>'
+        
         # 处理步骤HTML
         steps_html = ""
         for i, step in enumerate(history.prompt10_steps, 1):
@@ -1636,6 +1671,100 @@ class HistoryManager:
             margin-top: 10px;
             font-style: italic;
         }}
+        
+        /* 类型统计样式 */
+        .type-stats-box {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 15px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #e0e7ff;
+        }}
+        .type-stat-item {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: white;
+            border-radius: 6px;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }}
+        
+        /* 提取日志样式 */
+        .log-section {{
+            margin: 20px 0;
+        }}
+        .log-legend {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 13px;
+            border: 1px solid #e9ecef;
+        }}
+        .log-legend span {{
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }}
+        .extraction-log-box {{
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+        }}
+        .log-item {{
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px;
+            margin: 8px 0;
+            border-left: 3px solid #e9ecef;
+            background: #fafbfc;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.6;
+        }}
+        .log-icon {{
+            font-size: 18px;
+            min-width: 24px;
+            text-align: center;
+            margin-top: -2px;
+        }}
+        .log-text {{
+            flex: 1;
+            word-break: break-word;
+        }}
+        /* 不同类型日志的特殊样式 */
+        .log-item:nth-child(n) {{
+            border-left-color: #dee2e6;
+        }}
+        /* 根据图标设置不同边框色（通过CSS选择器） */
+        .log-item:has(.log-icon:contains("✓")) {{
+            border-left-color: #28a745;
+            background: #f0fff4;
+        }}
+        .log-item:has(.log-icon:contains("❌")) {{
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }}
+        .log-item:has(.log-icon:contains("🔍")) {{
+            border-left-color: #fd7e14;
+            background: #fff8f0;
+        }}
+        .log-item:has(.log-icon:contains("🔄")) {{
+            border-left-color: #17a2b8;
+            background: #e3f2fd;
+        }}
     </style>
     <!-- 引入 Mermaid.js 用于渲染架构图 -->
     <!-- 使用 jsDelivr CDN (lib.baomitu.com/10.6.1 不存在，jsdelivr 可用) -->
@@ -1706,6 +1835,22 @@ class HistoryManager:
                         {variables_html}
                     </tbody>
                 </table>
+                
+                <h4>类型统计</h4>
+                {type_stats_html}
+                
+                <h4>验证过程提取日志 ({len(history.prompt20_extraction_log)} 条记录)</h4>
+                <div class="log-section">
+                    <div class="log-legend">
+                        <span><span class="log-icon">🤖</span> LLM识别</span>
+                        <span><span class="log-icon">✓</span> 验证通过</span>
+                        <span><span class="log-icon">❌</span> 验证失败/幻觉</span>
+                        <span><span class="log-icon">🔍</span> 规则过滤</span>
+                        <span><span class="log-icon">🔄</span> 类型转换</span>
+                        <span><span class="log-icon">✅</span> 步骤完成</span>
+                    </div>
+                    {extraction_log_html}
+                </div>
             </div>
         </div>
         

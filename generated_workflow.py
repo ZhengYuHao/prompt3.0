@@ -7,118 +7,145 @@ from typing import Dict, Any
 from llm_client import invoke_function  # 需要实现 LLM 客户端
 
 
-def step_1_compute_vector_similarity_threshold():
+def step_1_compute_vector_search_top_k(code_lines):
     """Auto-generated module"""
-    return access_log_retention_days, cache_expiration_minutes, code_analysis_time_s, code_line_threshold, debug_log_retention_days, error_log_retention_days, graph_response_time_s, kg_neighbor_hops, legal_docs_count, max_concurrent_requests, medical_docs_count, qps_alert_threshold, response_time_95th_alert, tech_docs_count, total_response_time_s, user_priority_admin, user_priority_normal, user_priority_vip, vector_dim, vector_response_time_ms, vector_similarity_threshold, vector_top_k_results_high, vector_top_k_results_low
+    return access_log_retention, cache_ttl, code_analysis_timeout, debug_log_retention, error_log_retention, graph_search_timeout, legal_docs_count, max_concurrency, medical_docs_count, qps_threshold, response_time_threshold, tech_docs_count, total_response_timeout, vector_search_top_k, vector_search_top_k_low
 
 
-async def step_2_vector_search(query_type, similarity, vector_similarity_threshold, vector_top_k_results_high, vector_top_k_results_low):
+async def step_2_vector_search(cache_ttl, code_lines, query_type, similarity, vector_search_top_k, vector_search_top_k_low):
     """Auto-generated module"""
     if query_type == "simple_fact":
-        if similarity > vector_similarity_threshold:
-            results = await invoke_function('vector_search', top_k=vector_top_k_results_high)
-        elif similarity <= vector_similarity_threshold:
+        if similarity > 0.85:
+            results = await invoke_function('vector_search', top_k=vector_search_top_k)
+        elif similarity <= 0.85:
             results = await invoke_function('rerank_model')
-            results = await invoke_function('vector_search', top_k=vector_top_k_results_low)
+            results = await invoke_function('vector_search', top_k=vector_search_top_k_low)
         else:
             results = await invoke_function('hybrid_search')
-    return results
-
-
-async def step_3_intent_decomposition(cache_expiration_minutes, kg_neighbor_hops, query, query_type):
-    """Auto-generated module"""
-    if query_type == "complex_reasoning":
-        intents = await invoke_function('intent_decomposition', query=query)
-        graph_results = await invoke_function('graph_search', hops=kg_neighbor_hops)
-        if graph_results.found:
-            results = graph_results.entities_and_relations
+    elif query_type == "complex_reasoning":
+        entities = await invoke_function('graph_search', max_hops=_2)
+        if entities   is  not   NULL:
+            results = entities
         else:
             results = await invoke_function('full_graph_search')
-        await invoke_function('cache_results', results=results, expiration_minutes=cache_expiration_minutes)
-    return graph_results, intents, results
+        results = await invoke_function('cache_result', ttl=cache_ttl)
+    elif query_type == "code_analysis":
+        if code_lines > 500:
+            analysis = await invoke_function('static_code_analysis')
+        elif code_lines <= 500:
+            analysis = await invoke_function('semantic_code_analysis')
+            documentation = await invoke_function('generate_code_doc', analysis=analysis)
+    else:
+        results = await invoke_function('default_handler')
+    return analysis, documentation, entities, results
 
 
-async def step_4_static_code_analysis(code_line_threshold, query, query_type):
-    """Auto-generated module"""
-    if query_type == "code_analysis":
-        if code_lines > code_line_threshold:
-            analysis = await invoke_function('static_code_analysis', query=query)
-        else:
-            analysis = await invoke_function('semantic_code_analysis', query=query)
-            documentation = await invoke_function('generate_code_documentation', analysis=analysis)
-        results = analysis
-    return analysis, code_lines, documentation, results
-
-
-async def step_5_strong_reasoning_model(query, user_feedback):
+async def step_3_strong_reasoning_model(user_feedback):
     """Auto-generated module"""
     if user_feedback == "regenerate":
-        results = await invoke_function('strong_reasoning_model', query=query)
+        results = await invoke_function('strong_reasoning_model')
     return results
 
 
-async def step_6_escalate_to_human_review(negative_feedback_count, query):
+async def step_4_escalate_to_human_review(negative_feedback_count):
     """Auto-generated module"""
     if negative_feedback_count >= 3:
-        await invoke_function('escalate_to_human_review', query=query)
+        await invoke_function('escalate_to_human_review')
     return None
 
 
-async def step_7_reject_service(query):
+async def step_5_reject_service(query):
     """Auto-generated module"""
     if "sensitive_word" in query:
         await invoke_function('reject_service')
-        await invoke_function('log_security_incident')
+        await invoke_function('log_security_event')
     return None
 
 
-async def step_8_require_user_authentication(query):
+async def step_6_verify_user_identity(query):
     """Auto-generated module"""
     if "financial" in query:
-        await invoke_function('require_user_authentication')
+        await invoke_function('verify_user_identity')
     return None
 
 
-async def step_9_degrade_service(response_time, total_response_time_s):
+async def step_7_degrade_service(response_time, total_response_timeout):
     """Auto-generated module"""
-    if response_time > total_response_time_s:
+    if response_time > total_response_timeout:
         await invoke_function('degrade_service')
     return None
 
 
-def step_10_upload_log_to_central_system(error_log_retention_days):
+def step_8_upload_log(error_log_retention):
     """Auto-generated module"""
-    await invoke_function('upload_log_to_central_system', log_type="error", retention_days=error_log_retention_days)
+    await invoke_function('upload_log', log_type="error", retention_days=error_log_retention)
     return None
 
 
-def step_11_upload_log_to_central_system(access_log_retention_days):
+def step_9_upload_log(access_log_retention):
     """Auto-generated module"""
-    await invoke_function('upload_log_to_central_system', log_type="access", retention_days=access_log_retention_days)
+    await invoke_function('upload_log', log_type="access", retention_days=access_log_retention)
     return None
 
 
-def step_12_upload_log_to_central_system(debug_log_retention_days):
+def step_10_upload_log(debug_log_retention):
     """Auto-generated module"""
-    await invoke_function('upload_log_to_central_system', log_type="debug", retention_days=debug_log_retention_days)
+    await invoke_function('upload_log', log_type="debug", retention_days=debug_log_retention)
     return None
 
 
-async def step_13_trigger_alert(qps, qps_alert_threshold):
+async def step_11_queue_request(current_concurrency, max_concurrency):
     """Auto-generated module"""
-    if qps < qps_alert_threshold:
-        await invoke_function('trigger_alert', _Low_QPS_=_Low_QPS_)
+    if current_concurrency > max_concurrency:
+        await invoke_function('queue_request')
     return None
 
 
-async def step_14_trigger_scaling(response_time_95th, response_time_95th_alert):
+async def step_12_calculate_qps():
     """Auto-generated module"""
-    if response_time_95th > response_time_95th_alert:
+    qps = await invoke_function('calculate_qps')
+    return qps
+
+
+async def step_13_calculate_avg_response_time():
+    """Auto-generated module"""
+    avg_response_time = await invoke_function('calculate_avg_response_time')
+    return avg_response_time
+
+
+async def step_14_calculate_p95_response_time():
+    """Auto-generated module"""
+    p95_response_time = await invoke_function('calculate_p95_response_time')
+    return p95_response_time
+
+
+async def step_15_calculate_cache_hit_rate():
+    """Auto-generated module"""
+    cache_hit_rate = await invoke_function('calculate_cache_hit_rate')
+    return cache_hit_rate
+
+
+async def step_16_calculate_retrieval_accuracy():
+    """Auto-generated module"""
+    retrieval_accuracy = await invoke_function('calculate_retrieval_accuracy')
+    return retrieval_accuracy
+
+
+async def step_17_trigger_alert(qps, qps_threshold):
+    """Auto-generated module"""
+    if qps < qps_threshold:
+        await invoke_function('trigger_alert')
+    return None
+
+
+async def step_18_trigger_scaling(p95_response_time, response_time_threshold):
+    """Auto-generated module"""
+    if p95_response_time > response_time_threshold:
         await invoke_function('trigger_scaling')
     return None
 
 
-def step_15_compute_results(results):
+def step_19_compute_results(results):
     """Auto-generated module"""
     return results
 
@@ -128,7 +155,7 @@ async def main_workflow(input_params: dict):
     主工作流 - 自动生成
     
     Args:
-        input_params: 包含 ['negative_feedback_count', 'qps', 'query', 'query_type', 'response_time', 'response_time_95th', 'similarity', 'user_feedback'] 的字典
+        input_params: 包含 ['code_lines', 'current_concurrency', 'negative_feedback_count', 'query', 'query_type', 'response_time', 'similarity', 'user_feedback'] 的字典
     
     Returns:
         执行结果上下文
@@ -136,50 +163,62 @@ async def main_workflow(input_params: dict):
     # 初始化上下文
     ctx = input_params.copy()
 
-    # Module 1: step_1_compute_vector_similarity_threshold
-    ctx["access_log_retention_days"], ctx["cache_expiration_minutes"], ctx["code_analysis_time_s"], ctx["code_line_threshold"], ctx["debug_log_retention_days"], ctx["error_log_retention_days"], ctx["graph_response_time_s"], ctx["kg_neighbor_hops"], ctx["legal_docs_count"], ctx["max_concurrent_requests"], ctx["medical_docs_count"], ctx["qps_alert_threshold"], ctx["response_time_95th_alert"], ctx["tech_docs_count"], ctx["total_response_time_s"], ctx["user_priority_admin"], ctx["user_priority_normal"], ctx["user_priority_vip"], ctx["vector_dim"], ctx["vector_response_time_ms"], ctx["vector_similarity_threshold"], ctx["vector_top_k_results_high"], ctx["vector_top_k_results_low"] = step_1_compute_vector_similarity_threshold()
+    # Module 1: step_1_compute_vector_search_top_k
+    ctx["access_log_retention"], ctx["cache_ttl"], ctx["code_analysis_timeout"], ctx["debug_log_retention"], ctx["error_log_retention"], ctx["graph_search_timeout"], ctx["legal_docs_count"], ctx["max_concurrency"], ctx["medical_docs_count"], ctx["qps_threshold"], ctx["response_time_threshold"], ctx["tech_docs_count"], ctx["total_response_timeout"], ctx["vector_search_top_k"], ctx["vector_search_top_k_low"] = step_1_compute_vector_search_top_k(ctx.get("code_lines"))
 
     # Module 2: step_2_vector_search
-    ctx["results"] = await step_2_vector_search(ctx.get("query_type"), ctx.get("similarity"), ctx.get("vector_similarity_threshold"), ctx.get("vector_top_k_results_high"), ctx.get("vector_top_k_results_low"))
+    ctx["analysis"], ctx["documentation"], ctx["entities"], ctx["results"] = await step_2_vector_search(ctx.get("cache_ttl"), ctx.get("code_lines"), ctx.get("query_type"), ctx.get("similarity"), ctx.get("vector_search_top_k"), ctx.get("vector_search_top_k_low"))
 
-    # Module 3: step_3_intent_decomposition
-    ctx["graph_results"], ctx["intents"], ctx["results"] = await step_3_intent_decomposition(ctx.get("cache_expiration_minutes"), ctx.get("kg_neighbor_hops"), ctx.get("query"), ctx.get("query_type"))
+    # Module 3: step_3_strong_reasoning_model
+    ctx["results"] = await step_3_strong_reasoning_model(ctx.get("user_feedback"))
 
-    # Module 4: step_4_static_code_analysis
-    ctx["analysis"], ctx["code_lines"], ctx["documentation"], ctx["results"] = await step_4_static_code_analysis(ctx.get("code_line_threshold"), ctx.get("query"), ctx.get("query_type"))
+    # Module 4: step_4_escalate_to_human_review
+    await step_4_escalate_to_human_review(ctx.get("negative_feedback_count"))
 
-    # Module 5: step_5_strong_reasoning_model
-    ctx["results"] = await step_5_strong_reasoning_model(ctx.get("query"), ctx.get("user_feedback"))
+    # Module 5: step_5_reject_service
+    await step_5_reject_service(ctx.get("query"))
 
-    # Module 6: step_6_escalate_to_human_review
-    await step_6_escalate_to_human_review(ctx.get("negative_feedback_count"), ctx.get("query"))
+    # Module 6: step_6_verify_user_identity
+    await step_6_verify_user_identity(ctx.get("query"))
 
-    # Module 7: step_7_reject_service
-    await step_7_reject_service(ctx.get("query"))
+    # Module 7: step_7_degrade_service
+    await step_7_degrade_service(ctx.get("response_time"), ctx.get("total_response_timeout"))
 
-    # Module 8: step_8_require_user_authentication
-    await step_8_require_user_authentication(ctx.get("query"))
+    # Module 8: step_8_upload_log
+    step_8_upload_log(ctx.get("error_log_retention"))
 
-    # Module 9: step_9_degrade_service
-    await step_9_degrade_service(ctx.get("response_time"), ctx.get("total_response_time_s"))
+    # Module 9: step_9_upload_log
+    step_9_upload_log(ctx.get("access_log_retention"))
 
-    # Module 10: step_10_upload_log_to_central_system
-    step_10_upload_log_to_central_system(ctx.get("error_log_retention_days"))
+    # Module 10: step_10_upload_log
+    step_10_upload_log(ctx.get("debug_log_retention"))
 
-    # Module 11: step_11_upload_log_to_central_system
-    step_11_upload_log_to_central_system(ctx.get("access_log_retention_days"))
+    # Module 11: step_11_queue_request
+    await step_11_queue_request(ctx.get("current_concurrency"), ctx.get("max_concurrency"))
 
-    # Module 12: step_12_upload_log_to_central_system
-    step_12_upload_log_to_central_system(ctx.get("debug_log_retention_days"))
+    # Module 12: step_12_calculate_qps
+    ctx["qps"] = await step_12_calculate_qps()
 
-    # Module 13: step_13_trigger_alert
-    await step_13_trigger_alert(ctx.get("qps"), ctx.get("qps_alert_threshold"))
+    # Module 13: step_13_calculate_avg_response_time
+    ctx["avg_response_time"] = await step_13_calculate_avg_response_time()
 
-    # Module 14: step_14_trigger_scaling
-    await step_14_trigger_scaling(ctx.get("response_time_95th"), ctx.get("response_time_95th_alert"))
+    # Module 14: step_14_calculate_p95_response_time
+    ctx["p95_response_time"] = await step_14_calculate_p95_response_time()
 
-    # Module 15: step_15_compute_results
-    ctx["__results__"] = step_15_compute_results(ctx.get("results"))
+    # Module 15: step_15_calculate_cache_hit_rate
+    ctx["cache_hit_rate"] = await step_15_calculate_cache_hit_rate()
+
+    # Module 16: step_16_calculate_retrieval_accuracy
+    ctx["retrieval_accuracy"] = await step_16_calculate_retrieval_accuracy()
+
+    # Module 17: step_17_trigger_alert
+    await step_17_trigger_alert(ctx.get("qps"), ctx.get("qps_threshold"))
+
+    # Module 18: step_18_trigger_scaling
+    await step_18_trigger_scaling(ctx.get("p95_response_time"), ctx.get("response_time_threshold"))
+
+    # Module 19: step_19_compute_results
+    ctx["__results__"] = step_19_compute_results(ctx.get("results"))
 
     return ctx
 

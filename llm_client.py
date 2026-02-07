@@ -5,11 +5,14 @@
 
 import os
 import json
-from typing import Optional, List, Dict, Any, Union
+from typing import Optional, List, Dict, Any, Union, Tuple
 from dataclasses import dataclass
 from enum import Enum
 from logger import info, warning, error, debug
 from dotenv import load_dotenv
+
+# 优化模块：正则提取器
+from pre_pattern_extractor import PrePatternExtractor
 
 try:
     from openai import OpenAI
@@ -303,21 +306,53 @@ class UnifiedLLMClient:
     def extract_entities(
         self,
         text: str,
-        entity_types: Optional[List[str]] = None
-    ) -> List[Dict[str, Any]]:
+        entity_types: Optional[List[str]] = None,
+        enable_optimization: bool = True
+    ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
         """
-        实体抽取
-        
+        优化的实体抽取（极窄化LLM）
+
+        策略：
+        1. 正则预处理：提取常见模式（数字+单位、技术栈等）
+        2. 如果正则提取足够（3+个实体），直接返回
+        3. 否则调用LLM补充
+        4. 合并结果（正则优先）
+
         Args:
             text: 待抽取文本
             entity_types: 期望的实体类型列表
-            
+            enable_optimization: 是否启用优化（正则预处理）
+
         Returns:
-            实体列表
+            (实体列表, 优化统计信息)
         """
         types_hint = ""
         if entity_types:
             types_hint = f"实体类型限定: {', '.join(entity_types)}\n"
+
+        # 步骤1：正则预处理（如果启用优化）
+        regex_entities = []
+        if enable_optimization:
+            debug(f"[实体提取] 尝试正则预处理...")
+            regex_entities = PrePatternExtractor.extract(text)
+
+            # 如果正则提取足够（3+个实体），直接返回
+            if len(regex_entities) >= 3:
+                info(f"[实体提取] 正则提取成功，提取 {len(regex_entities)} 个实体，跳过 LLM")
+                stats = {
+                    "regex_count": len(regex_entities),
+                    "llm_count": 0,
+                    "merged_count": len(regex_entities),
+                    "llm_called": False,
+                    "optimization_enabled": True
+                }
+                return regex_entities, stats
+            elif len(regex_entities) > 0:
+                info(f"[实体提取] 正则提取 {len(regex_entities)} 个实体，继续使用 LLM 补充")
+            else:
+                debug(f"[实体提取] 正则提取未找到实体，使用 LLM")
+        else:
+            debug(f"[实体提取] 优化未启用，直接使用 LLM")
         
         system_prompt = f"""你是一个实体抽取专家。你的任务是从文本中识别需要动态调整的"变量"。
 
@@ -385,23 +420,45 @@ class UnifiedLLMClient:
 4. 数据类型仅限: String, Integer, Boolean, List, Enum
 5. 优先识别最长匹配项（如 "5个人" 优于 "5"）
 6. 如果描述包含动词+名词但没有数字，大概率是固定需求，不要提取"""
-        
+
+        # 步骤2：调用LLM补充（如果需要）
         response = self.call(system_prompt, text)
 
         # 打印原始响应用于调试
         debug(f"[实体抽取] LLM 原始响应:\n{response.content}\n")
 
         try:
-            entities = json.loads(response.content)
-            if isinstance(entities, list):
-                info(f"[实体抽取] 识别到 {len(entities)} 个实体")
-                return entities
-            else:
-                warning(f"[实体抽取] 响应格式不是数组，实际类型: {type(entities)}")
-                return []
+            llm_entities = json.loads(response.content)
+            if not isinstance(llm_entities, list):
+                warning(f"[实体抽取] 响应格式不是数组，实际类型: {type(llm_entities)}")
+                llm_entities = []
         except json.JSONDecodeError as e:
             warning(f"[实体抽取] JSON 解析失败: {e}")
-            return []
+            llm_entities = []
+
+        # 步骤3：合并结果（正则优先）
+        if enable_optimization and regex_entities:
+            merged_entities = PrePatternExtractor.merge_with_llm(regex_entities, llm_entities)
+            info(f"[实体抽取] 合并结果: 正则{len(regex_entities)} + LLM{len(llm_entities)} → {len(merged_entities)}")
+            stats = {
+                "regex_count": len(regex_entities),
+                "llm_count": len(llm_entities),
+                "merged_count": len(merged_entities),
+                "llm_called": True,
+                "optimization_enabled": True
+            }
+            return merged_entities, stats
+        else:
+            # 如果没有启用优化或正则未提取到实体，直接返回LLM结果
+            info(f"[实体抽取] 识别到 {len(llm_entities)} 个实体（纯LLM）")
+            stats = {
+                "regex_count": len(regex_entities) if enable_optimization else 0,
+                "llm_count": len(llm_entities),
+                "merged_count": len(llm_entities),
+                "llm_called": True,
+                "optimization_enabled": enable_optimization
+            }
+            return llm_entities, stats
     
     def detect_ambiguity(self, text: str) -> Optional[str]:
         """

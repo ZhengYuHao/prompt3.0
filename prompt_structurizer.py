@@ -61,21 +61,30 @@ class LLMEntityExtractor:
         self.llm = llm_client or create_llm_client(use_mock=use_mock)
         self.use_mock = use_mock
 
-    def extract(self, text: str) -> List[Dict]:
+    def extract(self, text: str, enable_optimization: bool = True) -> Tuple[List[Dict], Dict[str, Any]]:
         """
-        调用 LLM 进行实体提取
-        
+        调用 LLM 进行实体提取（支持优化）
+
         Args:
             text: 待抽取文本
-            
+            enable_optimization: 是否启用正则预处理优化
+
         Returns:
-            实体列表
+            (实体列表, 优化统计信息)
         """
         if self.use_mock:
-            return self._mock_extract(text)
-        
-        # 使用统一客户端的实体抽取功能
-        return self.llm.extract_entities(text)
+            entities = self._mock_extract(text)
+            stats = {
+                "regex_count": 0,
+                "llm_count": len(entities),
+                "merged_count": len(entities),
+                "llm_called": False,
+                "optimization_enabled": False
+            }
+            return entities, stats
+
+        # 使用统一客户端的实体抽取功能（返回元组）
+        return self.llm.extract_entities(text, enable_optimization=enable_optimization)
     
     def _mock_extract(self, text: str) -> List[Dict]:
         """模拟实体抽取（用于测试）"""
@@ -536,21 +545,29 @@ class PromptStructurizer:
         except Exception as e:
             warning(f"保存 Prompt 2.0 历史记录失败: {e}")
     
-    def process(self, clean_text: str) -> PromptStructure:
+    def process(self, clean_text: str) -> Tuple[PromptStructure, Dict[str, Any]]:
         """
         主处理流程
         输入: Prompt 1.0 (已清洗文本)
-        输出: PromptStructure (Prompt 2.0)
+        输出: (PromptStructure, 优化统计信息)
         """
         logger.info(f"开始结构化处理: {clean_text[:50]}...")
         self.extraction_log = []
-        
+
         # ===== 阶段 2.1: 语义扫描与实体定位 (LLM-Layer) =====
-        raw_entities = self.llm_extractor.extract(clean_text)
+        raw_entities, optimization_stats = self.llm_extractor.extract(clean_text)
         # 兼容处理：确保是列表
         if isinstance(raw_entities, str):
             raw_entities = json.loads(raw_entities)
-        self._log(f"LLM 识别到 {len(raw_entities)} 个候选实体")
+
+        # 记录优化统计
+        if optimization_stats.get('optimization_enabled'):
+            if optimization_stats.get('llm_called'):
+                self._log(f"实体提取: 正则{optimization_stats.get('regex_count')} + LLM{optimization_stats.get('llm_count')} → {optimization_stats.get('merged_count')}")
+            else:
+                self._log(f"实体提取: 正则提取成功，跳过 LLM (提取{optimization_stats.get('regex_count')}个)")
+        else:
+            self._log(f"LLM 识别到 {len(raw_entities)} 个候选实体")
         
         # ===== 阶段 2.2: 幻觉防火墙与存在性校验 (Code-Layer) =====
         validated_entities = []
@@ -612,15 +629,17 @@ class PromptStructurizer:
             }
             for var in variable_metas
         ]
-        
+
         logger.info("✅ Prompt 2.0 生成完毕")
-        
-        return PromptStructure(
+
+        result = PromptStructure(
             template_text=template_text,
             variable_registry=variable_registry,
             original_text=clean_text,
             extraction_log=self.extraction_log
         )
+
+        return result, optimization_stats
     
     def _generate_template(self, original_text: str, variables: List[VariableMeta]) -> str:
         """

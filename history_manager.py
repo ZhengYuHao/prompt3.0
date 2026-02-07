@@ -26,6 +26,16 @@ class ProcessingHistory:
     success: bool  # 是否成功处理（无歧义）
     processing_time_ms: Optional[int] = None  # 处理耗时（毫秒）
 
+    # 新增：规则引擎统计（极窄化LLM优化）
+    rule_engine_stats: Dict[str, Any] = field(default_factory=dict)
+    # {
+    #   "llm_calls": 0,  # LLM调用次数
+    #   "normalization_changes": 5,  # 规范化变更次数
+    #   "ambiguity_detected": false,  # 是否检测到歧义
+    #   "processing_mode": "dictionary",  # 处理模式
+    #   "has_llm_fallback": false  # 是否回退到LLM
+    # }
+
 
 @dataclass
 class Prompt20History:
@@ -106,6 +116,16 @@ class PipelineHistory:
     overall_status: str = ""
     total_time_ms: int = 0
     error_message: Optional[str] = None
+
+    # 优化统计字段（极窄化LLM优化）
+    prompt10_rule_stats: Dict[str, Any] = field(default_factory=dict)
+    prompt20_optimization_stats: Dict[str, Any] = field(default_factory=dict)
+    prompt30_optimization_stats: Dict[str, Any] = field(default_factory=dict)
+    total_cache_hits: int = 0
+    total_cache_misses: int = 0
+    cache_hit_rate: float = 0.0
+    validation_stats: Dict[str, Any] = field(default_factory=dict)
+    auto_fix_stats: Dict[str, Any] = field(default_factory=dict)
 
 
 class HistoryManager:

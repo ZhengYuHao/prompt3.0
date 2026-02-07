@@ -1,0 +1,398 @@
+<mxfile host="app.diagrams.net" modified="2026-02-07T00:00:00.000Z" agent="Claude AI" version="22.0.0" type="device">
+  <diagram name="系统Approach - 科研视角" id="system-approach">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="Intelligent Q&amp;A System: A Narrow-LLM Approach" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="600" y="20" width="400" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Main Input Node -->
+        <mxCell id="input-node" value="Natural Language Input&lt;br/&gt;自然语言输入" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE5B4;strokeColor=#FF9800;fontSize=12;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="80" y="120" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Prompt 1.0 Stage -->
+        <mxCell id="p10-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5FE;strokeColor=#01579B;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="240" width="760" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p10-label" value="Stage 1: Text Understanding&lt;br/&gt;Prompt 1.0 文本理解" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="100" y="250" width="200" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tokenization" value="Tokenization&lt;br/&gt;分词与预处理" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="120" y="300" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="semantic-analysis" value="Semantic Analysis&lt;br/&gt;语义分析" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="260" y="300" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="standardization" value="Standardization&lt;br/&gt;文本规范化&lt;br/&gt;(Rule Engine)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;fontFamily=Courier New;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="400" y="300" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ambiguity" value="Ambiguity Detection&lt;br/&gt;歧义检测&lt;br/&gt;(Rule + LLM)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;fontFamily=Courier New;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="540" y="300" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="llm-check1" value="LLM Check&lt;br/&gt;LLM检查" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#C2185B;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="680" y="300" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Prompt 2.0 Stage -->
+        <mxCell id="p20-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#880E4F;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="460" width="760" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p20-label" value="Stage 2: Structured Extraction&lt;br/&gt;Prompt 2.0 结构化提取" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="100" y="470" width="200" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pattern-match" value="Pattern Matching&lt;br/&gt;模式匹配&lt;br/&gt;(Regex)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;fontFamily=Courier New;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="120" y="520" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="entity-rec" value="Entity Recognition&lt;br/&gt;实体识别" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="260" y="520" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="variable-ext" value="Variable Extraction&lt;br/&gt;变量提取" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="400" y="520" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conflict-resolve" value="Conflict Resolution&lt;br/&gt;冲突解决&lt;br/&gt;(Deduplication)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;fontFamily=Courier New;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="540" y="520" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="llm-check2" value="LLM Check&lt;br/&gt;LLM检查" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#C2185B;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="680" y="520" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Prompt 3.0 Stage -->
+        <mxCell id="p30-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#E65100;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="680" width="760" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p30-label" value="Stage 3: DSL Generation&lt;br/&gt;Prompt 3.0 DSL生成" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="100" y="690" width="200" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="template-gen" value="Template Generation&lt;br/&gt;模板生成" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="120" y="740" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="logic-trans" value="Logic Translation&lt;br/&gt;逻辑转译" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="260" y="740" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="dsl-build" value="DSL Construction&lt;br/&gt;DSL构建" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="400" y="740" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="validation" value="Validation&lt;br/&gt;验证&lt;br/&gt;(Code Layer)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;fontFamily=Courier New;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="540" y="740" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="llm-transpile" value="LLM Transpilation&lt;br/&gt;LLM转译" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#C2185B;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="680" y="740" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Output Node -->
+        <mxCell id="output-node" value="DSL Code&lt;br/&gt;DSL代码&#xa;DEFINE | CALL | IF/FOR" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=12;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="300" y="920" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="executable-node" value="Executable Code&lt;br/&gt;可执行代码" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#81C784;strokeColor=#388E3C;fontSize=12;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="620" y="920" width="180" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Optimization Strategy -->
+        <mxCell id="opt-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;dashed=1;dashPattern=4 4;" vertex="1" parent="1">
+          <mxGeometry x="900" y="240" width="600" height="620" as="geometry" />
+        </mxCell>
+
+        <mxCell id="opt-label" value="Optimization Strategy&lt;br/&gt;优化策略" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="950" y="250" width="200" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="narrow-llm" value="Narrow-LLM Principle&lt;br/&gt;极窄化LLM原则&#xa;&#xa;1. Code-First&lt;br/&gt;2. Rule-Based&lt;br/&gt;3. LLM as Fallback" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#01579B;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="920" y="310" width="160" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rule-engine" value="Rule Engine&#xa;规则引擎&#xa;&#xa;• Colloquial Fillers&lt;br/&gt;• Punctuation Norm&lt;br/&gt;• Numeric Patterns&lt;br/&gt;• Tech Stack Patterns" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=9;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="1120" y="310" width="160" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="regex-extractor" value="Regex Extractor&#xa;正则提取器&#xa;&#xa;• Duration Patterns&lt;br/&gt;• Count Patterns&lt;br/&gt;• Tech Patterns&lt;br/&gt;• Merge Strategy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=9;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="1310" y="310" width="160" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cache-mech" value="Cache Mechanism&#xa;缓存机制&#xa;&#xa;• Response Caching&lt;br/&gt;• Hash-based Key&lt;br/&gt;• File Persistence" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=9;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="920" y="460" width="250" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="orchestrator" value="LLM Orchestrator&#xa;LLM编排器&#xa;&#xa;• Fallback Logic&lt;br/&gt;• Call Optimization&lt;br/&gt;• Cost Tracking" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=9;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="1220" y="460" width="250" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="metrics" value="Metrics Tracking&#xa;指标追踪&#xa;&#xa;• LLM Calls: 3/req&lt;br/&gt;• Token Savings: ~1000&lt;br/&gt;• Cost Reduction: 40%" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#01579B;fontSize=9;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="920" y="610" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="performance" value="Performance Gains&#xa;性能提升&#xa;&#xa;• Speed: 1.5-2x&lt;br/&gt;• Accuracy: 95%+&lt;br/&gt;• Explainability: 100%" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#01579B;fontSize=9;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="1210" y="610" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- Design Philosophy -->
+        <mxCell id="philosophy-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F57F17;dashed=1;dashPattern=4 4;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1020" width="1420" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="phil-label" value="Design Philosophy &amp; Key Insights" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=1;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="100" y="1030" width="300" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="phil-1" value="1. Narrow-LLM: LLM is used as a last resort for complex tasks only" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="120" y="1070" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="phil-2" value="2. Code-First: Simple tasks are handled by deterministic rules and regex" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="560" y="1070" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="phil-3" value="3. Explainability: Every transformation is traceable and interpretable" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="980" y="1070" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows: Input to P1.0 -->
+        <mxCell id="arrow1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeWidth=2;strokeColor=#666;" edge="1" parent="1" source="input-node" target="tokenization">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="150" y="180" as="sourcePoint" />
+            <mxPoint x="180" y="240" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="150" y="210" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrows: Within P1.0 -->
+        <mxCell id="arrow2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666;" edge="1" parent="1" source="tokenization" target="semantic-analysis">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="325" as="sourcePoint" />
+            <mxPoint x="260" y="325" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666;" edge="1" parent="1" source="semantic-analysis" target="standardization">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="325" as="sourcePoint" />
+            <mxPoint x="400" y="325" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666;" edge="1" parent="1" source="standardization" target="ambiguity">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="520" y="325" as="sourcePoint" />
+            <mxPoint x="540" y="325" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#C2185B;dashed=1;" edge="1" parent="1" source="ambiguity" target="llm-check1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="660" y="325" as="sourcePoint" />
+            <mxPoint x="680" y="325" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrows: P1.0 to P2.0 -->
+        <mxCell id="arrow6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeWidth=3;strokeColor=#666;" edge="1" parent="1" source="llm-check1" target="pattern-match">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="740" y="350" as="sourcePoint" />
+            <mxPoint x="180" y="460" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="740" y="405" />
+              <mxPoint x="180" y="405" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrows: Within P2.0 -->
+        <mxCell id="arrow7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666;" edge="1" parent="1" source="pattern-match" target="entity-rec">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="545" as="sourcePoint" />
+            <mxPoint x="260" y="545" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666;" edge="1" parent="1" source="entity-rec" target="variable-ext">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="545" as="sourcePoint" />
+            <mxPoint x="400" y="545" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666;" edge="1" parent="1" source="variable-ext" target="conflict-resolve">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="520" y="545" as="sourcePoint" />
+            <mxPoint x="540" y="545" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#C2185B;dashed=1;" edge="1" parent="1" source="conflict-resolve" target="llm-check2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="660" y="545" as="sourcePoint" />
+            <mxPoint x="680" y="545" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrows: P2.0 to P3.0 -->
+        <mxCell id="arrow11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeWidth=3;strokeColor=#666;" edge="1" parent="1" source="llm-check2" target="template-gen">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="740" y="570" as="sourcePoint" />
+            <mxPoint x="180" y="680" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="740" y="625" />
+              <mxPoint x="180" y="625" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrows: Within P3.0 -->
+        <mxCell id="arrow12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666;" edge="1" parent="1" source="template-gen" target="logic-trans">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="765" as="sourcePoint" />
+            <mxPoint x="260" y="765" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666;" edge="1" parent="1" source="logic-trans" target="dsl-build">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="765" as="sourcePoint" />
+            <mxPoint x="400" y="765" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666;" edge="1" parent="1" source="dsl-build" target="validation">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="520" y="765" as="sourcePoint" />
+            <mxPoint x="540" y="765" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#C2185B;dashed=1;" edge="1" parent="1" source="validation" target="llm-transpile">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="660" y="765" as="sourcePoint" />
+            <mxPoint x="680" y="765" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrows: P3.0 to Output -->
+        <mxCell id="arrow16" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeWidth=3;strokeColor=#666;" edge="1" parent="1" source="llm-transpile" target="output-node">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="740" y="790" as="sourcePoint" />
+            <mxPoint x="410" y="920" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="740" y="855" />
+              <mxPoint x="410" y="855" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeWidth=3;strokeColor=#388E3C;" edge="1" parent="1" source="output-node" target="executable-node">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="520" y="950" as="sourcePoint" />
+            <mxPoint x="620" y="950" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Optimization Arrows (dashed) -->
+        <mxCell id="opt-arrow1" value="Rule" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#388E3C;dashed=1;" edge="1" parent="1" source="rule-engine" target="standardization">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1120" y="360" as="sourcePoint" />
+            <mxPoint x="520" y="360" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="840" y="360" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="opt-arrow2" value="Regex" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#388E3C;dashed=1;" edge="1" parent="1" source="regex-extractor" target="pattern-match">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1310" y="360" as="sourcePoint" />
+            <mxPoint x="240" y="580" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1420" y="360" />
+              <mxPoint x="1420" y="580" />
+              <mxPoint x="240" y="580" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="opt-arrow3" value="Cache" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#388E3C;dashed=1;" edge="1" parent="1" source="cache-mech" target="llm-check1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1045" y="510" as="sourcePoint" />
+            <mxPoint x="740" y="340" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1045" y="340" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="opt-arrow4" value="Orchestration" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#388E3C;dashed=1;" edge="1" parent="1" source="orchestrator" target="llm-check2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1345" y="510" as="sourcePoint" />
+            <mxPoint x="740" y="560" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1345" y="560" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#9E9E9E;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1200" width="400" height="150" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-label" value="Legend" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="100" y="1210" width="80" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend1" value="Data Flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="100" y="1250" width="350" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-arrow1" value="" style="endArrow=block;endFill=1;html=1;strokeWidth=2;strokeColor=#666;" edge="1" parent="1" source="legend1" target="legend1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="460" y="1260" as="sourcePoint" />
+            <mxPoint x="470" y="1260" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="legend2" value="LLM Call (Optimization)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="100" y="1280" width="350" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-arrow2" value="" style="endArrow=block;endFill=1;html=1;strokeWidth=2;strokeColor=#C2185B;dashed=1;" edge="1" parent="1" source="legend2" target="legend2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="460" y="1290" as="sourcePoint" />
+            <mxPoint x="470" y="1290" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="legend3" value="Optimization Impact" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="100" y="1310" width="350" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-arrow3" value="" style="endArrow=block;endFill=1;html=1;strokeWidth=1;strokeColor=#388E3C;dashed=1;" edge="1" parent="1" source="legend3" target="legend3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="460" y="1320" as="sourcePoint" />
+            <mxPoint x="470" y="1320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

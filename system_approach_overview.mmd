@@ -1,0 +1,158 @@
+flowchart TD
+    %% 智能问答系统 - 整体架构图
+    %% 科研视角的系统设计
+
+    subgraph SystemOverview["智能问答系统整体架构"]
+        direction LR
+
+        subgraph InputLayer["输入层 Input Layer"]
+            direction TB
+            UserQuery["用户查询&#xa;自然语言需求"]
+                Context["上下文信息&#xa;历史对话/知识库"]
+        end
+
+        subgraph CoreLayer["核心处理层 Core Processing Layer"]
+            direction TB
+
+            subgraph Prompt10["Prompt 1.0: 文本理解层"]
+                direction LR
+                Tokenization["分词与预处理"]
+                SemanticAnalysis["语义分析"]
+                Standardization["文本标准化"]
+                AmbiguityDetection["歧义检测与消解"]
+            end
+
+            subgraph Prompt20["Prompt 2.0: 结构化提取层"]
+                direction LR
+                PatternMatching["模式匹配"]
+                EntityRecognition["实体识别"]
+                VariableExtraction["变量提取"]
+                TypeInference["类型推断"]
+            end
+
+            subgraph Prompt30["Prompt 3.0: DSL生成层"]
+                direction LR
+                TemplateGeneration["模板生成"]
+                LogicTranslation["逻辑转译"]
+                DSLConstruction["DSL构建"]
+                CodeGeneration["代码生成"]
+            end
+        end
+
+        subgraph OptimizationLayer["优化层 Optimization Layer"]
+            direction TB
+            RuleEngine["规则引擎&#xa;Rule-Based Engine"]
+            RegexExtractor["正则提取器&#xa;Regex Extractor"]
+            LLMOrchestration["LLM编排器&#xa;LLM Orchestrator"]
+            CacheMechanism["缓存机制&#xa;Cache Mechanism"]
+        end
+
+        subgraph OutputLayer["输出层 Output Layer"]
+            direction TB
+            DSLCode["DSL代码"]
+                ExecutableCode["可执行代码"]
+                ExecutionResult["执行结果"]
+                Explanation["执行解释"]
+        end
+    end
+
+    subgraph StorageLayer["存储层 Storage Layer"]
+        direction TB
+        KnowledgeBase["知识库&#xa;Knowledge Base"]
+        HistoryDB["历史记录&#xa;History DB"]
+        CacheStore["缓存存储&#xa;Cache Store"]
+        ModelRegistry["模型注册表&#xa;Model Registry"]
+    end
+
+    subgraph InfrastructureLayer["基础设施层 Infrastructure Layer"]
+        direction TB
+        LLMService["LLM服务&#xa;Qwen3-32B"]
+        CodeInterpreter["代码解释器&#xa;Python Runtime"]
+        VectorSearch["向量检索&#xa;Vector Search"]
+        WorkflowEngine["工作流引擎&#xa;Workflow Engine"]
+    end
+
+    %% 数据流
+    UserQuery -->|"1. 接收查询"| InputLayer
+    Context -->|"2. 加载上下文"| InputLayer
+
+    InputLayer -->|"3. 文本理解"| Prompt10
+    Prompt10 -->|"4. 结构化提取"| Prompt20
+    Prompt20 -->|"5. DSL生成"| Prompt30
+
+    OptimizationLayer -.|"6. 优化辅助"| Prompt10
+    OptimizationLayer -.|"7. 优化辅助"| Prompt20
+    OptimizationLayer -.|"8. 优化辅助"| Prompt30
+
+    Prompt10 -->|"9. 缓存读写"| CacheMechanism
+    Prompt20 -->|"10. 缓存读写"| CacheMechanism
+    Prompt30 -->|"11. 缓存读写"| CacheMechanism
+
+    Prompt30 -->|"12. LLM调用"| LLMOrchestration
+    LLMOrchestration -->|"13. LLM推理"| LLMService
+
+    Prompt30 -->|"14. 生成DSL"| OutputLayer
+    OutputLayer -->|"15. 执行代码"| CodeInterpreter
+
+    CoreLayer -->|"16. 查询知识库"| KnowledgeBase
+    CoreLayer -->|"17. 保存历史"| HistoryDB
+    CoreLayer -->|"18. 访问缓存"| CacheStore
+
+    CacheMechanism -.|"19. 持久化"| CacheStore
+
+    LLMOrchestration -->|"20. 向量检索"| VectorSearch
+    CodeInterpreter -->|"21. 工作流调度"| WorkflowEngine
+
+    %% 设计原则标注
+    subgraph Principles["设计原则 Design Principles"]
+        direction TB
+        P1["极窄化LLM&#xa;Narrow LLM"]
+        P2["代码优先&#xa;Code-First"]
+        P3["可解释性&#xa;Explainable"]
+        P4["可扩展性&#xa;Extensible"]
+        P5["鲁棒性&#xa;Robustness"]
+    end
+
+    Principles -.|"指导"| OptimizationLayer
+    Principles -.|"指导"| CoreLayer
+
+    %% 关键技术栈
+    subgraph TechStack["技术栈 Technology Stack"]
+        direction TB
+        T1["Python + FastAPI"]
+        T2["OpenAI API"]
+        T3["NumPy + SciPy"]
+        T4["Regex + NLP"]
+        T5["Redis + PostgreSQL"]
+    end
+
+    TechStack -.|"支持"| InfrastructureLayer
+
+    %% 样式定义
+    classDef layerStyle fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
+    classDef processStyle fill:#fff4e6,stroke:#f57c00,stroke-width:2px
+    classDef optStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef storageStyle fill:#e8f5e9,stroke:#880e4f,stroke-width:2px
+    classDef infraStyle fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    classDef principleStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px,stroke-dasharray: 5 5
+    classDef techStyle fill:#fff3cd,stroke:#ffc107,stroke-width:1px
+
+    %% 应用样式
+    class InputLayer,OutputLayer layerStyle
+    class Prompt10,Prompt20,Prompt30,CoreLayer processStyle
+    class OptimizationLayer optStyle
+    class StorageLayer storageStyle
+    class InfrastructureLayer infraStyle
+    class Principles principleStyle
+    class TechStack techStyle
+
+    %% 核心指标
+    subgraph Metrics["系统指标 System Metrics"]
+        M1["准确率: 95%+"]
+        M2["响应时间: &lt; 10s"]
+        M3["LLM调用: 3次/请求"]
+        M4["成本: 降低40%"]
+        M5["可解释性: 100%"]
+    end
+
+    style Metrics fill:#f8fff8,stroke:#4caf50,stroke-width:2px

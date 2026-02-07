@@ -7,90 +7,96 @@ from typing import Dict, Any
 from llm_client import invoke_function  # 需要实现 LLM 客户端
 
 
-def step_1_compute_top_k_results_high(code_lines):
+def step_1_compute_tech_stack():
     """Auto-generated module"""
-    return access_log_retention, cache_ttl, code_analysis_timeout, debug_log_retention, error_log_retention, graph_search_timeout, legal_docs_count, max_concurrency, medical_docs_count, tech_docs_count, top_k_results_high, top_k_results_low, total_response_timeout
+    return duration_days, duration_days_2, duration_days_3, tech_stack
 
 
-async def step_2_vector_search(cache_ttl, code_lines, query, query_type, top_k_results_high, top_k_results_low):
+async def step_2_vector_search(duration_days_2, query, query_type):
     """Auto-generated module"""
     if query_type == "simple_fact":
         results = await invoke_function('vector_search', query=query)
         if results.similarity > 0.85:
-            results.top_n = top_k_results_high
+            results.top_n = 3
         elif results.similarity <= 0.85:
             results = await invoke_function('rerank_model', results=results)
-            results.top_n = top_k_results_low
+            results.top_n = 5
         else:
             results = await invoke_function('hybrid_search', query=query)
         return results
     elif query_type == "complex_reasoning":
         intent = await invoke_function('intent_decomposition', query=query)
-        kg_results = await invoke_function('graph_search', intent=intent)
-        if kg_results.found:
-            return kg_results
-        else:
-            kg_results = await invoke_function('full_search', intent=intent)
-            kg_results.cache_ttl = cache_ttl
-            return kg_results
+        results = await invoke_function('graph_search', intent=intent)
+        if results.matched_nodes   is  not   None:
+            results.cache_ttl = duration_days_2 * 60  # 30分钟
+            await invoke_function('cache_store', results=results)
+        elif results.matched_nodes  is  None:
+            results = await invoke_function('full_search', query=query)
+        return results
     elif query_type == "code_analysis":
         if code_lines > 500:
-            analysis = await invoke_function('static_code_analysis', query=query)
+            analysis = await invoke_function('static_analysis', query=query)
         elif code_lines <= 500:
-            analysis = await invoke_function('full_code_analysis', query=query)
-            documentation = await invoke_function('generate_code_doc', analysis=analysis)
-            return documentation
-        return analysis
+            analysis = await invoke_function('semantic_analysis', query=query)
+            doc = await invoke_function('generate_explanation', analysis=analysis)
+        return doc
     else:
         results = await invoke_function('default_search', query=query)
         return results
 
 
-async def step_3_strong_reasoning_model(query, user_feedback):
+async def step_3_strong_model(query, user_feedback):
     """Auto-generated module"""
     if user_feedback == "regenerate":
-        results = await invoke_function('strong_reasoning_model', query=query)
+        results = await invoke_function('strong_model', query=query)
         return results
+    elif user_feedback.count("unsatisfied") >= 3:
+        await invoke_function('escalate_to_human', query=query)
 
 
-async def step_4_escalate_to_human_review(negative_feedback_count, query):
+async def step_4_verify_identity(query, user):
     """Auto-generated module"""
-    if negative_feedback_count >= 3:
-        await invoke_function('escalate_to_human_review', query=query)
+    if "金融" in query:
+        verification = await invoke_function('verify_identity', user=user)
+        if verification == False:
+            await invoke_function('reject_service')
+            await invoke_function('log', query=query)
+            return None
+
+
+async def step_5_queue_request(request_count):
+    """Auto-generated module"""
+    if request_count > 50:
+        await invoke_function('queue_request')
+    else:
+        await invoke_function('process_request')
     return None
 
 
-async def step_5_reject_service(query):
+def step_6_compute_retention(duration_days, duration_days_2, duration_days_3, log_type):
     """Auto-generated module"""
-    if "sensitive_word" in query:
-        await invoke_function('reject_service')
-        await invoke_function('log_security_event', query=query)
+    if log_type == "error":
+        retention = duration_days  # 90天
+    elif log_type == "access":
+        retention = duration_days_2  # 30天
+    elif log_type == "debug":
+        retention = duration_days_3  # 7天
+    return retention
+
+
+def step_7_upload_log(retention):
+    """Auto-generated module"""
+    await invoke_function('upload_log', log=log, retention_days=retention)
+    return log
+
+
+async def step_8_trigger_alert(p95_latency, qps):
+    """Auto-generated module"""
+    if qps < 10:
+        await invoke_function('trigger_alert')
+    elif p95_latency > 3:
+        await invoke_function('scale_out')
     return None
-
-
-async def step_6_require_user_authentication(query):
-    """Auto-generated module"""
-    if "financial" in query:
-        await invoke_function('require_user_authentication')
-    return None
-
-
-def step_7_send_log_to_central_system(error_log_retention):
-    """Auto-generated module"""
-    await invoke_function('send_log_to_central_system', error_log=error_log, retention_days=error_log_retention)
-    return error_log
-
-
-def step_8_send_log_to_central_system(access_log_retention):
-    """Auto-generated module"""
-    await invoke_function('send_log_to_central_system', access_log=access_log, retention_days=access_log_retention)
-    return access_log
-
-
-def step_9_send_log_to_central_system(debug_log_retention):
-    """Auto-generated module"""
-    await invoke_function('send_log_to_central_system', debug_log=debug_log, retention_days=debug_log_retention)
-    return debug_log
 
 
 async def main_workflow(input_params: dict):
@@ -98,7 +104,7 @@ async def main_workflow(input_params: dict):
     主工作流 - 自动生成
     
     Args:
-        input_params: 包含 ['code_lines', 'negative_feedback_count', 'query', 'query_type', 'user_feedback'] 的字典
+        input_params: 包含 ['log_type', 'p95_latency', 'qps', 'query', 'query_type', 'request_count', 'user', 'user_feedback'] 的字典
     
     Returns:
         执行结果上下文
@@ -106,32 +112,29 @@ async def main_workflow(input_params: dict):
     # 初始化上下文
     ctx = input_params.copy()
 
-    # Module 1: step_1_compute_top_k_results_high
-    ctx["access_log_retention"], ctx["cache_ttl"], ctx["code_analysis_timeout"], ctx["debug_log_retention"], ctx["error_log_retention"], ctx["graph_search_timeout"], ctx["legal_docs_count"], ctx["max_concurrency"], ctx["medical_docs_count"], ctx["tech_docs_count"], ctx["top_k_results_high"], ctx["top_k_results_low"], ctx["total_response_timeout"] = step_1_compute_top_k_results_high(ctx.get("code_lines"))
+    # Module 1: step_1_compute_tech_stack
+    ctx["duration_days"], ctx["duration_days_2"], ctx["duration_days_3"], ctx["tech_stack"] = step_1_compute_tech_stack()
 
     # Module 2: step_2_vector_search
-    ctx["__analysis__"], ctx["__documentation__"], ctx["__kg_results__"], ctx["__results__"], ctx["analysis"], ctx["documentation"], ctx["intent"], ctx["kg_results"], ctx["results"] = await step_2_vector_search(ctx.get("cache_ttl"), ctx.get("code_lines"), ctx.get("query"), ctx.get("query_type"), ctx.get("top_k_results_high"), ctx.get("top_k_results_low"))
+    ctx["__doc__"], ctx["__results__"], ctx["analysis"], ctx["code_lines"], ctx["doc"], ctx["intent"], ctx["results"] = await step_2_vector_search(ctx.get("duration_days_2"), ctx.get("query"), ctx.get("query_type"))
 
-    # Module 3: step_3_strong_reasoning_model
-    ctx["__results__"], ctx["results"] = await step_3_strong_reasoning_model(ctx.get("query"), ctx.get("user_feedback"))
+    # Module 3: step_3_strong_model
+    ctx["__results__"], ctx["results"] = await step_3_strong_model(ctx.get("query"), ctx.get("user_feedback"))
 
-    # Module 4: step_4_escalate_to_human_review
-    await step_4_escalate_to_human_review(ctx.get("negative_feedback_count"), ctx.get("query"))
+    # Module 4: step_4_verify_identity
+    ctx["None"], ctx["verification"] = await step_4_verify_identity(ctx.get("query"), ctx.get("user"))
 
-    # Module 5: step_5_reject_service
-    await step_5_reject_service(ctx.get("query"))
+    # Module 5: step_5_queue_request
+    await step_5_queue_request(ctx.get("request_count"))
 
-    # Module 6: step_6_require_user_authentication
-    await step_6_require_user_authentication(ctx.get("query"))
+    # Module 6: step_6_compute_retention
+    ctx["retention"] = step_6_compute_retention(ctx.get("duration_days"), ctx.get("duration_days_2"), ctx.get("duration_days_3"), ctx.get("log_type"))
 
-    # Module 7: step_7_send_log_to_central_system
-    ctx["error_log"] = step_7_send_log_to_central_system(ctx.get("error_log_retention"))
+    # Module 7: step_7_upload_log
+    ctx["log"] = step_7_upload_log(ctx.get("retention"))
 
-    # Module 8: step_8_send_log_to_central_system
-    ctx["access_log"] = step_8_send_log_to_central_system(ctx.get("access_log_retention"))
-
-    # Module 9: step_9_send_log_to_central_system
-    ctx["debug_log"] = step_9_send_log_to_central_system(ctx.get("debug_log_retention"))
+    # Module 8: step_8_trigger_alert
+    await step_8_trigger_alert(ctx.get("p95_latency"), ctx.get("qps"))
 
     return ctx
 

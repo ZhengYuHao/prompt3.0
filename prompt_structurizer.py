@@ -395,26 +395,29 @@ class TypeCleaner:
 # ========== 实体冲突解析器 ==========
 class EntityConflictResolver:
     """处理重叠实体 (Overlapping Entities)"""
-    
+
     @staticmethod
     def resolve_overlaps(entities: List[Dict]) -> List[Dict]:
         """
         最长覆盖原则: 优先保留更长的实体
         例: "3年经验" vs "3年", 保留 "3年经验"
+
+        新增: 变量名去重逻辑
         """
         if not entities:
             return []
-        
+
         # 按起始位置排序
         sorted_entities = sorted(entities, key=lambda x: (x['start_index'], -(x['end_index'] - x['start_index'])))
-        
+
         non_overlapping = []
         last_end = -1
-        
+
+        # 第一步: 解决位置重叠
         for entity in sorted_entities:
             start = entity['start_index']
             end = entity['end_index']
-            
+
             # 如果当前实体与上一个不重叠
             if start >= last_end:
                 non_overlapping.append(entity)
@@ -425,13 +428,34 @@ class EntityConflictResolver:
                     last_entity = non_overlapping[-1]
                     current_length = end - start
                     last_length = last_entity['end_index'] - last_entity['start_index']
-                    
+
                     if current_length > last_length:
                         # 替换为更长的实体
                         non_overlapping[-1] = entity
                         last_end = end
-        
-        return non_overlapping
+
+        # 第二步: 变量名去重（新增）
+        name_counter = {}
+        deduplicated_entities = []
+
+        for entity in non_overlapping:
+            name = entity['name']
+
+            if name not in name_counter:
+                # 第一次出现的变量名，直接保留
+                name_counter[name] = 1
+                deduplicated_entities.append(entity)
+            else:
+                # 重复的变量名，生成新名称
+                count = name_counter[name] + 1
+                name_counter[name] = count
+
+                # 创建新变量名
+                new_name = f"{name}_{count}"
+                entity['name'] = new_name
+                deduplicated_entities.append(entity)
+
+        return deduplicated_entities
 
 
 # ========== 核心处理引擎 ==========

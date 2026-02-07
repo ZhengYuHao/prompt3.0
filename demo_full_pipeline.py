@@ -51,7 +51,7 @@ from history_manager import HistoryManager, PipelineHistory
 # 配置
 # ============================================================================
 # 是否使用模拟 LLM 客户端（设为 True 可避免真实 API 调用）
-USE_MOCK = True  # 使用模拟客户端，避免 API 超时
+USE_MOCK = False  # 使用真实 LLM 客户端
 # 如果要使用真实 LLM，请设置为 False 并确保配置了有效的 API 密钥
 # USE_MOCK = False
 

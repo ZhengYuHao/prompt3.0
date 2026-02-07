@@ -612,19 +612,36 @@ class MockLLMClient(UnifiedLLMClient):
         )
     
     def _mock_entity_extraction(self, text: str) -> str:
-        """模拟实体抽取"""
+        """模拟实体抽取（修复重复定义问题）"""
         import re
         entities = []
-        
+
+        # 用于跟踪相同单位的计数（修复重复定义）
+        unit_counter = {}
+
         # 识别数字+单位模式
         for match in re.finditer(r'(\d+)(年|周|月|天|小时|分钟)', text):
+            unit = match.group(2)
+            value = int(match.group(1))
+
+            # 对相同单位进行计数，创建唯一名称
+            count = unit_counter.get(unit, 0) + 1
+            unit_counter[unit] = count
+
+            # 如果是第一个该单位，使用标准名称
+            if count == 1:
+                var_name = f"duration_{unit}"
+            else:
+                # 如果是重复的单位，添加后缀
+                var_name = f"duration_{unit}_{count}"
+
             entities.append({
-                "name": f"duration_{match.group(2)}",
+                "name": var_name,
                 "original_text": match.group(0),
                 "start_index": match.start(),
                 "end_index": match.end(),
                 "type": "Integer",
-                "value": int(match.group(1))
+                "value": value
             })
         
         # 识别专业术语

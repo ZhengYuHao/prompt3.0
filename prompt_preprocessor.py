@@ -24,7 +24,7 @@ from data_models import (
 )
 
 # 优化模块：规则引擎
-from rule_based_normalizer import RuleBasedTextNormalizer, SyntacticAmbiguityDetector
+from utils.rule_based_normalizer import RuleBasedTextNormalizer, SyntacticAmbiguityDetector
 
 
 # ============================================================================

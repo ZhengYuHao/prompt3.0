@@ -12,10 +12,10 @@ from logger import info, warning, error, debug
 from dotenv import load_dotenv
 
 # 优化模块：正则提取器
-from pre_pattern_extractor import PrePatternExtractor
+from utils.pre_pattern_extractor import PrePatternExtractor
 
 # 优化模块：缓存客户端
-from cached_llm_client import CachedLLMClient
+from utils.cached_llm_client import CachedLLMClient
 
 try:
     from openai import OpenAI

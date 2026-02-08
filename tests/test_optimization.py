@@ -5,8 +5,8 @@
 
 import time
 import json
-from rule_based_normalizer import RuleBasedTextNormalizer, SyntacticAmbiguityDetector
-from pre_pattern_extractor import PrePatternExtractor
+from utils.rule_based_normalizer import RuleBasedTextNormalizer, SyntacticAmbiguityDetector
+from utils.pre_pattern_extractor import PrePatternExtractor
 
 
 def test_prompt10_optimization():

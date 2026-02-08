@@ -34,21 +34,23 @@ class PromptPipeline:
         term_mapping: Optional[Dict[str, str]] = None,
         ambiguity_blacklist: Optional[list] = None,
         use_mock_llm: bool = False,
-        enable_deep_check: bool = True
+        enable_deep_check: bool = True,
+        enable_cache: bool = False
     ):
         """
         初始化流水线
-        
+
         Args:
             mode: 处理模式
             term_mapping: 术语映射表
             ambiguity_blacklist: 歧义词黑名单
             use_mock_llm: 是否使用模拟LLM
             enable_deep_check: 是否启用深度歧义检测
+            enable_cache: 是否启用缓存
         """
-        # 创建共享的 LLM 客户端
-        self.llm_client = create_llm_client(use_mock=use_mock_llm)
-        
+        # 创建共享的 LLM 客户端（支持缓存）
+        self.llm_client = create_llm_client(use_mock=use_mock_llm, enable_cache=enable_cache)
+
         # 初始化阶段1处理器
         self.preprocessor = PromptPreprocessor(
             mode=mode,
@@ -57,14 +59,15 @@ class PromptPipeline:
             llm_client=self.llm_client,
             enable_deep_check=enable_deep_check
         )
-        
+
         # 初始化阶段2处理器
         self.structurizer = PromptStructurizer(
             llm_client=self.llm_client,
             use_mock=use_mock_llm
         )
-        
+
         self.use_mock = use_mock_llm
+        self.enable_cache = enable_cache
         self.history_manager = HistoryManager()
     
     def run(
@@ -163,12 +166,20 @@ class PromptPipeline:
             for var in result.prompt20_result.variables:
                 dtype = var.data_type
                 type_stats[dtype] = type_stats.get(dtype, 0) + 1
-        
+
+        # 收集缓存统计
+        cache_stats = self.llm_client.get_cache_stats() if self.enable_cache else {}
+
+        # 收集优化统计
+        prompt10_rule_stats = {}
+        if result.prompt10_result and hasattr(result.prompt10_result, 'rule_engine_stats'):
+            prompt10_rule_stats = result.prompt10_result.rule_engine_stats
+
         history = PipelineHistory(
             pipeline_id=result.pipeline_id,
             timestamp=result.timestamp,
             raw_input=result.raw_input,
-            
+
             # 阶段1结果
             prompt10_id=result.prompt10_result.id if result.prompt10_result else "",
             prompt10_original=result.prompt10_result.original_text if result.prompt10_result else "",
@@ -179,7 +190,7 @@ class PromptPipeline:
             prompt10_ambiguity_detected=result.prompt10_result.ambiguity_detected if result.prompt10_result else False,
             prompt10_status=result.prompt10_result.status if result.prompt10_result else "",
             prompt10_time_ms=result.prompt10_result.processing_time_ms if result.prompt10_result else 0,
-            
+
             # 阶段2结果
             prompt20_id=result.prompt20_result.id if result.prompt20_result else "",
             prompt20_template=result.prompt20_result.template_text if result.prompt20_result else "",
@@ -188,13 +199,21 @@ class PromptPipeline:
             prompt20_type_stats=type_stats,
             prompt20_extraction_log=result.prompt20_result.extraction_log if result.prompt20_result else [],
             prompt20_time_ms=result.prompt20_result.processing_time_ms if result.prompt20_result else 0,
-            
+
             # 整体状态
             overall_status=result.overall_status,
             total_time_ms=result.total_time_ms,
-            error_message=result.error_message
+            error_message=result.error_message,
+
+            # 优化统计（极窄化LLM）
+            prompt10_rule_stats=prompt10_rule_stats,
+            prompt20_optimization_stats={},  # 从 prompt20_result 中提取
+            prompt30_optimization_stats={},
+            total_cache_hits=cache_stats.get('hits', 0),
+            total_cache_misses=cache_stats.get('misses', 0),
+            cache_hit_rate=cache_stats.get('hit_rate', 0.0)
         )
-        
+
         try:
             self.history_manager.save_pipeline_history(history)
             info(f"流水线历史记录已保存: {result.pipeline_id}")

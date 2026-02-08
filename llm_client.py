@@ -14,6 +14,9 @@ from dotenv import load_dotenv
 # 优化模块：正则提取器
 from pre_pattern_extractor import PrePatternExtractor
 
+# 优化模块：缓存客户端
+from cached_llm_client import CachedLLMClient
+
 try:
     from openai import OpenAI
 except ImportError:
@@ -109,11 +112,12 @@ class UnifiedLLMClient:
         base_url: Optional[str] = None,
         api_key: Optional[str] = None,
         max_retries: int = 3,
-        timeout: int = 60
+        timeout: int = 60,
+        enable_cache: bool = False
     ):
         """
         初始化 LLM 客户端
-        
+
         Args:
             model: 模型名称
             temperature: 温度参数（0-2，越低越确定性）
@@ -121,6 +125,7 @@ class UnifiedLLMClient:
             api_key: API 密钥
             max_retries: 最大重试次数
             timeout: 超时时间（秒）
+            enable_cache: 是否启用缓存
         """
         self.model = model
         self.temperature = temperature
@@ -129,6 +134,8 @@ class UnifiedLLMClient:
         self.max_retries = max_retries
         self.timeout = timeout
         self._client: Optional["OpenAI"] = None
+        self.enable_cache = enable_cache
+        self._cache_client: Optional[CachedLLMClient] = None
     
     def _get_client(self) -> "OpenAI":
         """获取或创建 OpenAI 客户端实例"""
@@ -141,6 +148,94 @@ class UnifiedLLMClient:
                 timeout=self.timeout
             )
         return self._client
+
+    def _get_cache_client(self) -> CachedLLMClient:
+        """获取或创建缓存客户端实例"""
+        if self._cache_client is None:
+            self._cache_client = CachedLLMClient(self)
+        return self._cache_client
+
+    def _call_without_cache(
+        self,
+        system_prompt: str,
+        user_content: str,
+        temperature: Optional[float] = None,
+        model: Optional[str] = None
+    ) -> LLMResponse:
+        """
+        不使用缓存的调用方法
+
+        Args:
+            system_prompt: 系统提示词
+            user_content: 用户输入
+            temperature: 可选的温度覆盖
+            model: 可选的模型覆盖
+
+        Returns:
+            LLMResponse 对象
+        """
+        _model = model or self.model
+        _temp = temperature if temperature is not None else self.temperature
+
+        # 如果是千问模型，在系统提示词中添加强抑制指令
+        if "qwen" in _model.lower():
+            suppress_thought = """
+
+【禁止输出思考过程】
+- 直接输出最终结果
+- 严禁输出推理步骤、思考过程或中间想法
+- 严禁使用"好的"、"我现在需要"、"接下来"等引导词
+- 只输出符合要求格式的内容
+- 输出必须简洁精确
+"""
+            system_prompt = system_prompt + suppress_thought
+
+        info(f"[LLM调用] 模型: {_model}, Temperature: {_temp}")
+        debug(f"[System] {system_prompt[:100]}...")
+        debug(f"[User] {user_content[:100]}...")
+
+        client = self._get_client()
+
+        for attempt in range(self.max_retries):
+            try:
+                resp = client.chat.completions.create(
+                    model=_model,
+                    temperature=_temp,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_content},
+                    ],
+                )
+
+                content = (resp.choices[0].message.content or "").strip()
+
+                # 清理响应中的格式标签和脏数据
+                content = self._clean_llm_response(content)
+
+                usage = None
+                if hasattr(resp, 'usage') and resp.usage:
+                    usage = {
+                        "prompt_tokens": resp.usage.prompt_tokens,
+                        "completion_tokens": resp.usage.completion_tokens,
+                        "total_tokens": resp.usage.total_tokens
+                    }
+
+                debug(f"[LLM响应] 长度: {len(content)} 字符")
+
+                return LLMResponse(
+                    content=content,
+                    model=_model,
+                    usage=usage,
+                    raw_response=resp
+                )
+
+            except Exception as e:
+                warning(f"LLM 调用失败 (尝试 {attempt + 1}/{self.max_retries}): {e}")
+                if attempt == self.max_retries - 1:
+                    error(f"LLM 调用最终失败: {e}")
+                    raise
+
+        raise RuntimeError("LLM 调用失败，已超过最大重试次数")
     
     def _clean_llm_response(self, content: str) -> str:
         """
@@ -209,7 +304,7 @@ class UnifiedLLMClient:
         model: Optional[str] = None
     ) -> LLMResponse:
         """
-        基础对话调用
+        基础对话调用（支持缓存）
 
         Args:
             system_prompt: 系统提示词
@@ -220,68 +315,37 @@ class UnifiedLLMClient:
         Returns:
             LLMResponse 对象
         """
-        _model = model or self.model
-        _temp = temperature if temperature is not None else self.temperature
+        # 如果启用缓存，使用缓存客户端
+        if self.enable_cache:
+            cache_client = self._get_cache_client()
+            response = cache_client.call(system_prompt, user_content, temperature=temperature, model=model)
 
-        # 如果是千问模型，在系统提示词中添加强抑制指令
-        if "qwen" in _model.lower():
-            suppress_thought = """
+            # 标记是否来自缓存
+            if hasattr(response, 'from_cache') and response.from_cache:
+                info("[缓存命中] 使用缓存结果")
+            else:
+                info("[缓存未命中] 调用 LLM")
 
-【禁止输出思考过程】
-- 直接输出最终结果
-- 严禁输出推理步骤、思考过程或中间想法
-- 严禁使用"好的"、"我现在需要"、"接下来"等引导词
-- 只输出符合要求格式的内容
-- 输出必须简洁精确
-"""
-            system_prompt = system_prompt + suppress_thought
+            return response
+        else:
+            # 直接调用，不使用缓存
+            return self._call_without_cache(system_prompt, user_content, temperature, model)
 
-        info(f"[LLM调用] 模型: {_model}, Temperature: {_temp}")
-        debug(f"[System] {system_prompt[:100]}...")
-        debug(f"[User] {user_content[:100]}...")
+    def get_cache_stats(self) -> Dict[str, Any]:
+        """
+        获取缓存统计信息
 
-        client = self._get_client()
-        
-        for attempt in range(self.max_retries):
-            try:
-                resp = client.chat.completions.create(
-                    model=_model,
-                    temperature=_temp,
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_content},
-                    ],
-                )
-                
-                content = (resp.choices[0].message.content or "").strip()
-
-                # 清理响应中的格式标签和脏数据
-                content = self._clean_llm_response(content)
-
-                usage = None
-                if hasattr(resp, 'usage') and resp.usage:
-                    usage = {
-                        "prompt_tokens": resp.usage.prompt_tokens,
-                        "completion_tokens": resp.usage.completion_tokens,
-                        "total_tokens": resp.usage.total_tokens
-                    }
-
-                debug(f"[LLM响应] 长度: {len(content)} 字符")
-                
-                return LLMResponse(
-                    content=content,
-                    model=_model,
-                    usage=usage,
-                    raw_response=resp
-                )
-                
-            except Exception as e:
-                warning(f"LLM 调用失败 (尝试 {attempt + 1}/{self.max_retries}): {e}")
-                if attempt == self.max_retries - 1:
-                    error(f"LLM 调用最终失败: {e}")
-                    raise
-        
-        raise RuntimeError("LLM 调用失败，已超过最大重试次数")
+        Returns:
+            缓存统计字典
+        """
+        if self.enable_cache and self._cache_client:
+            return self._cache_client.get_stats()
+        return {
+            "hits": 0,
+            "misses": 0,
+            "total": 0,
+            "hit_rate": 0.0
+        }
     
     def call_simple(
         self,
@@ -787,45 +851,54 @@ def create_llm_client(
 ) -> UnifiedLLMClient:
     """
     创建 LLM 客户端的工厂函数
-    
+
     Args:
         use_mock: 是否使用模拟客户端
         config_name: 预定义配置名称，可选值: "default", "gpt-3.5", "gpt-4", "qwen3-32b"
         **kwargs: 传递给客户端的其他参数（可覆盖配置中的值）
-        
+            - enable_cache: 是否启用缓存（默认False）
+
     Returns:
         LLM 客户端实例
-        
+
     Examples:
         # 使用默认配置
         client = create_llm_client()
-        
+
         # 使用预定义的 Qwen3 配置
         client = create_llm_client(config_name="qwen3-32b")
-        
+
         # 使用配置但覆盖部分参数
         client = create_llm_client(config_name="qwen3-32b", temperature=0.5)
+
+        # 启用缓存
+        client = create_llm_client(enable_cache=True)
     """
     if use_mock:
         info("[LLM] 使用模拟客户端")
         return MockLLMClient(**kwargs)
-    
+
     # 如果指定了配置名称，则应用配置
     if config_name:
         if config_name not in MODEL_CONFIGS:
             available = ", ".join(MODEL_CONFIGS.keys())
             raise ValueError(f"未知的配置名称: {config_name}, 可用配置: {available}")
-        
+
         config = MODEL_CONFIGS[config_name]
         info(f"[LLM] 使用预定义配置: {config_name}")
         info(f"[LLM]  模型: {config['model']}")
         info(f"[LLM]  地址: {config['base_url']}")
-        
+        if kwargs.get('enable_cache', False):
+            info(f"[LLM]  缓存: 已启用")
+
         # 合并配置：预定义配置 + kwargs（kwargs优先级更高）
         merged_kwargs = {**config, **kwargs}
         return UnifiedLLMClient(**merged_kwargs)
     else:
-        info("[LLM] 使用真实客户端（自定义配置）")
+        if kwargs.get('enable_cache', False):
+            info("[LLM] 使用真实客户端（自定义配置，缓存已启用）")
+        else:
+            info("[LLM] 使用真实客户端（自定义配置）")
         return UnifiedLLMClient(**kwargs)
 
 

@@ -2356,5 +2356,411 @@
       "processing_mode": "dictionary",
       "has_llm_fallback": true
     }
+  },
+  "2026-02-08 15:49:14": {
+    "timestamp": "2026-02-08 15:49:14",
+    "original_text": "帮我搞一个RAG的应用",
+    "processed_text": "帮我搞一个检索增强生成(RAG)的应用",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 1 类术语共 1 处"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "RAG": "检索增强生成(RAG)"
+    },
+    "ambiguity_detected": false,
+    "success": false,
+    "processing_time_ms": 534165,
+    "rule_engine_stats": {
+      "llm_calls": 0,
+      "normalization_changes": 1,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": false
+    }
+  },
+  "2026-02-08 16:07:03": {
+    "timestamp": "2026-02-08 16:07:03",
+    "original_text": "那个，帮我弄一下大模型的项目吧",
+    "processed_text": "，帮我操作大型语言模型(LLM)的项目",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 1 类术语共 1 处",
+      "[OK] 规则引擎语义重构完成 (耗时 0ms, 变更3处)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "大模型": "大型语言模型(LLM)"
+    },
+    "ambiguity_detected": false,
+    "success": false,
+    "processing_time_ms": 533523,
+    "rule_engine_stats": {
+      "llm_calls": 0,
+      "normalization_changes": 1,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": false
+    }
+  },
+  "2026-02-08 16:23:02": {
+    "timestamp": "2026-02-08 16:23:02",
+    "original_text": "需要5个人，其中2个Java，3个Python",
+    "processed_text": "需要5个人，其中2个Java，3个Python",
+    "mode": "dictionary",
+    "steps_log": [],
+    "warnings": [],
+    "terminology_changes": {},
+    "ambiguity_detected": false,
+    "success": false,
+    "processing_time_ms": 124794,
+    "rule_engine_stats": {
+      "llm_calls": 0,
+      "normalization_changes": 0,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": false
+    }
+  },
+  "2026-02-08 16:25:11": {
+    "timestamp": "2026-02-08 16:25:11",
+    "original_text": "项目需要5个人，为期2周",
+    "processed_text": "项目需要5个人，为期2周",
+    "mode": "dictionary",
+    "steps_log": [],
+    "warnings": [],
+    "terminology_changes": {},
+    "ambiguity_detected": false,
+    "success": false,
+    "processing_time_ms": 4625,
+    "rule_engine_stats": {
+      "llm_calls": 0,
+      "normalization_changes": 0,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": false
+    }
+  },
+  "2026-02-08 16:25:21": {
+    "timestamp": "2026-02-08 16:25:21",
+    "original_text": "预算50万，需要3个Java开发人员",
+    "processed_text": "预算50万，需要3个Java开发人员",
+    "mode": "dictionary",
+    "steps_log": [],
+    "warnings": [],
+    "terminology_changes": {},
+    "ambiguity_detected": false,
+    "success": false,
+    "processing_time_ms": 4601,
+    "rule_engine_stats": {
+      "llm_calls": 0,
+      "normalization_changes": 0,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": false
+    }
+  },
+  "2026-02-08 16:25:33": {
+    "timestamp": "2026-02-08 16:25:33",
+    "original_text": "处理时间限制在2秒以内，支持中英文双语",
+    "processed_text": "处理时间限制在2秒以内，支持中英文双语。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 规则引擎语义重构完成 (耗时 783ms, 变更0处)",
+      "[OK] 结构歧义检查: 通过 (耗时 434ms, 方法:LLM深度检查)"
+    ],
+    "warnings": [],
+    "terminology_changes": {},
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 1218,
+    "rule_engine_stats": {
+      "llm_calls": 2,
+      "normalization_changes": 0,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": true
+    }
+  },
+  "2026-02-08 16:25:37": {
+    "timestamp": "2026-02-08 16:25:37",
+    "original_text": "帮我搞一个RAG的应用",
+    "processed_text": "请构建一个检索增强生成（RAG）的应用程序。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 规则引擎语义重构完成 (耗时 1141ms, 变更0处)",
+      "[OK] 结构歧义检查: 通过 (耗时 403ms, 方法:LLM深度检查)"
+    ],
+    "warnings": [],
+    "terminology_changes": {},
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 1545,
+    "rule_engine_stats": {
+      "llm_calls": 2,
+      "normalization_changes": 0,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": true
+    }
+  },
+  "2026-02-08 16:25:39": {
+    "timestamp": "2026-02-08 16:25:39",
+    "original_text": "帮我搞一个RAG的应用",
+    "processed_text": "请设计一个检索增强生成（RAG）的应用方案",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 规则引擎语义重构完成 (耗时 794ms, 变更0处)",
+      "[OK] 结构歧义检查: 通过 (耗时 330ms, 方法:LLM深度检查)"
+    ],
+    "warnings": [],
+    "terminology_changes": {},
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 1125,
+    "rule_engine_stats": {
+      "llm_calls": 2,
+      "normalization_changes": 0,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": true
+    }
+  },
+  "2026-02-08 16:25:50": {
+    "timestamp": "2026-02-08 16:25:50",
+    "original_text": "帮我搞一个RAG的应用",
+    "processed_text": "请构建一个检索增强生成（RAG）的应用。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 1 类术语共 1 处",
+      "[OK] 规则引擎语义重构完成 (耗时 1199ms, 变更0处)",
+      "[OK] 结构歧义检查: 通过 (耗时 286ms, 方法:LLM深度检查)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "RAG": "检索增强生成(RAG)"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 1487,
+    "rule_engine_stats": {
+      "llm_calls": 2,
+      "normalization_changes": 1,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": true
+    }
+  },
+  "2026-02-08 16:25:53": {
+    "timestamp": "2026-02-08 16:25:53",
+    "original_text": "那个，帮我弄一下大模型的项目吧",
+    "processed_text": "，帮我操作大型语言模型(LLM)的项目",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 1 类术语共 1 处",
+      "[OK] 规则引擎语义重构完成 (耗时 0ms, 变更3处)",
+      "[WARN] 检测到句法歧义: \"帮我操作大型语言模型的项目\" 中 \"操作\" 一词存在歧义，可能指管理、使用或开发等不同行为。"
+    ],
+    "warnings": [
+      "[WARN] 检测到句法歧义 (LLM深度检查): \"帮我操作大型语言模型的项目\" 中 \"操作\" 一词存在歧义，可能指管理、使用或开发等不同行为。"
+    ],
+    "terminology_changes": {
+      "大模型": "大型语言模型(LLM)"
+    },
+    "ambiguity_detected": true,
+    "success": false,
+    "processing_time_ms": 1073,
+    "rule_engine_stats": {
+      "llm_calls": 1,
+      "normalization_changes": 1,
+      "ambiguity_detected": true,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": true
+    }
+  },
+  "2026-02-08 16:25:55": {
+    "timestamp": "2026-02-08 16:25:55",
+    "original_text": "帮我设计一个5人的团队，开发基于RAG的智能问答系统，预计需要2个月",
+    "processed_text": "请设计一个5人团队，开发基于检索增强生成的智能问答系统，预计开发周期为2个月。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 1 类术语共 1 处",
+      "[OK] 规则引擎语义重构完成 (耗时 1138ms, 变更0处)",
+      "[OK] 结构歧义检查: 通过 (耗时 365ms, 方法:LLM深度检查)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "RAG": "检索增强生成(RAG)"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 1504,
+    "rule_engine_stats": {
+      "llm_calls": 2,
+      "normalization_changes": 1,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": true
+    }
+  },
+  "2026-02-08 16:25:56": {
+    "timestamp": "2026-02-08 16:25:56",
+    "original_text": "需要5个人，其中2个Java，3个Python",
+    "processed_text": "需要5人，其中2人具备Java技能，3人具备Python技能。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 规则引擎语义重构完成 (耗时 1038ms, 变更0处)",
+      "[WARN] 检测到句法歧义: 无法确定是否允许同时具备Java和Python技能的人选重叠。"
+    ],
+    "warnings": [
+      "[WARN] 检测到句法歧义 (LLM深度检查): 无法确定是否允许同时具备Java和Python技能的人选重叠。"
+    ],
+    "terminology_changes": {},
+    "ambiguity_detected": true,
+    "success": false,
+    "processing_time_ms": 2203,
+    "rule_engine_stats": {
+      "llm_calls": 2,
+      "normalization_changes": 0,
+      "ambiguity_detected": true,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": true
+    }
+  },
+  "2026-02-08 16:26:00": {
+    "timestamp": "2026-02-08 16:26:00",
+    "original_text": "项目需要5个人，为期2周",
+    "processed_text": "项目需要5人参与，周期为2周。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 规则引擎语义重构完成 (耗时 656ms, 变更0处)",
+      "[OK] 结构歧义检查: 通过 (耗时 499ms, 方法:LLM深度检查)"
+    ],
+    "warnings": [],
+    "terminology_changes": {},
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 1156,
+    "rule_engine_stats": {
+      "llm_calls": 2,
+      "normalization_changes": 0,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": true
+    }
+  },
+  "2026-02-08 16:26:04": {
+    "timestamp": "2026-02-08 16:26:04",
+    "original_text": "预算50万，需要3个Java开发人员",
+    "processed_text": "预算50万元，需要3名Java开发人员。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 规则引擎语义重构完成 (耗时 637ms, 变更0处)",
+      "[OK] 结构歧义检查: 通过 (耗时 482ms, 方法:LLM深度检查)"
+    ],
+    "warnings": [],
+    "terminology_changes": {},
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 1120,
+    "rule_engine_stats": {
+      "llm_calls": 2,
+      "normalization_changes": 0,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": true
+    }
+  },
+  "2026-02-08 16:26:09": {
+    "timestamp": "2026-02-08 16:26:09",
+    "original_text": "处理时间限制在2秒以内，支持中英文双语",
+    "processed_text": "处理时间限制在2秒以内，支持中英文双语。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 规则引擎语义重构完成 (耗时 1012ms, 变更0处)",
+      "[OK] 结构歧义检查: 通过 (耗时 534ms, 方法:LLM深度检查)"
+    ],
+    "warnings": [],
+    "terminology_changes": {},
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 1547,
+    "rule_engine_stats": {
+      "llm_calls": 2,
+      "normalization_changes": 0,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": true
+    }
+  },
+  "2026-02-08 16:26:12": {
+    "timestamp": "2026-02-08 16:26:12",
+    "original_text": "帮我搞一个RAG的应用",
+    "processed_text": "请设计一个检索增强生成（RAG）的应用方案",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 规则引擎语义重构完成 (耗时 983ms, 变更0处)",
+      "[OK] 结构歧义检查: 通过 (耗时 306ms, 方法:LLM深度检查)"
+    ],
+    "warnings": [],
+    "terminology_changes": {},
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 1290,
+    "rule_engine_stats": {
+      "llm_calls": 2,
+      "normalization_changes": 0,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": true
+    }
+  },
+  "2026-02-08 16:27:37": {
+    "timestamp": "2026-02-08 16:27:37",
+    "original_text": "帮我搞一个RAG的应用",
+    "processed_text": "请设计一个检索增强生成（RAG）的应用方案",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 规则引擎语义重构完成 (耗时 624ms, 变更0处)",
+      "[OK] 结构歧义检查: 通过 (耗时 421ms, 方法:LLM深度检查)"
+    ],
+    "warnings": [],
+    "terminology_changes": {},
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 1046,
+    "rule_engine_stats": {
+      "llm_calls": 2,
+      "normalization_changes": 0,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": true
+    }
+  },
+  "2026-02-08 16:27:52": {
+    "timestamp": "2026-02-08 16:27:52",
+    "original_text": "帮我设计一个5人的团队，开发基于RAG的智能问答系统，预计需要2个月",
+    "processed_text": "请设计一个5人团队，开发基于检索增强生成的智能问答系统，预计开发周期为2个月。",
+    "mode": "dictionary",
+    "steps_log": [
+      "[OK] 术语对齐: 1 类术语共 1 处",
+      "[OK] 规则引擎语义重构完成 (耗时 1674ms, 变更0处)",
+      "[OK] 结构歧义检查: 通过 (耗时 6704ms, 方法:LLM深度检查)"
+    ],
+    "warnings": [],
+    "terminology_changes": {
+      "RAG": "检索增强生成(RAG)"
+    },
+    "ambiguity_detected": false,
+    "success": true,
+    "processing_time_ms": 8379,
+    "rule_engine_stats": {
+      "llm_calls": 2,
+      "normalization_changes": 1,
+      "ambiguity_detected": false,
+      "processing_mode": "dictionary",
+      "has_llm_fallback": true
+    }
   }
 }

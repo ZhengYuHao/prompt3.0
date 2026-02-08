@@ -47,7 +47,7 @@ class CachedLLMClient:
         Args:
             system_prompt: 系统 Prompt
             user_content: 用户内容
-            **kwargs: 其他参数
+            **kwargs: 其他参数（temperature, model等，但不影响缓存键）
 
         Returns:
             LLM 响应对象

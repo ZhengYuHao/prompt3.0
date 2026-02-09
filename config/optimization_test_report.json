@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-02-08 16:28:03",
+  "results": {
+    "Prompt 1.0 规则化": false,
+    "Prompt 2.0 实体提取": false,
+    "缓存机制": true,
+    "整体优化效果": false
+  },
+  "summary": {
+    "total": 4,
+    "passed": 1,
+    "pass_rate": 0.25
+  }
+}

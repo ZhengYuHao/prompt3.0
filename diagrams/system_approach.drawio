@@ -1,0 +1,370 @@
+<mxfile host="app.diagrams.net" modified="2026-02-07T00:00:00.000Z" agent="Claude AI" version="22.0.0" type="device">
+  <diagram name="智能问答系统 - 系统架构" id="system-approach">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- 标题 -->
+        <mxCell id="title" value="智能问答系统架构：基于极窄化LLM的DSL生成方法" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontFamily=Microsoft YaHei" vertex="1" parent="1">
+          <mxGeometry x="700" y="20" width="600" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- 输入层 -->
+        <mxCell id="input-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
+          <mxGeometry x="50" y="100" width="1900" height="200" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="input-label" value="输入层 Input Layer" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;fontFamily=Microsoft YaHei" vertex="1" parent="1">
+          <mxGeometry x="60" y="110" width="200" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="user-input" value="用户自然语言查询&#xa;&#xa;示例:&#xa;&quot;我想创建一个5人的团队&#xa;开发Python项目，&#xa;使用React框架，&#xa;预计需要2个月&quot;&#xa;&#xa;输出格式:&#xa;str = &quot;...&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#FF9800;fontSize=11;fontFamily=Microsoft YaHei;align=left;spacingLeft=10;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="80" y="160" width="200" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="context-input" value="上下文信息&#xa;&#xa;示例:&#xa;history = [&#xa;  {&quot;role&quot;: &quot;user&quot;, &#xa;   &quot;content&quot;: &quot;...&quot;}&#xa;]&#xa;&#xa;输出格式:&#xa;List[Dict]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#FF9800;fontSize=11;fontFamily=Microsoft YaHei;align=left;spacingLeft=10;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="310" y="160" width="200" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="config-input" value="系统配置&#xa;&#xa;示例:&#xa;{&#xa;  &quot;model&quot;: &quot;qwen-turbo&quot;,&#xa;  &quot;temperature&quot;: 0.7,&#xa;  &quot;optimization&quot;: true&#xa;}&#xa;&#xa;输出格式:&#xa;Dict[str, Any]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#FF9800;fontSize=11;fontFamily=Microsoft YaHei;align=left;spacingLeft=10;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="540" y="160" width="200" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="input-arrow" value="统一输入接口" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#FF9800;" edge="1" parent="1" source="user-input" target="preprocessor">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="180" y="380" />
+              <mxPoint x="1000" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Prompt 1.0 阶段 -->
+        <mxCell id="p10-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
+          <mxGeometry x="50" y="340" width="1100" height="520" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p10-label" value="第一阶段：文本理解与规范化 Prompt 1.0 - Text Understanding" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontFamily=Microsoft YaHei" vertex="1" parent="1">
+          <mxGeometry x="70" y="350" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="preprocessor" value="文本预处理&#xa;&#xa;功能:&#xa;• 分词 (jieba切分)&#xa;• 去除停用词&#xa;• 标点规范化&#xa;&#xa;示例输入:&#xa;&quot;我想创建一个5人的团队&quot;&#xa;&#xa;示例输出:&#xa;[&quot;我&quot;, &quot;想&quot;, &quot;创建&quot;, &#xa; &quot;一个&quot;, &quot;5&quot;, &quot;人&quot;, &#xa; &quot;团队&quot;]&#xa;&#xa;数据格式:&#xa;List[str]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="80" y="400" width="200" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="semantic-analyzer" value="语义分析&#xa;&#xa;功能:&#xa;• 词性标注&#xa;• 句法分析&#xa;• 关键词提取&#xa;&#xa;示例输入:&#xa;[&quot;创建&quot;, &quot;团队&quot;, &quot;5&quot;]&#xa;&#xa;示例输出:&#xa;{&#xa;  &quot;action&quot;: &quot;创建&quot;,&#xa;  &quot;object&quot;: &quot;团队&quot;,&#xa;  &quot;quantity&quot;: &quot;5&quot;&#xa;}&#xa;&#xa;数据格式:&#xa;Dict[str, str]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="310" y="400" width="200" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rule-engine" value="规则引擎&#xa;规则引擎&#xa;&#xa;功能:&#xa;• 口语规范化&#xa;• 标点标准化&#xa;• 同义词替换&#xa;&#xa;示例输入:&#xa;&quot;搞得怎么样了&quot;&#xa;&#xa;示例输出:&#xa;&quot;进展如何&quot;&#xa;&#xa;数据格式:&#xa;str" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="540" y="400" width="200" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ambiguity-detector" value="歧义检测&#xa;&#xa;功能:&#xa;• 句法歧义识别&#xa;• 语义歧义检测&#xa;• 提供消歧建议&#xa;&#xa;示例输入:&#xa;&quot;学生和家长的老师&quot;&#xa;&#xa;示例输出:&#xa;{&#xa;  &quot;is_ambiguous&quot;: true,&#xa;  &quot;type&quot;: &quot;修饰歧义&quot;,&#xa;  &quot;suggestion&quot;: &quot;明确修饰对象&quot;&#xa;}&#xa;&#xa;数据格式:&#xa;Dict[str, Any]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="770" y="400" width="200" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="llm-check1" value="LLM检查点1&#xa;&#xa;触发条件:&#xa;• 规则引擎无法处理&#xa;• 检测到复杂歧义&#xa;&#xa;调用LLM:&#xa;standardize_text()&#xa;&#xa;示例:&#xa;• 置信度 &lt; 0.7&#xa;• 歧义类型 = 复杂&#xa;&#xa;输出格式:&#xa;str (规范化文本)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#C2185B;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="1000" y="400" width="130" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p10-stats" value="优化统计:&#xa;&#xa;• 规则处理率: 60-80%&#xa;• LLM回退率: 20-40%&#xa;• Token节省: ~500/次&#xa;&#xa;数据格式:&#xa;{&#xa;  &quot;rule_count&quot;: 8,&#xa;  &quot;llm_count&quot;: 2,&#xa;  &quot;savings&quot;: 500&#xa;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;fontSize=9;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="80" y="650" width="220" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p10-output" value="阶段输出:&#xa;&#xa;normalized_text: str&#xa;=&quot;创建5人团队&#xa;  开发Python项目&#xa;  使用React框架&#xa;  预计2个月&quot;&#xa;&#xa;ambiguity_report: Dict&#xa;{&quot;detected&quot;: [], &#xa; &quot;confidence&quot;: 0.95}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F57F17;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="320" y="650" width="280" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p10-performance" value="性能指标:&#xa;&#xa;• 处理时间: 0.5-1.5s&#xa;• 准确率: 95%+&#xa;• 可解释性: 100%&#xa;&#xa;相比纯LLM:&#xa;• 速度: 1.5x-2x&#xa;• 成本: 降低40%" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F57F17;fontSize=9;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="630" y="650" width="280" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p10-implement" value="实现文件:&#xa;&#xa;• prompt_preprocessor.py&#xa;  (主要处理逻辑)&#xa;• rule_based_normalizer.py&#xa;  (规则引擎实现)&#xa;• llm_client.py&#xa;  (LLM调用接口)&#xa;&#xa;核心类:&#xa;• TextPreprocessor&#xa;• RuleBasedTextNormalizer&#xa;• SyntacticAmbiguityDetector" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#00796B;fontSize=9;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="930" y="650" width="200" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- Prompt 2.0 阶段 -->
+        <mxCell id="p20-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
+          <mxGeometry x="50" y="890" width="1100" height="520" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p20-label" value="第二阶段：结构化提取 Prompt 2.0 - Structured Extraction" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontFamily=Microsoft YaHei" vertex="1" parent="1">
+          <mxGeometry x="70" y="900" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pattern-matcher" value="正则模式匹配&#xa;&#xa;功能:&#xa;• 数字+单位识别&#xa;• 技术栈识别&#xa;• 时长模式识别&#xa;&#xa;示例输入:&#xa;&quot;5人团队&quot;&#xa;&#xa;示例输出:&#xa;{&#xa;  &quot;name&quot;: &quot;team_size&quot;,&#xa;  &quot;value&quot;: &quot;5&quot;,&#xa;  &quot;type&quot;: &quot;Integer&quot;&#xa;}&#xa;&#xa;数据格式:&#xa;List[Dict]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="80" y="950" width="200" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="entity-recognizer" value="实体识别&#xa;&#xa;功能:&#xa;• 实体类型分类&#xa;• 实体边界检测&#xa;• 实体关系推断&#xa;&#xa;示例输入:&#xa;&quot;Python项目&quot;&#xa;&#xa;示例输出:&#xa;{&#xa;  &quot;text&quot;: &quot;Python&quot;,&#xa;  &quot;type&quot;: &quot;tech_stack&quot;,&#xa;  &quot;start&quot;: 0,&#xa;  &quot;end&quot;: 6&#xa;}&#xa;&#xa;数据格式:&#xa;List[Dict]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="310" y="950" width="200" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="variable-extractor" value="变量提取&#xa;&#xa;功能:&#xa;• 变量名生成&#xa;• 变量类型推断&#xa;• 变量值提取&#xa;&#xa;示例输入:&#xa;实体列表&#xa;&#xa;示例输出:&#xa;[&#xa;  {&quot;name&quot;: &quot;team_size&quot;,&#xa;   &quot;type&quot;: &quot;int&quot;},&#xa;  {&quot;name&quot;: &quot;tech_stack&quot;,&#xa;   &quot;type&quot;: &quot;str&quot;}&#xa;]&#xa;&#xa;数据格式:&#xa;List[Dict]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="540" y="950" width="200" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conflict-resolver" value="冲突解决&#xa;&#xa;功能:&#xa;• 位置重叠解决&#xa;• 变量名去重&#xa;• 优先级排序&#xa;&#xa;示例输入:&#xa;[&quot;duration&quot;, &quot;duration&quot;]&#xa;&#xa;示例输出:&#xa;[&quot;duration&quot;, &quot;duration_2&quot;]&#xa;&#xa;数据格式:&#xa;List[str]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="770" y="950" width="200" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="llm-check2" value="LLM检查点2&#xa;&#xa;触发条件:&#xa;• 正则提取不足3个&#xa;• 复杂实体类型&#xa;&#xa;调用LLM:&#xa;extract_entities()&#xa;&#xa;示例:&#xa;• regex_count &lt; 3&#xa;• type = COMPLEX&#xa;&#xa;输出格式:&#xa;List[Dict]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#C2185B;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="1000" y="950" width="130" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p20-stats" value="优化统计:&#xa;&#xa;• 正则提取率: 40-70%&#xa;• LLM补充率: 30-60%&#xa;• Token节省: ~300/次&#xa;&#xa;数据格式:&#xa;{&#xa;  &quot;regex_count&quot;: 5,&#xa;  &quot;llm_count&quot;: 1,&#xa;  &quot;savings&quot;: 300&#xa;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;fontSize=9;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="80" y="1200" width="220" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p20-output" value="阶段输出:&#xa;&#xa;entities: List[Dict]&#xa;[&#xa;  {&quot;name&quot;: &quot;team_size&quot;,&#xa;   &quot;value&quot;: &quot;5&quot;,&#xa;   &quot;type&quot;: &quot;Integer&quot;},&#xa;  {&quot;name&quot;: &quot;tech_stack&quot;,&#xa;   &quot;value&quot;: &quot;Python&quot;,&#xa;   &quot;type&quot;: &quot;String&quot;}&#xa;]&#xa;&#xa;stats: Dict&#xa;{&quot;llm_called&quot;: false}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F57F17;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="320" y="1200" width="280" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p20-performance" value="性能指标:&#xa;&#xa;• 提取准确率: 92%+&#xa;• 去重成功率: 100%&#xa;• 可解释性: 100%&#xa;&#xa;相比纯LLM:&#xa;• 速度: 2x-3x&#xa;• 成本: 降低50%" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F57F17;fontSize=9;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="630" y="1200" width="280" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p20-implement" value="实现文件:&#xa;&#xa;• prompt_structurizer.py&#xa;  (结构化提取逻辑)&#xa;• pre_pattern_extractor.py&#xa;  (正则提取器)&#xa;• llm_client.py&#xa;  (LLM实体提取)&#xa;&#xa;核心类:&#xa;• EntityConflictResolver&#xa;• PrePatternExtractor&#xa;• StructuredExtractor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#00796B;fontSize=9;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="930" y="1200" width="200" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- Prompt 3.0 阶段 -->
+        <mxCell id="p30-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#E65100;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1440" width="1100" height="520" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p30-label" value="第三阶段：DSL生成 Prompt 3.0 - DSL Generation" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontFamily=Microsoft YaHei" vertex="1" parent="1">
+          <mxGeometry x="70" y="1450" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="template-generator" value="DSL模板生成&#xa;&#xa;功能:&#xa;• 选择合适的模板&#xa;• 填充变量占位符&#xa;• 生成基础DSL&#xa;&#xa;示例输入:&#xa;entities列表&#xa;&#xa;示例输出:&#xa;&quot;DEFINE team_size:&#xa;  Integer = 5&#xa;DEFINE tech_stack:&#xa;  String = 'Python'&quot;&#xa;&#xa;数据格式:&#xa;str (DSL代码)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="80" y="1500" width="200" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="logic-translator" value="逻辑转译器&#xa;&#xa;功能:&#xa;• 业务逻辑转换&#xa;• 控制流生成&#xa;• 条件语句构建&#xa;&#xa;示例输入:&#xa;&quot;如果人数&gt;3人&#xa; 使用敏捷开发&quot;&#xa;&#xa;示例输出:&#xa;&quot;IF team_size &gt; 3:&#xa;  mode = 'agile'&quot;&#xa;&#xa;数据格式:&#xa;str (DSL代码)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="310" y="1500" width="200" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="dsl-builder" value="DSL构建器&#xa;&#xa;功能:&#xa;• 模块整合&#xa;• 语法验证&#xa;• 依赖分析&#xa;&#xa;示例输入:&#xa;DSL片段列表&#xa;&#xa;示例输出:&#xa;&quot;DEFINE team_size: Integer = 5&#xa;CALL create_team(team_size)&#xa;IF project_type == 'web':&#xa;  CALL setup_react()&quot;&#xa;&#xa;数据格式:&#xa;str (完整DSL)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="540" y="1500" width="200" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="validator" value="验证器&#xa;&#xa;功能:&#xa;• 语法检查&#xa;• 类型验证&#xa;• 变量依赖检查&#xa;&#xa;示例输入:&#xa;DSL代码&#xa;&#xa;示例输出:&#xa;{&#xa;  &quot;valid&quot;: true,&#xa;  &quot;errors&quot;: [],&#xa;  &quot;warnings&quot;: []&#xa;}&#xa;&#xa;数据格式:&#xa;Dict[str, Any]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="770" y="1500" width="200" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="llm-transpiler" value="LLM转译&#xa;&#xa;触发条件:&#xa;• 模板不匹配&#xa;• 复杂业务逻辑&#xa;&#xa;调用LLM:&#xa;generate_dsl()&#xa;&#xa;示例:&#xa;• template = None&#xa;• complexity = HIGH&#xa;&#xa;输出格式:&#xa;str (DSL代码)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#C2185B;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="1000" y="1500" width="130" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p30-stats" value="优化统计:&#xa;&#xa;• 模板生成率: 70-85%&#xa;• LLM转译率: 15-30%&#xa;• Token节省: ~800/次&#xa;&#xa;数据格式:&#xa;{&#xa;  &quot;template_count&quot;: 3,&#xa;  &quot;llm_count&quot;: 1,&#xa;  &quot;savings&quot;: 800&#xa;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;fontSize=9;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="80" y="1750" width="220" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p30-output" value="阶段输出:&#xa;&#xa;dsl_code: str&#xa;&quot;DEFINE team_size: Integer = 5&#xa;DEFINE tech_stack: String = 'Python'&#xa;DEFINE duration_months: Integer = 2&#xa;CALL create_team(team_size)&#xa;CALL setup_project(tech_stack)&quot;&#xa;&#xa;validation: Dict&#xa;{&quot;valid&quot;: true, &quot;errors&quot;: []}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F57F17;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="320" y="1750" width="280" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p30-performance" value="性能指标:&#xa;&#xa;• 生成成功率: 95%+&#xa;• 验证通过率: 98%+&#xa;• 可解释性: 100%&#xa;&#xa;相比纯LLM:&#xa;• 速度: 1.8x-2.5x&#xa;• 成本: 降低45%" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F57F17;fontSize=9;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="630" y="1750" width="280" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p30-implement" value="实现文件:&#xa;&#xa;• prompt_codegenetate.py&#xa;  (DSL生成逻辑)&#xa;• dsl_builder.py&#xa;  (DSL构建器)&#xa;• enhanced_validator.py&#xa;  (验证器)&#xa;&#xa;核心类:&#xa;• DSLGenerator&#xa;• TemplateMatcher&#xa;• DSLValidator" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#00796B;fontSize=9;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="930" y="1750" width="200" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- 输出层 -->
+        <mxCell id="output-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1990" width="1900" height="850" as="geometry" />
+        </mxCell>
+
+        <mxCell id="output-label" value="输出层 Output Layer" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;fontFamily=Microsoft YaHei" vertex="1" parent="1">
+          <mxGeometry x="60" y="2000" width="200" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- DSL代码输出 -->
+        <mxCell id="dsl-output" value="DSL代码输出&#xa;&#xa;格式:&#xa;str (完整DSL脚本)&#xa;&#xa;示例:&#xa;&quot;DEFINE team_size: Integer = 5&#xa;DEFINE tech_stack: String = 'Python'&#xa;DEFINE duration: Integer = 2&#xa;&#xa;CALL init_project()&#xa;CALL create_team(team_size)&#xa;CALL setup_stack(tech_stack)&#xa;&#xa;FOR i IN range(duration):&#xa;  CALL execute_sprint(i)&#xa;  IF velocity &lt; threshold:&#xa;    CALL_adjust_team()&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#4CAF50;fontSize=11;fontFamily=Microsoft YaHei;align=left;spacingLeft=10;spacingTop=5;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="80" y="2050" width="350" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- DSL解析步骤 -->
+        <mxCell id="dsl-parser" value="DSL解析器&#xa;&#xa;功能:&#xa;• 词法分析 (Lexical Analysis)&#xa;• 语法解析 (Syntax Parsing)&#xa;• 语义检查 (Semantic Check)&#xa;&#xa;示例:&#xa;输入: &quot;DEFINE team_size: Integer = 5&quot;&#xa;&#xa;输出: Token Stream&#xa;[DEFINE, team_size, :, Integer, =, 5]&#xa;&#xa;数据格式:&#xa;List[Token]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="460" y="2050" width="320" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- AST构建 -->
+        <mxCell id="ast-builder" value="AST构建器&#xa;&#xa;功能:&#xa;• 抽象语法树生成&#xa;• 节点类型分类&#xa;• 作用域分析&#xa;&#xa;示例:&#xa;输入: Token Stream&#xa;&#xa;输出: AST Tree&#xa;DefineNode(&#xa;  name: 'team_size',&#xa;  type: Integer,&#xa;  value: 5&#xa;)&#xa;&#xa;数据格式:&#xa;ASTNode" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="810" y="2050" width="320" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- Python代码生成 -->
+        <mxCell id="code-generator" value="Python代码生成器&#xa;&#xa;功能:&#xa;• AST遍历与转换&#xa;• 模板匹配与填充&#xa;• 代码片段生成&#xa;&#xa;示例:&#xa;输入: DefineNode&#xa;&#xa;输出: Python Code&#xa;team_size = 5&#xa;&#xa;数据格式:&#xa;str (Python代码片段)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#4CAF50;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="1160" y="2050" width="320" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- 代码优化 -->
+        <mxCell id="code-optimizer" value="代码优化器&#xa;&#xa;功能:&#xa;• 死代码消除&#xa;• 常量折叠&#xa;• 循环优化&#xa;• 变量重命名&#xa;&#xa;示例:&#xa;输入: Python代码&#xa;&#xa;输出: 优化后代码&#xa;x = 5  # 常量折叠&#xa;team_size = x&#xa;&#xa;数据格式:&#xa;str (优化后的代码)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#4CAF50;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="1510" y="2050" width="320" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- 代码验证 -->
+        <mxCell id="code-validator" value="代码验证器&#xa;&#xa;功能:&#xa;• 语法验证&#xa;• 类型检查&#xa;• 未定义变量检测&#xa;• 安全性检查&#xa;&#xa;示例:&#xa;输入: Python代码&#xa;&#xa;输出: 验证结果&#xa;{&#xa;  &quot;valid&quot;: true,&#xa;  &quot;errors&quot;: [],&#xa;  &quot;warnings&quot;: []&#xa;}&#xa;&#xa;数据格式:&#xa;Dict[str, Any]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="80" y="2300" width="320" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- 代码格式化 -->
+        <mxCell id="code-formatter" value="代码格式化器&#xa;&#xa;功能:&#xa;• 代码美化&#xa;• 缩进规范化&#xa;• 导入排序&#xa;• 注释添加&#xa;&#xa;示例:&#xa;输入: Python代码&#xa;&#xa;输出: 格式化代码&#xa;def create_team(size):&#xa;    pass  # 标准缩进&#xa;&#xa;数据格式:&#xa;str (格式化代码)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=8;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="440" y="2300" width="320" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- 元数据输出 -->
+        <mxCell id="metadata-output" value="元数据输出&#xa;&#xa;格式:&#xa;Dict[str, Any]&#xa;&#xa;示例:&#xa;{&#xa;  &quot;version&quot;: &quot;1.0&quot;,&#xa;  &quot;generated_at&quot;: &quot;2026-02-07&quot;,&#xa;  &quot;processing_time&quot;: 2.3,&#xa;  &quot;llm_calls&quot;: 2,&#xa;  &quot;token_usage&quot;: 1500,&#xa;  &quot;cost&quot;: 0.03,&#xa;  &quot;optimization&quot;: {&#xa;    &quot;rule_hits&quot;: 8,&#xa;    &quot;regex_hits&quot;: 5,&#xa;    &quot;template_hits&quot;: 3&#xa;  }&#xa;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F57F17;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=10;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="800" y="2300" width="320" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- 处理历史记录 -->
+        <mxCell id="history-output" value="处理历史记录&#xa;&#xa;格式:&#xa;List[ProcessingStep]&#xa;&#xa;示例:&#xa;[&#xa;  {&#xa;    &quot;step&quot;: &quot;preprocessing&quot;,&#xa;    &quot;method&quot;: &quot;rule_engine&quot;,&#xa;    &quot;input&quot;: &quot;...&quot;,&#xa;    &quot;output&quot;: &quot;...&quot;,&#xa;    &quot;duration&quot;: 0.5&#xa;  },&#xa;  {&#xa;    &quot;step&quot;: &quot;extraction&quot;,&#xa;    &quot;method&quot;: &quot;regex&quot;,&#xa;    &quot;entities&quot;: 5,&#xa;    &quot;llm_called&quot;: false&#xa;  }&#xa;]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F57F17;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=10;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="1160" y="2300" width="320" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- 性能指标汇总 -->
+        <mxCell id="metrics-output" value="性能指标汇总&#xa;&#xa;格式:&#xa;Dict[str, float]&#xa;&#xa;示例:&#xa;{&#xa;  &quot;total_time&quot;: 3.2,&#xa;  &quot;llm_calls&quot;: 2,&#xa;  &quot;token_total&quot;: 1800,&#xa;  &quot;cost_total&quot;: 0.036,&#xa;  &quot;savings&quot;: 1600,&#xa;  &quot;speedup&quot;: 1.8,&#xa;  &quot;cost_reduction&quot;: 0.44&#xa;}&#xa;&#xa;单位:&#xa;时间: 秒, 成本: 美元" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F57F17;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=10;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="1510" y="2300" width="320" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- 最终输出 -->
+        <mxCell id="code-output" value="最终可执行Python代码&#xa;&#xa;格式:&#xa;str (完整Python脚本)&#xa;&#xa;示例:&#xa;&quot;# Generated from DSL&#xa;# Version: 1.0&#xa;# Date: 2026-02-07&#xa;&#xa;team_size = 5&#xa;tech_stack = 'Python'&#xa;duration = 2&#xa;&#xa;def init_project():&#xa;    &quot;&quot;Initialize the project&quot;&quot;&#xa;    pass&#xa;&#xa;def create_team(size):&#xa;    &quot;&quot;Create a team with specified size&quot;&quot;&#xa;    pass&#xa;&#xa;for i in range(duration):&#xa;    execute_sprint(i)&#xa;    if velocity &lt; threshold:&#xa;        adjust_team()&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#4CAF50;fontSize=11;fontFamily=Microsoft YaHei;align=left;spacingLeft=10;spacingTop=5;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="80" y="2550" width="920" height="240" as="geometry" />
+        </mxCell>
+
+        <!-- 输出说明 -->
+        <mxCell id="output-notes" value="代码转换说明:&#xa;&#xa;1. DSL解析: 将DSL代码分解为Token流&#xa;2. AST构建: 根据Token构建抽象语法树&#xa;3. 代码生成: 遍历AST生成Python代码&#xa;4. 代码优化: 优化生成的Python代码&#xa;5. 代码验证: 验证代码语法和类型&#xa;6. 代码格式化: 规范化代码格式&#xa;7. 最终输出: 输出完整的可执行Python脚本&#xa;&#xa;实现文件:&#xa;• prompt_codegenetate.py&#xa;• dsl_builder.py&#xa;• enhanced_auto_fixer.py&#xa;&#xa;核心技术:&#xa;• 词法分析器 (Lexer)&#xa;• 语法解析器 (Parser)&#xa;• 代码生成器 (CodeGenerator)&#xa;• AST遍历器 (ASTWalker)&#xa;• 优化器 (Optimizer)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#00796B;fontSize=10;fontFamily=Microsoft YaHei;align=left;spacingLeft=10;spacingTop=5" vertex="1" parent="1">
+          <mxGeometry x="1040" y="2550" width="800" height="240" as="geometry" />
+        </mxCell>
+
+        <!-- 连接线 -->
+        <mxCell id="arrow1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#666;" edge="1" parent="1" source="preprocessor" target="semantic-analyzer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#666;" edge="1" parent="1" source="semantic-analyzer" target="rule-engine">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#666;" edge="1" parent="1" source="rule-engine" target="ambiguity-detector">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#C2185B;dashed=1;" edge="1" parent="1" source="ambiguity-detector" target="llm-check1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#666;" edge="1" parent="1" source="llm-check1" target="pattern-matcher">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1065" y="895" />
+              <mxPoint x="180" y="895" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#666;" edge="1" parent="1" source="pattern-matcher" target="entity-recognizer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#666;" edge="1" parent="1" source="entity-recognizer" target="variable-extractor">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#666;" edge="1" parent="1" source="variable-extractor" target="conflict-resolver">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#C2185B;dashed=1;" edge="1" parent="1" source="conflict-resolver" target="llm-check2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#666;" edge="1" parent="1" source="llm-check2" target="template-generator">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1065" y="1445" />
+              <mxPoint x="180" y="1445" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#666;" edge="1" parent="1" source="template-generator" target="logic-translator">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#666;" edge="1" parent="1" source="logic-translator" target="dsl-builder">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#666;" edge="1" parent="1" source="dsl-builder" target="validator">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#C2185B;dashed=1;" edge="1" parent="1" source="validator" target="llm-transpiler">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=4;strokeColor=#4CAF50;" edge="1" parent="1" source="llm-transpiler" target="dsl-output">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1065" y="1995" />
+              <mxPoint x="255" y="1995" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 输出层内部连接 -->
+        <mxCell id="arrow16" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#4CAF50;" edge="1" parent="1" source="dsl-output" target="dsl-parser">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#4CAF50;" edge="1" parent="1" source="dsl-parser" target="ast-builder">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow18" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#4CAF50;" edge="1" parent="1" source="ast-builder" target="code-generator">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow19" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#4CAF50;" edge="1" parent="1" source="code-generator" target="code-optimizer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#FF9800;" edge="1" parent="1" source="code-optimizer" target="code-validator">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1670" y="2270" />
+              <mxPoint x="1670" y="2330" />
+              <mxPoint x="240" y="2330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#4CAF50;" edge="1" parent="1" source="code-validator" target="code-formatter">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow22" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#4CAF50;" edge="1" parent="1" source="code-formatter" target="code-output">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="600" y="2580" />
+              <mxPoint x="540" y="2580" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow23" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#FF9800;dashed=1;" edge="1" parent="1" source="code-output" target="output-notes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

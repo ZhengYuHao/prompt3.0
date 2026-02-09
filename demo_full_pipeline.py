@@ -51,7 +51,7 @@ from history_manager import HistoryManager, PipelineHistory
 # 配置
 # ============================================================================
 # 是否使用模拟 LLM 客户端（设为 True 可避免真实 API 调用）
-USE_MOCK = False  # 默认使用模拟客户端，避免意外 API 调用
+USE_MOCK = False  # 使用真实 LLM 客户端
 # 如果要使用真实 LLM，请设置为 False 并确保配置了有效的 API 密钥
 # USE_MOCK = False
 
@@ -379,15 +379,18 @@ def run_full_pipeline(input_text: str = None):
     info("=" * 80)
     
     info("\n>>> 输入: Prompt 1.0 处理后的标准化文本")
-    
-    # 使用 PromptStructurizer 进行完整处理（包括 extraction_log）
+
+    # 使用 PromptStructurizer 进行完整处理（包括 extraction_log 和 优化统计）
     structurizer = PromptStructurizer(use_mock=USE_MOCK)
-    prompt_structure = structurizer.process(processed_text)
-    
+    prompt_structure, optimization_stats = structurizer.process(processed_text)
+
     # 从结果中提取数据
     template = prompt_structure.template_text
     variable_registry = prompt_structure.variable_registry
     extraction_log = prompt_structure.extraction_log
+
+    # 记录优化统计（用于后续报告）
+    stage2_optimization_stats = optimization_stats
     
     # 将 variable_registry (List[Dict]) 转换为 variable_metas (List[VariableMeta])
     variable_metas = []
@@ -721,7 +724,17 @@ def run_full_pipeline(input_text: str = None):
 
         # 整体状态 - 根据编译决策判断
         total_time_ms=prompt10_result.processing_time_ms + dsl_compile_time + prompt40_time_ms,
-        error_message=None
+        error_message=None,
+
+        # 优化统计（极窄化LLM）
+        prompt10_rule_stats=prompt10_result.rule_engine_stats if hasattr(prompt10_result, 'rule_engine_stats') else {},
+        prompt20_optimization_stats=stage2_optimization_stats if 'stage2_optimization_stats' in locals() else {},
+        prompt30_optimization_stats={},  # 待集成
+        total_cache_hits=0,  # 待集成
+        total_cache_misses=0,  # 待集成
+        cache_hit_rate=0.0,  # 待集成
+        validation_stats={},  # 待集成
+        auto_fix_stats={}  # 待集成
     )
 
     # 根据编译决策更新整体状态

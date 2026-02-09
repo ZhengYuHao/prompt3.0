@@ -5,11 +5,17 @@
 
 import os
 import json
-from typing import Optional, List, Dict, Any, Union
+from typing import Optional, List, Dict, Any, Union, Tuple
 from dataclasses import dataclass
 from enum import Enum
 from logger import info, warning, error, debug
 from dotenv import load_dotenv
+
+# 优化模块：正则提取器
+from utils.pre_pattern_extractor import PrePatternExtractor
+
+# 优化模块：缓存客户端
+from utils.cached_llm_client import CachedLLMClient
 
 try:
     from openai import OpenAI
@@ -106,11 +112,12 @@ class UnifiedLLMClient:
         base_url: Optional[str] = None,
         api_key: Optional[str] = None,
         max_retries: int = 3,
-        timeout: int = 60
+        timeout: int = 60,
+        enable_cache: bool = False
     ):
         """
         初始化 LLM 客户端
-        
+
         Args:
             model: 模型名称
             temperature: 温度参数（0-2，越低越确定性）
@@ -118,6 +125,7 @@ class UnifiedLLMClient:
             api_key: API 密钥
             max_retries: 最大重试次数
             timeout: 超时时间（秒）
+            enable_cache: 是否启用缓存
         """
         self.model = model
         self.temperature = temperature
@@ -126,6 +134,8 @@ class UnifiedLLMClient:
         self.max_retries = max_retries
         self.timeout = timeout
         self._client: Optional["OpenAI"] = None
+        self.enable_cache = enable_cache
+        self._cache_client: Optional[CachedLLMClient] = None
     
     def _get_client(self) -> "OpenAI":
         """获取或创建 OpenAI 客户端实例"""
@@ -138,6 +148,94 @@ class UnifiedLLMClient:
                 timeout=self.timeout
             )
         return self._client
+
+    def _get_cache_client(self) -> CachedLLMClient:
+        """获取或创建缓存客户端实例"""
+        if self._cache_client is None:
+            self._cache_client = CachedLLMClient(self)
+        return self._cache_client
+
+    def _call_without_cache(
+        self,
+        system_prompt: str,
+        user_content: str,
+        temperature: Optional[float] = None,
+        model: Optional[str] = None
+    ) -> LLMResponse:
+        """
+        不使用缓存的调用方法
+
+        Args:
+            system_prompt: 系统提示词
+            user_content: 用户输入
+            temperature: 可选的温度覆盖
+            model: 可选的模型覆盖
+
+        Returns:
+            LLMResponse 对象
+        """
+        _model = model or self.model
+        _temp = temperature if temperature is not None else self.temperature
+
+        # 如果是千问模型，在系统提示词中添加强抑制指令
+        if "qwen" in _model.lower():
+            suppress_thought = """
+
+【禁止输出思考过程】
+- 直接输出最终结果
+- 严禁输出推理步骤、思考过程或中间想法
+- 严禁使用"好的"、"我现在需要"、"接下来"等引导词
+- 只输出符合要求格式的内容
+- 输出必须简洁精确
+"""
+            system_prompt = system_prompt + suppress_thought
+
+        info(f"[LLM调用] 模型: {_model}, Temperature: {_temp}")
+        debug(f"[System] {system_prompt[:100]}...")
+        debug(f"[User] {user_content[:100]}...")
+
+        client = self._get_client()
+
+        for attempt in range(self.max_retries):
+            try:
+                resp = client.chat.completions.create(
+                    model=_model,
+                    temperature=_temp,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_content},
+                    ],
+                )
+
+                content = (resp.choices[0].message.content or "").strip()
+
+                # 清理响应中的格式标签和脏数据
+                content = self._clean_llm_response(content)
+
+                usage = None
+                if hasattr(resp, 'usage') and resp.usage:
+                    usage = {
+                        "prompt_tokens": resp.usage.prompt_tokens,
+                        "completion_tokens": resp.usage.completion_tokens,
+                        "total_tokens": resp.usage.total_tokens
+                    }
+
+                debug(f"[LLM响应] 长度: {len(content)} 字符")
+
+                return LLMResponse(
+                    content=content,
+                    model=_model,
+                    usage=usage,
+                    raw_response=resp
+                )
+
+            except Exception as e:
+                warning(f"LLM 调用失败 (尝试 {attempt + 1}/{self.max_retries}): {e}")
+                if attempt == self.max_retries - 1:
+                    error(f"LLM 调用最终失败: {e}")
+                    raise
+
+        raise RuntimeError("LLM 调用失败，已超过最大重试次数")
     
     def _clean_llm_response(self, content: str) -> str:
         """
@@ -206,7 +304,7 @@ class UnifiedLLMClient:
         model: Optional[str] = None
     ) -> LLMResponse:
         """
-        基础对话调用
+        基础对话调用（支持缓存）
 
         Args:
             system_prompt: 系统提示词
@@ -217,68 +315,37 @@ class UnifiedLLMClient:
         Returns:
             LLMResponse 对象
         """
-        _model = model or self.model
-        _temp = temperature if temperature is not None else self.temperature
+        # 如果启用缓存，使用缓存客户端
+        if self.enable_cache:
+            cache_client = self._get_cache_client()
+            response = cache_client.call(system_prompt, user_content, temperature=temperature, model=model)
 
-        # 如果是千问模型，在系统提示词中添加强抑制指令
-        if "qwen" in _model.lower():
-            suppress_thought = """
+            # 标记是否来自缓存
+            if hasattr(response, 'from_cache') and response.from_cache:
+                info("[缓存命中] 使用缓存结果")
+            else:
+                info("[缓存未命中] 调用 LLM")
 
-【禁止输出思考过程】
-- 直接输出最终结果
-- 严禁输出推理步骤、思考过程或中间想法
-- 严禁使用"好的"、"我现在需要"、"接下来"等引导词
-- 只输出符合要求格式的内容
-- 输出必须简洁精确
-"""
-            system_prompt = system_prompt + suppress_thought
+            return response
+        else:
+            # 直接调用，不使用缓存
+            return self._call_without_cache(system_prompt, user_content, temperature, model)
 
-        info(f"[LLM调用] 模型: {_model}, Temperature: {_temp}")
-        debug(f"[System] {system_prompt[:100]}...")
-        debug(f"[User] {user_content[:100]}...")
+    def get_cache_stats(self) -> Dict[str, Any]:
+        """
+        获取缓存统计信息
 
-        client = self._get_client()
-        
-        for attempt in range(self.max_retries):
-            try:
-                resp = client.chat.completions.create(
-                    model=_model,
-                    temperature=_temp,
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_content},
-                    ],
-                )
-                
-                content = (resp.choices[0].message.content or "").strip()
-
-                # 清理响应中的格式标签和脏数据
-                content = self._clean_llm_response(content)
-
-                usage = None
-                if hasattr(resp, 'usage') and resp.usage:
-                    usage = {
-                        "prompt_tokens": resp.usage.prompt_tokens,
-                        "completion_tokens": resp.usage.completion_tokens,
-                        "total_tokens": resp.usage.total_tokens
-                    }
-
-                debug(f"[LLM响应] 长度: {len(content)} 字符")
-                
-                return LLMResponse(
-                    content=content,
-                    model=_model,
-                    usage=usage,
-                    raw_response=resp
-                )
-                
-            except Exception as e:
-                warning(f"LLM 调用失败 (尝试 {attempt + 1}/{self.max_retries}): {e}")
-                if attempt == self.max_retries - 1:
-                    error(f"LLM 调用最终失败: {e}")
-                    raise
-        
-        raise RuntimeError("LLM 调用失败，已超过最大重试次数")
+        Returns:
+            缓存统计字典
+        """
+        if self.enable_cache and self._cache_client:
+            return self._cache_client.get_stats()
+        return {
+            "hits": 0,
+            "misses": 0,
+            "total": 0,
+            "hit_rate": 0.0
+        }
     
     def call_simple(
         self,
@@ -303,21 +370,53 @@ class UnifiedLLMClient:
     def extract_entities(
         self,
         text: str,
-        entity_types: Optional[List[str]] = None
-    ) -> List[Dict[str, Any]]:
+        entity_types: Optional[List[str]] = None,
+        enable_optimization: bool = True
+    ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
         """
-        实体抽取
-        
+        优化的实体抽取（极窄化LLM）
+
+        策略：
+        1. 正则预处理：提取常见模式（数字+单位、技术栈等）
+        2. 如果正则提取足够（3+个实体），直接返回
+        3. 否则调用LLM补充
+        4. 合并结果（正则优先）
+
         Args:
             text: 待抽取文本
             entity_types: 期望的实体类型列表
-            
+            enable_optimization: 是否启用优化（正则预处理）
+
         Returns:
-            实体列表
+            (实体列表, 优化统计信息)
         """
         types_hint = ""
         if entity_types:
             types_hint = f"实体类型限定: {', '.join(entity_types)}\n"
+
+        # 步骤1：正则预处理（如果启用优化）
+        regex_entities = []
+        if enable_optimization:
+            debug(f"[实体提取] 尝试正则预处理...")
+            regex_entities = PrePatternExtractor.extract(text)
+
+            # 如果正则提取足够（3+个实体），直接返回
+            if len(regex_entities) >= 3:
+                info(f"[实体提取] 正则提取成功，提取 {len(regex_entities)} 个实体，跳过 LLM")
+                stats = {
+                    "regex_count": len(regex_entities),
+                    "llm_count": 0,
+                    "merged_count": len(regex_entities),
+                    "llm_called": False,
+                    "optimization_enabled": True
+                }
+                return regex_entities, stats
+            elif len(regex_entities) > 0:
+                info(f"[实体提取] 正则提取 {len(regex_entities)} 个实体，继续使用 LLM 补充")
+            else:
+                debug(f"[实体提取] 正则提取未找到实体，使用 LLM")
+        else:
+            debug(f"[实体提取] 优化未启用，直接使用 LLM")
         
         system_prompt = f"""你是一个实体抽取专家。你的任务是从文本中识别需要动态调整的"变量"。
 
@@ -385,23 +484,45 @@ class UnifiedLLMClient:
 4. 数据类型仅限: String, Integer, Boolean, List, Enum
 5. 优先识别最长匹配项（如 "5个人" 优于 "5"）
 6. 如果描述包含动词+名词但没有数字，大概率是固定需求，不要提取"""
-        
+
+        # 步骤2：调用LLM补充（如果需要）
         response = self.call(system_prompt, text)
 
         # 打印原始响应用于调试
         debug(f"[实体抽取] LLM 原始响应:\n{response.content}\n")
 
         try:
-            entities = json.loads(response.content)
-            if isinstance(entities, list):
-                info(f"[实体抽取] 识别到 {len(entities)} 个实体")
-                return entities
-            else:
-                warning(f"[实体抽取] 响应格式不是数组，实际类型: {type(entities)}")
-                return []
+            llm_entities = json.loads(response.content)
+            if not isinstance(llm_entities, list):
+                warning(f"[实体抽取] 响应格式不是数组，实际类型: {type(llm_entities)}")
+                llm_entities = []
         except json.JSONDecodeError as e:
             warning(f"[实体抽取] JSON 解析失败: {e}")
-            return []
+            llm_entities = []
+
+        # 步骤3：合并结果（正则优先）
+        if enable_optimization and regex_entities:
+            merged_entities = PrePatternExtractor.merge_with_llm(regex_entities, llm_entities)
+            info(f"[实体抽取] 合并结果: 正则{len(regex_entities)} + LLM{len(llm_entities)} → {len(merged_entities)}")
+            stats = {
+                "regex_count": len(regex_entities),
+                "llm_count": len(llm_entities),
+                "merged_count": len(merged_entities),
+                "llm_called": True,
+                "optimization_enabled": True
+            }
+            return merged_entities, stats
+        else:
+            # 如果没有启用优化或正则未提取到实体，直接返回LLM结果
+            info(f"[实体抽取] 识别到 {len(llm_entities)} 个实体（纯LLM）")
+            stats = {
+                "regex_count": len(regex_entities) if enable_optimization else 0,
+                "llm_count": len(llm_entities),
+                "merged_count": len(llm_entities),
+                "llm_called": True,
+                "optimization_enabled": enable_optimization
+            }
+            return llm_entities, stats
     
     def detect_ambiguity(self, text: str) -> Optional[str]:
         """
@@ -555,19 +676,36 @@ class MockLLMClient(UnifiedLLMClient):
         )
     
     def _mock_entity_extraction(self, text: str) -> str:
-        """模拟实体抽取"""
+        """模拟实体抽取（修复重复定义问题）"""
         import re
         entities = []
-        
+
+        # 用于跟踪相同单位的计数（修复重复定义）
+        unit_counter = {}
+
         # 识别数字+单位模式
         for match in re.finditer(r'(\d+)(年|周|月|天|小时|分钟)', text):
+            unit = match.group(2)
+            value = int(match.group(1))
+
+            # 对相同单位进行计数，创建唯一名称
+            count = unit_counter.get(unit, 0) + 1
+            unit_counter[unit] = count
+
+            # 如果是第一个该单位，使用标准名称
+            if count == 1:
+                var_name = f"duration_{unit}"
+            else:
+                # 如果是重复的单位，添加后缀
+                var_name = f"duration_{unit}_{count}"
+
             entities.append({
-                "name": f"duration_{match.group(2)}",
+                "name": var_name,
                 "original_text": match.group(0),
                 "start_index": match.start(),
                 "end_index": match.end(),
                 "type": "Integer",
-                "value": int(match.group(1))
+                "value": value
             })
         
         # 识别专业术语
@@ -713,45 +851,54 @@ def create_llm_client(
 ) -> UnifiedLLMClient:
     """
     创建 LLM 客户端的工厂函数
-    
+
     Args:
         use_mock: 是否使用模拟客户端
         config_name: 预定义配置名称，可选值: "default", "gpt-3.5", "gpt-4", "qwen3-32b"
         **kwargs: 传递给客户端的其他参数（可覆盖配置中的值）
-        
+            - enable_cache: 是否启用缓存（默认False）
+
     Returns:
         LLM 客户端实例
-        
+
     Examples:
         # 使用默认配置
         client = create_llm_client()
-        
+
         # 使用预定义的 Qwen3 配置
         client = create_llm_client(config_name="qwen3-32b")
-        
+
         # 使用配置但覆盖部分参数
         client = create_llm_client(config_name="qwen3-32b", temperature=0.5)
+
+        # 启用缓存
+        client = create_llm_client(enable_cache=True)
     """
     if use_mock:
         info("[LLM] 使用模拟客户端")
         return MockLLMClient(**kwargs)
-    
+
     # 如果指定了配置名称，则应用配置
     if config_name:
         if config_name not in MODEL_CONFIGS:
             available = ", ".join(MODEL_CONFIGS.keys())
             raise ValueError(f"未知的配置名称: {config_name}, 可用配置: {available}")
-        
+
         config = MODEL_CONFIGS[config_name]
         info(f"[LLM] 使用预定义配置: {config_name}")
         info(f"[LLM]  模型: {config['model']}")
         info(f"[LLM]  地址: {config['base_url']}")
-        
+        if kwargs.get('enable_cache', False):
+            info(f"[LLM]  缓存: 已启用")
+
         # 合并配置：预定义配置 + kwargs（kwargs优先级更高）
         merged_kwargs = {**config, **kwargs}
         return UnifiedLLMClient(**merged_kwargs)
     else:
-        info("[LLM] 使用真实客户端（自定义配置）")
+        if kwargs.get('enable_cache', False):
+            info("[LLM] 使用真实客户端（自定义配置，缓存已启用）")
+        else:
+            info("[LLM] 使用真实客户端（自定义配置）")
         return UnifiedLLMClient(**kwargs)
 
 

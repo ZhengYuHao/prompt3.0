@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Mermaid 测试</title>
+    <!-- 备选1: jsdelivr -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <script>
+        // 如果第一个 CDN 加载失败，尝试其他 CDN
+        if (typeof mermaid === 'undefined') {
+            document.write('<script src="https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js"><\/script>');
+        }
+    </script>
+</head>
+<body>
+    <h1>Mermaid 测试（多 CDN 备选）</h1>
+    <div class="mermaid">
+graph TD
+    %% 业务流程图（默认生成）
+
+    Start([用户输入])
+
+    Process1[处理输入数据]
+    Start --> Process1
+
+
+    End([返回结果])
+    Process1 --> End
+
+    %% 样式定义
+    style Start fill:#d4edda,stroke:#28a745,stroke-width:2px
+    style End fill:#d4edda,stroke:#28a745,stroke-width:2px
+    style Process1 fill:#e1f5ff,stroke:#007bff,stroke-width:2px
+    </div>
+    <hr>
+    <h2>原始代码</h2>
+    <pre style="background:#f0f0f0;padding:20px;border:1px solid #ccc;">
+graph TD
+    %% 业务流程图（默认生成）
+
+    Start([用户输入])
+
+    Process1[处理输入数据]
+    Start --> Process1
+
+
+    End([返回结果])
+    Process1 --> End
+
+    %% 样式定义
+    style Start fill:#d4edda,stroke:#28a745,stroke-width:2px
+    style End fill:#d4edda,stroke:#28a745,stroke-width:2px
+    style Process1 fill:#e1f5ff,stroke:#007bff,stroke-width:2px
+    </pre>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: false,
+                htmlLabels: true
+            },
+            logLevel: 'error'
+        });
+    </script>
+</body>
+</html>

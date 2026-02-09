@@ -23,6 +23,9 @@ from data_models import (
     Prompt10Result, create_prompt10_result, generate_id, get_timestamp
 )
 
+# 优化模块：规则引擎
+from utils.rule_based_normalizer import RuleBasedTextNormalizer, SyntacticAmbiguityDetector
+
 
 # ============================================================================
 # 核心预处理器
@@ -145,81 +148,100 @@ class PromptPreprocessor:
         return bool(found_ambiguities), found_ambiguities
     
     # ========================================================================
-    # 阶段 1.3: 语义重构 (LLM辅助)
+    # 阶段 1.3: 语义重构 (规则引擎优先)
     # ========================================================================
     
-    def _smooth_with_llm(self, text: str, step_name: str = "LLM语义重构") -> str:
+    def _smooth_with_llm(self, text: str, step_name: str = "规则引擎语义重构") -> str:
         """
-        【LLM操作】受限语义重构
-        
-        约束条件:
-          - Temperature = 0.1 (极低创造性)
-          - 禁止添加原文不存在的信息
-          - 仅做语法修正和口语转书面语
+        【规则操作】受限语义重构（替代LLM）
+
+        策略：
+          - 优先使用规则引擎
+          - 规则引擎失败时才回退到LLM
+          - 记录LLM回退情况
         """
         start_time = time.time()
-        
-        # 使用统一的 LLM 客户端
-        result = self.llm.standardize_text(text)
-        self.llm_calls_count += 1
-        
+
+        # 步骤1：尝试规则引擎
+        normalized_text, changes = RuleBasedTextNormalizer.normalize(text)
+
+        # 步骤2：如果规则引擎没有变化，且启用LLM，则回退到LLM
+        if not changes and hasattr(self, 'llm'):
+            debug(f"[规则引擎] 未能识别标准化模式，回退到LLM")
+            result = self.llm.standardize_text(text)
+            self.llm_calls_count += 1
+            changes_desc = "LLM标准化"
+        else:
+            result = normalized_text
+            changes_desc = f"规则引擎: {len(changes)}处变更"
+
         duration_ms = int((time.time() - start_time) * 1000)
-        
+
         # 记录步骤快照
         self._add_step_snapshot(
             step_name=step_name,
             input_text=text,
             output_text=result,
-            changes={"标准化": f"{len(text)}字 → {len(result)}字"},
-            duration_ms=duration_ms
+            changes={"标准化": changes_desc},
+            duration_ms=duration_ms,
+            notes=[f"变更: {change}" for change in changes] if changes else []
         )
-        
-        self.processing_log.append(f"[OK] {step_name}完成 (耗时 {duration_ms}ms)")
-        
+
+        self.processing_log.append(f"[OK] {step_name}完成 (耗时 {duration_ms}ms, 变更{len(changes)}处)")
+
         return result
     
     # ========================================================================
-    # 阶段 1.4: 深层歧义检测 (LLM辅助)
+    # 阶段 1.4: 深层歧义检测 (规则引擎优先)
     # ========================================================================
-    
+
     def _detect_structural_ambiguity(self, text: str) -> Optional[str]:
         """
-        【LLM操作】结构性歧义审计
-        
+        【规则操作】结构性歧义审计（替代LLM）
+
         检测代码无法识别的句法歧义
         经典案例: "咬死了猎人的狗" - 是狗死了还是猎人死了?
-        
+
         返回: 如果存在歧义则返回描述,否则返回None
         """
         start_time = time.time()
-        
-        # 使用统一的 LLM 客户端
-        ambiguity = self.llm.detect_ambiguity(text)
-        self.llm_calls_count += 1
-        
+
+        # 步骤1：尝试规则引擎
+        ambiguity = SyntacticAmbiguityDetector.detect(text)
+
+        # 步骤2：如果规则引擎未检测到歧义，且启用深度检查和LLM，则回退到LLM
+        if not ambiguity and self.enable_deep_check and hasattr(self, 'llm'):
+            debug(f"[规则引擎] 未能识别歧义模式，回退到LLM深度检查")
+            ambiguity = self.llm.detect_ambiguity(text)
+            self.llm_calls_count += 1
+            detection_method = "LLM深度检查"
+        else:
+            detection_method = "规则引擎"
+
         duration_ms = int((time.time() - start_time) * 1000)
-        
-        if ambiguity is None:
-            self.processing_log.append(f"[OK] 结构歧义检查: 通过 (耗时 {duration_ms}ms)")
+
+        if ambiguity:
+            self.warnings.append(f"[WARN] 检测到句法歧义 ({detection_method}): {ambiguity}")
+            self._add_step_snapshot(
+                step_name="结构歧义检测",
+                input_text=text,
+                output_text=text,
+                changes={"检测结果": f"歧义: {ambiguity}"},
+                duration_ms=duration_ms,
+                notes=[f"检测方法: {detection_method}", f"歧义详情: {ambiguity}"]
+            )
+        else:
+            self.processing_log.append(f"[OK] 结构歧义检查: 通过 (耗时 {duration_ms}ms, 方法:{detection_method})")
             self._add_step_snapshot(
                 step_name="结构歧义检测",
                 input_text=text,
                 output_text=text,
                 changes={"检测结果": "通过"},
-                duration_ms=duration_ms
+                duration_ms=duration_ms,
+                notes=[f"检测方法: {detection_method}"]
             )
-            return None
-        
-        self.warnings.append(f"[WARN] 检测到句法歧义: {ambiguity}")
-        self._add_step_snapshot(
-            step_name="结构歧义检测",
-            input_text=text,
-            output_text=text,
-            changes={"检测结果": f"歧义: {ambiguity}"},
-            duration_ms=duration_ms,
-            notes=[f"歧义详情: {ambiguity}"]
-        )
-        return ambiguity
+
+        return ambiguity if ambiguity else None
     
     # ========================================================================
     # 智能模式: 纯LLM端到端处理
@@ -470,7 +492,16 @@ class PromptPreprocessor:
         return result
     
     def _save_processing_history_v2(self, result: Prompt10Result):
-        """保存处理历史（使用新数据结构）"""
+        """保存处理历史（使用新数据结构，包含优化统计）"""
+        # 收集优化统计信息
+        rule_stats = {
+            "llm_calls": result.llm_calls_count,
+            "normalization_changes": len(result.terminology_changes) if result.terminology_changes else 0,
+            "ambiguity_detected": result.ambiguity_detected,
+            "processing_mode": result.mode,
+            "has_llm_fallback": result.llm_calls_count > 0
+        }
+
         history = ProcessingHistory(
             timestamp=result.timestamp,
             original_text=result.original_text,
@@ -481,9 +512,10 @@ class PromptPreprocessor:
             terminology_changes=result.terminology_changes,
             ambiguity_detected=result.ambiguity_detected,
             success=result.is_success(),
-            processing_time_ms=result.processing_time_ms
+            processing_time_ms=result.processing_time_ms,
+            rule_engine_stats=rule_stats  # 新增：优化统计
         )
-        
+
         try:
             self.history_manager.save_history(history)
         except Exception as e:
